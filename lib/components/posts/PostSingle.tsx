@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { SanityImage } from '@/lib/components/ui/SanityImage'
 import { PortableText } from '@/lib/components/ui/PortableText'
+import { cleanStegaString } from '@/lib/utils/stegaClean'
 
 type Post = {
   _id: string
@@ -31,8 +32,9 @@ type PostSingleProps = {
 }
 
 // Helper function to get text color class
-function getTextColorClass(color?: 'primary' | 'secondary', defaultColor: 'primary' | 'secondary' = 'primary') {
-  return (color ?? defaultColor) === 'secondary' ? 'text-text-secondary' : 'text-text-primary'
+function getTextColorClass(color?: string, defaultColor: 'primary' | 'secondary' = 'primary') {
+  const cleanColor = cleanStegaString(color) ?? defaultColor
+  return cleanColor === 'secondary' ? 'text-text-secondary' : 'text-text-primary'
 }
 
 export function PostSingle({ post }: PostSingleProps) {

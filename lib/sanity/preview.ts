@@ -12,6 +12,19 @@ export function getPreviewClient(site?: string): SanityClient | null {
     console.warn('[Sanity] Missing NEXT_PUBLIC_SANITY_PROJECT_ID')
     return null
   }
+
+  const token = process.env.SANITY_API_TOKEN
+  
+  // If no token, fall back to published content only
+  if (!token) {
+    console.warn('[Sanity] No SANITY_API_TOKEN - preview will show published content only')
+    return createClient({
+      projectId,
+      dataset,
+      apiVersion: '2024-01-01',
+      useCdn: false
+    })
+  }
   
   return createClient({
     projectId,
@@ -19,6 +32,11 @@ export function getPreviewClient(site?: string): SanityClient | null {
     apiVersion: '2024-01-01',
     useCdn: false,
     perspective: 'previewDrafts',
-    token: process.env.SANITY_API_TOKEN
+    token,
+    // Enable stega encoding for visual editing
+    stega: {
+      enabled: true,
+      studioUrl: `/studio/${dataset}`
+    }
   })
 }

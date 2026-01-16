@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react'
 import { SanityImage } from '@/lib/components/ui/SanityImage'
 import { CtaButtons } from './BlockWrapper'
 import { BlockContainer } from './BlockContainer'
+import { cleanStegaString } from '@/lib/utils/stegaClean'
 
 type GalleryBlockProps = {
   data: {
@@ -87,7 +88,8 @@ function AnimatedGalleryItem({
 }
 
 export function GalleryBlock({ data }: GalleryBlockProps) {
-  const layout = data.layout ?? 'grid'
+  // Clean stega encoding from config values
+  const layout = cleanStegaString(data.layout) ?? 'grid'
   const columns = data.columns ?? 3
   const [currentSlide, setCurrentSlide] = useState(0)
   const [touchStart, setTouchStart] = useState<number | null>(null)

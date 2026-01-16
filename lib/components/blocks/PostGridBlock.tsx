@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from 'react'
 import Link from 'next/link'
 import { SanityImage } from '@/lib/components/ui/SanityImage'
 import { BlockContainer } from './BlockContainer'
+import { cleanStegaString } from '@/lib/utils/stegaClean'
 
 type Post = {
   _id: string
@@ -47,8 +48,9 @@ type PostGridBlockProps = {
   }
 }
 
-function getTextColorClass(color?: 'primary' | 'secondary', defaultColor: 'primary' | 'secondary' = 'primary') {
-  return (color ?? defaultColor) === 'secondary' ? 'text-text-secondary' : 'text-text-primary'
+function getTextColorClass(color?: string, defaultColor: 'primary' | 'secondary' = 'primary') {
+  const cleanColor = cleanStegaString(color) ?? defaultColor
+  return cleanColor === 'secondary' ? 'text-text-secondary' : 'text-text-primary'
 }
 
 export function PostGridBlock({ data }: PostGridBlockProps) {
@@ -56,7 +58,8 @@ export function PostGridBlock({ data }: PostGridBlockProps) {
   // Apply limit on client side since GROQ doesn't support dynamic limits
   const limit = data.limit ?? 6
   const posts = limit > 0 ? allPosts.slice(0, limit) : allPosts
-  const layout = data.layout ?? 'grid'
+  // Clean stega encoding from config values
+  const layout = cleanStegaString(data.layout) ?? 'grid'
   const columns = data.columns ?? 3
   const showImage = data.showImage ?? true
   const showExcerpt = data.showExcerpt ?? true

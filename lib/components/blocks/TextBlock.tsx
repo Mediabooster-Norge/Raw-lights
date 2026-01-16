@@ -1,6 +1,7 @@
 import { PortableText } from '@/lib/components/ui/PortableText'
 import { CtaButtons } from './BlockWrapper'
 import { BlockContainer } from './BlockContainer'
+import { cleanStegaString } from '@/lib/utils/stegaClean'
 
 type TextBlockProps = {
   data: {
@@ -20,20 +21,23 @@ type TextBlockProps = {
 }
 
 export function TextBlock({ data }: TextBlockProps) {
-  const alignment = data.alignment ?? 'left'
+  // Clean stega encoding from config values
+  const alignment = cleanStegaString(data.alignment) ?? 'left'
+  const textWidth = cleanStegaString(data.textWidth) ?? 'medium'
+  const textColor = cleanStegaString(data.textColor) ?? 'primary'
   
-  const textWidthClasses = {
+  const textWidthClasses: Record<string, string> = {
     narrow: 'max-w-2xl',
     medium: 'max-w-4xl',
     wide: 'max-w-6xl'
   }
 
-  const textColorClasses = {
+  const textColorClasses: Record<string, string> = {
     primary: 'text-text-primary',
     secondary: 'text-text-secondary'
   }
 
-  const alignmentClasses = {
+  const alignmentClasses: Record<string, string> = {
     left: 'text-left',
     center: 'text-center',
     right: 'text-right'
@@ -45,7 +49,7 @@ export function TextBlock({ data }: TextBlockProps) {
       spacing={data.spacing}
       containerWidth={data.containerWidth}
     >
-      <div className={`${textWidthClasses[data.textWidth ?? 'medium']} ${textColorClasses[data.textColor ?? 'primary']} ${alignmentClasses[alignment]} mx-auto`}>
+      <div className={`${textWidthClasses[textWidth] ?? textWidthClasses.medium} ${textColorClasses[textColor] ?? textColorClasses.primary} ${alignmentClasses[alignment] ?? alignmentClasses.left} mx-auto`}>
         <PortableText value={data.content} className="prose prose-lg prose-inherit" />
         <CtaButtons 
           primaryCta={data.primaryCta}

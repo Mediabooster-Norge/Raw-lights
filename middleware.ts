@@ -26,8 +26,22 @@ export function middleware(request: NextRequest) {
     return NextResponse.next()
   }
 
-  // Determine site from domain
-  const site = domainToSite[hostname] ?? 'landstreff'
+  // Check for preview-site cookie (set by Sanity Studio preview)
+  const previewSite = request.cookies.get('preview-site')?.value
+  
+  // Determine site from: 1) preview cookie, 2) subdomain, 3) domain mapping
+  let site: string
+  
+  if (previewSite) {
+    // Use preview site cookie if set (for Sanity Studio preview)
+    site = previewSite
+  } else if (hostname.includes('.localhost')) {
+    // Handle subdomain in local dev (e.g., landstreff.localhost)
+    site = hostname.split('.')[0]
+  } else {
+    // Use domain mapping or default
+    site = domainToSite[hostname] ?? 'landstreff'
+  }
 
   // Rewrite to site-specific route
   const url = request.nextUrl.clone()

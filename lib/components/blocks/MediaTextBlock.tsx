@@ -5,6 +5,7 @@ import { SanityImage } from '@/lib/components/ui/SanityImage'
 import { PortableText } from '@/lib/components/ui/PortableText'
 import { CtaButtons } from './BlockWrapper'
 import { BlockContainer } from './BlockContainer'
+import { cleanStegaString } from '@/lib/utils/stegaClean'
 
 type MediaTextBlockProps = {
   data: {
@@ -97,18 +98,22 @@ function AnimatedSection({
 }
 
 export function MediaTextBlock({ data }: MediaTextBlockProps) {
-  const layout = data.layout ?? 'text-left'
-  const mediaType = data.mediaType ?? 'image'
-  const verticalAlign = data.verticalAlign ?? 'center'
+  // Clean stega encoding from config values
+  const layout = cleanStegaString(data.layout) ?? 'text-left'
+  const mediaType = cleanStegaString(data.mediaType) ?? 'image'
+  const verticalAlign = cleanStegaString(data.verticalAlign) ?? 'center'
+  const headingColor = cleanStegaString(data.headingColor)
+  const subheadingColor = cleanStegaString(data.subheadingColor)
+  const contentColor = cleanStegaString(data.contentColor)
   const autoplay = data.videoAutoplay ?? true
   const loop = data.videoLoop ?? true
   
   // Individuelle fargevalg per tekstfelt
-  const headingColorClass = data.headingColor === 'secondary' ? 'text-text-secondary' : 'text-text-primary'
-  const subheadingColorClass = data.subheadingColor === 'secondary' ? 'text-text-secondary' : 'text-primary'
-  const contentColorClass = data.contentColor === 'primary' ? 'text-text-primary' : 'text-text-secondary'
+  const headingColorClass = headingColor === 'secondary' ? 'text-text-secondary' : 'text-text-primary'
+  const subheadingColorClass = subheadingColor === 'secondary' ? 'text-text-secondary' : 'text-primary'
+  const contentColorClass = contentColor === 'primary' ? 'text-text-primary' : 'text-text-secondary'
 
-  const verticalAlignClasses = {
+  const verticalAlignClasses: Record<string, string> = {
     start: 'items-start',
     center: 'items-center',
     end: 'items-end'

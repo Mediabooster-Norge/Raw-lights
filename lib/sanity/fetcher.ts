@@ -21,30 +21,35 @@ import {
 
 export async function getPage(slug: string, site: string) {
   const { isEnabled: isPreview } = await draftMode()
-  const client = isPreview ? getPreviewClient(site) : getClient(site)
+  
+  // Try preview client first, fall back to regular client if it fails
+  let client = isPreview ? getPreviewClient(site) : getClient(site)
+  let usePreviewQuery = isPreview
   
   if (!client) {
     console.log('[getPage] No client available')
     return null
   }
   
-  // DEBUG: Hent alle sider for å se hva som finnes
-  const allPages = await client.fetch(`*[_type == "page"]{ title, "slug": slug.current, visibility }`)
-  console.log('[getPage] All pages in database:', JSON.stringify(allPages, null, 2))
+  const query = usePreviewQuery ? pagePreviewQuery : pageQuery
   
-  const query = isPreview ? pagePreviewQuery : pageQuery
-  
-  console.log('[getPage] Looking for slug:', slug)
-  
-  const result = await client.fetch(
-    query,
-    { slug },
-    isPreview ? {} : { next: { tags: ['pages', `page-${slug}`] } }
-  )
-  
-  console.log('[getPage] Result:', result ? 'Found' : 'Not found')
-  
-  return result
+  try {
+    const result = await client.fetch(
+      query,
+      { slug },
+      usePreviewQuery ? {} : { next: { tags: ['pages', `page-${slug}`] } }
+    )
+    return result
+  } catch (error: any) {
+    // If preview fails due to auth, fall back to published content
+    if (error?.message?.includes('Unauthorized') || error?.message?.includes('Session')) {
+      console.warn('[getPage] Preview auth failed, falling back to published content')
+      client = getClient(site)
+      if (!client) return null
+      return client.fetch(pageQuery, { slug }, { next: { tags: ['pages', `page-${slug}`] } })
+    }
+    throw error
+  }
 }
 
 export async function getPageSlugs(site: string) {
@@ -77,19 +82,41 @@ export async function getGlobalSettings(site: string) {
 // Post Types
 
 export async function getAllPostTypes(site: string) {
-  const client = getClient(site)
+  const { isEnabled: isPreview } = await draftMode()
+  const client = isPreview ? getPreviewClient(site) : getClient(site)
   if (!client) return []
-  return client.fetch(allPostTypesQuery, {}, {
-    next: { tags: ['post-types'] }
-  })
+  
+  try {
+    return await client.fetch(allPostTypesQuery, {}, 
+      isPreview ? {} : { next: { tags: ['post-types'] } }
+    )
+  } catch (error: any) {
+    if (error?.message?.includes('Unauthorized') || error?.message?.includes('Session')) {
+      const fallbackClient = getClient(site)
+      if (!fallbackClient) return []
+      return fallbackClient.fetch(allPostTypesQuery, {}, { next: { tags: ['post-types'] } })
+    }
+    throw error
+  }
 }
 
 export async function getPostTypeBySlug(slug: string, site: string) {
-  const client = getClient(site)
+  const { isEnabled: isPreview } = await draftMode()
+  const client = isPreview ? getPreviewClient(site) : getClient(site)
   if (!client) return null
-  return client.fetch(postTypeBySlugQuery, { slug }, {
-    next: { tags: ['post-types', `post-type-${slug}`] }
-  })
+  
+  try {
+    return await client.fetch(postTypeBySlugQuery, { slug }, 
+      isPreview ? {} : { next: { tags: ['post-types', `post-type-${slug}`] } }
+    )
+  } catch (error: any) {
+    if (error?.message?.includes('Unauthorized') || error?.message?.includes('Session')) {
+      const fallbackClient = getClient(site)
+      if (!fallbackClient) return null
+      return fallbackClient.fetch(postTypeBySlugQuery, { slug }, { next: { tags: ['post-types', `post-type-${slug}`] } })
+    }
+    throw error
+  }
 }
 
 export async function getPostTypeSlugs(site: string): Promise<string[]> {
@@ -103,20 +130,43 @@ export async function getPostTypeSlugs(site: string): Promise<string[]> {
 // Posts
 
 export async function getPostsByType(postTypeSlug: string, site: string) {
-  const client = getClient(site)
+  const { isEnabled: isPreview } = await draftMode()
+  const client = isPreview ? getPreviewClient(site) : getClient(site)
   if (!client) return []
-  return client.fetch(postsByTypeQuery, { postTypeSlug }, {
-    next: { tags: ['posts', `posts-${postTypeSlug}`] }
-  })
+  
+  try {
+    return await client.fetch(postsByTypeQuery, { postTypeSlug }, 
+      isPreview ? {} : { next: { tags: ['posts', `posts-${postTypeSlug}`] } }
+    )
+  } catch (error: any) {
+    if (error?.message?.includes('Unauthorized') || error?.message?.includes('Session')) {
+      const fallbackClient = getClient(site)
+      if (!fallbackClient) return []
+      return fallbackClient.fetch(postsByTypeQuery, { postTypeSlug }, { next: { tags: ['posts', `posts-${postTypeSlug}`] } })
+    }
+    throw error
+  }
 }
 
 export async function getSinglePost(postTypeSlug: string, postSlug: string, site: string) {
   const { isEnabled: isPreview } = await draftMode()
-  const client = isPreview ? getPreviewClient(site) : getClient(site)
+  let client = isPreview ? getPreviewClient(site) : getClient(site)
   if (!client) return null
-  return client.fetch(singlePostQuery, { postTypeSlug, postSlug }, 
-    isPreview ? {} : { next: { tags: ['posts', `post-${postSlug}`] } }
-  )
+  
+  try {
+    return await client.fetch(singlePostQuery, { postTypeSlug, postSlug }, 
+      isPreview ? {} : { next: { tags: ['posts', `post-${postSlug}`] } }
+    )
+  } catch (error: any) {
+    // If preview fails due to auth, fall back to published content
+    if (error?.message?.includes('Unauthorized') || error?.message?.includes('Session')) {
+      console.warn('[getSinglePost] Preview auth failed, falling back to published content')
+      client = getClient(site)
+      if (!client) return null
+      return client.fetch(singlePostQuery, { postTypeSlug, postSlug }, { next: { tags: ['posts', `post-${postSlug}`] } })
+    }
+    throw error
+  }
 }
 
 export async function getPostSlugsByType(postTypeSlug: string, site: string): Promise<string[]> {

@@ -1,6 +1,8 @@
 import { ReactNode } from 'react'
 import { Metadata } from 'next'
 import { Inter } from 'next/font/google'
+import { draftMode } from 'next/headers'
+import { VisualEditing } from 'next-sanity'
 import { getNavigation, getGlobalSettings } from '@/lib/sanity/fetcher'
 import { mergeTheme } from '@/lib/theme/mergeTheme'
 import { Header } from '@/lib/components/layout/Header'
@@ -40,6 +42,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function SiteLayout({ children, params }: Props) {
   const { site } = await params
+  const draft = await draftMode()
+  const isDraftMode = draft.isEnabled
+  
   const [navigation, settings] = await Promise.all([
     getNavigation(site),
     getGlobalSettings(site)
@@ -118,6 +123,7 @@ export default async function SiteLayout({ children, params }: Props) {
             {settings.customCode.footerScripts}
           </Script>
         )}
+        {isDraftMode && <VisualEditing />}
       </body>
     </html>
   )

@@ -1,24 +1,53 @@
 import { defineConfig } from 'sanity'
 import { structureTool } from 'sanity/structure'
+import { presentationTool } from 'sanity/presentation'
 import { visionTool } from '@sanity/vision'
 import { colorInput } from '@sanity/color-input'
 import { media } from 'sanity-plugin-media'
 import { schemaTypes } from './schemas'
+import { resolve } from './lib/sanity/presentation'
 
 const PROJECT_ID = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID ?? ''
 
+// Site configs - maps dataset to preview URL
+// In development, we use localhost with site parameter since subdomains don't work
+const siteConfigs: Record<string, { previewUrl: string; title: string; site: string }> = {
+  landstreff: {
+    previewUrl: process.env.NEXT_PUBLIC_VERCEL_URL 
+      ? `https://landstreff.${process.env.NEXT_PUBLIC_VERCEL_URL}`
+      : 'http://localhost:3000',
+    site: 'landstreff',
+    title: 'Landstreff Stavanger'
+  },
+  production: {
+    previewUrl: process.env.NEXT_PUBLIC_VERCEL_URL
+      ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}`
+      : 'http://localhost:3000',
+    site: 'production',
+    title: 'Delt (Ypsilon/Juli Vinterland)'
+  },
+  // Uncomment når datasett er opprettet:
+  // ypsilon: {
+  //   previewUrl: process.env.NEXT_PUBLIC_VERCEL_URL
+  //     ? `https://ypsilon.${process.env.NEXT_PUBLIC_VERCEL_URL}`
+  //     : 'http://localhost:3000',
+  //   site: 'ypsilon',
+  //   title: 'Ypsilon Festivalen'
+  // },
+}
+
 // Aktive datasett - legg til flere når de er opprettet i Sanity
-const datasets = [
-  { name: 'landstreff', title: 'Landstreff Stavanger' },
-  { name: 'production', title: 'Delt (Ypsilon/Juli Vinterland)' }, // Midlertidig - fjern når separate datasett er opprettet
-  // { name: 'ypsilon', title: 'Ypsilon Festivalen' },            // Uncomment når datasett er opprettet
-  // { name: 'julivinterland', title: 'Juli Vinterland' }         // Uncomment når datasett er opprettet
-]
+const datasets = Object.entries(siteConfigs).map(([name, config]) => ({
+  name,
+  title: config.title,
+  previewUrl: config.previewUrl,
+  site: config.site
+}))
 
 const singletons = ['navigation', 'globalSettings']
 
 export default defineConfig(
-  datasets.map(({ name, title }) => ({
+  datasets.map(({ name, title, previewUrl, site }) => ({
     name,
     title,
     projectId: PROJECT_ID,
@@ -86,6 +115,10 @@ export default defineConfig(
               ...otherDocumentItems
             ])
         }
+      }),
+      presentationTool({
+        previewUrl: `${previewUrl}/api/draft?site=${site}&redirect=/`,
+        resolve
       }),
       visionTool(),
       colorInput(),

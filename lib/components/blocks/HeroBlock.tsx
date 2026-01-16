@@ -2,6 +2,7 @@
 
 import { SanityImage } from '@/lib/components/ui/SanityImage'
 import { CtaButtons } from './BlockWrapper'
+import { cleanStegaString } from '@/lib/utils/stegaClean'
 
 type HeroBlockProps = {
   data: {
@@ -27,10 +28,12 @@ type HeroBlockProps = {
 }
 
 export function HeroBlock({ data }: HeroBlockProps) {
-  const alignment = data.alignment ?? 'center'
-  const isVideo = data.backgroundType === 'video'
+  // Clean stega encoding from config values used for styling
+  const alignment = cleanStegaString(data.alignment) ?? 'center'
+  const backgroundType = cleanStegaString(data.backgroundType)
+  const isVideo = backgroundType === 'video'
   const animateText = data.animateText ?? false
-  const containerWidth = data.containerWidth ?? 'container'
+  const containerWidth = cleanStegaString(data.containerWidth) ?? 'container'
   
   const alignmentClasses = {
     left: 'text-left items-start',

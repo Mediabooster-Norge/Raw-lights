@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { SanityImage } from '@/lib/components/ui/SanityImage'
+import { cleanStegaString } from '@/lib/utils/stegaClean'
 
 type Post = {
   _id: string
@@ -41,12 +42,14 @@ type PostArchiveProps = {
 }
 
 // Helper function to get text color class
-function getTextColorClass(color?: 'primary' | 'secondary', defaultColor: 'primary' | 'secondary' = 'primary') {
-  return (color ?? defaultColor) === 'secondary' ? 'text-text-secondary' : 'text-text-primary'
+function getTextColorClass(color?: string, defaultColor: 'primary' | 'secondary' = 'primary') {
+  const cleanColor = cleanStegaString(color) ?? defaultColor
+  return cleanColor === 'secondary' ? 'text-text-secondary' : 'text-text-primary'
 }
 
 export function PostArchive({ postType, posts }: PostArchiveProps) {
-  const layout = postType.archiveLayout ?? 'grid'
+  // Clean stega encoding from config values
+  const layout = cleanStegaString(postType.archiveLayout) ?? 'grid'
   const columns = postType.archiveColumns ?? 3
   const showExcerpt = postType.showExcerpt ?? true
   const showImage = postType.showImage ?? true

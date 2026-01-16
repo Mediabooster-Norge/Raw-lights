@@ -1,5 +1,6 @@
 import { CtaButtons } from './BlockWrapper'
 import { BlockContainer } from './BlockContainer'
+import { cleanStegaString } from '@/lib/utils/stegaClean'
 
 type CtaBlockProps = {
   data: {
@@ -19,8 +20,12 @@ type CtaBlockProps = {
 }
 
 export function CtaBlock({ data }: CtaBlockProps) {
-  const headingColorClass = data.headingColor === 'secondary' ? 'text-text-secondary' : 'text-text-primary'
-  const textColorClass = data.textColor === 'primary' ? 'text-text-primary' : 'text-text-secondary'
+  // Clean stega encoding from config values
+  const headingColor = cleanStegaString(data.headingColor)
+  const textColor = cleanStegaString(data.textColor)
+  
+  const headingColorClass = headingColor === 'secondary' ? 'text-text-secondary' : 'text-text-primary'
+  const textColorClass = textColor === 'primary' ? 'text-text-primary' : 'text-text-secondary'
   
   return (
     <BlockContainer

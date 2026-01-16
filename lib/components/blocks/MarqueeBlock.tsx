@@ -3,6 +3,7 @@
 import { useRef, useEffect, useState } from 'react'
 import { SanityImage } from '@/lib/components/ui/SanityImage'
 import { BlockContainer } from './BlockContainer'
+import { cleanStegaString } from '@/lib/utils/stegaClean'
 
 type MarqueeBlockProps = {
   data: {
@@ -29,22 +30,24 @@ export function MarqueeBlock({ data }: MarqueeBlockProps) {
   const [animationDuration, setAnimationDuration] = useState('20s')
   const [isReady, setIsReady] = useState(false)
   
-  const isImages = data.contentType === 'images'
+  // Clean stega encoding from config values
+  const contentType = cleanStegaString(data.contentType)
+  const isImages = contentType === 'images'
   const items = isImages ? data.imageItems : data.textItems
   
   // Hastighet i piksler per sekund
-  const speedValues = {
+  const speedValues: Record<string, number> = {
     slow: 100,
     normal: 250,
     fast: 600
   }
 
-  const size = data.size ?? 'medium'
-  const speed = data.speed ?? 'normal'
-  const direction = data.direction ?? 'left'
-  const separator = data.separator || '•'
-  const textColor = data.textColor ?? 'text-primary'
-  const imageStyle = data.imageStyle ?? 'normal'
+  const size = cleanStegaString(data.size) ?? 'medium'
+  const speed = cleanStegaString(data.speed) ?? 'normal'
+  const direction = cleanStegaString(data.direction) ?? 'left'
+  const separator = cleanStegaString(data.separator) || '•'
+  const textColor = cleanStegaString(data.textColor) ?? 'text-primary'
+  const imageStyle = cleanStegaString(data.imageStyle) ?? 'normal'
 
   // Flere duplikater for mindre innhold for å sikre seamless loop
   const duplicateCount = size === 'small' ? 15 : 10
