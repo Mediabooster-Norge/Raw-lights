@@ -1,0 +1,76 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* 
+ * CSS-variabler settes dynamisk fra Sanity via layout.tsx
+ * Ingen hardkodede fargeverdier her - alt kommer fra globalSettings
+ */
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-background text-text-primary font-body;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-heading;
+  }
+
+  /* All interactive elements should have pointer cursor */
+  a, button, [role="button"], input[type="submit"], input[type="button"] {
+    @apply cursor-pointer;
+  }
+
+  /* Focus visible styles for accessibility */
+  *:focus-visible {
+    @apply outline-2 outline-offset-2 outline-primary;
+  }
+
+  /* Remove focus outline for mouse users */
+  *:focus:not(:focus-visible) {
+    @apply outline-none;
+  }
+}
+
+@layer components {
+  .container {
+    @apply max-w-7xl mx-auto px-4;
+  }
+
+  /* Marquee hover pause */
+  .marquee-container:hover .marquee-content {
+    animation-play-state: paused !important;
+  }
+
+  .prose {
+    @apply max-w-none;
+  }
+
+  .prose h2 {
+    @apply text-3xl font-bold mt-8 mb-4;
+  }
+
+  .prose h3 {
+    @apply text-2xl font-semibold mt-6 mb-3;
+  }
+
+  .prose p {
+    @apply mb-4;
+  }
+
+  .prose ul {
+    @apply list-disc pl-6 mb-4;
+  }
+
+  .prose ol {
+    @apply list-decimal pl-6 mb-4;
+  }
+
+  .prose a {
+    @apply text-primary underline hover:no-underline;
+  }
+}
