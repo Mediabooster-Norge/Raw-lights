@@ -1,5 +1,9 @@
 import { groq } from 'next-sanity'
 
+// Site filter - betinget basert på om siteId er gitt
+// Hvis siteId er null (single-site modus), hent første navigation dokument
+const SITE_FILTER = `(!defined($siteId) || site->siteId.current == $siteId)`
+
 export const linkFields = groq`
   _type,
   type,
@@ -15,7 +19,7 @@ export const linkFields = groq`
 `
 
 export const navigationQuery = groq`
-  *[_type == "navigation"][0] {
+  *[_type == "navigation" && ${SITE_FILTER}][0] {
     mainNav[] {
       label,
       link { ${linkFields} },

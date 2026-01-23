@@ -1,10 +1,12 @@
 import { defineType, defineField } from 'sanity'
+import { getSiteField, getSitePreviewSelect, formatSubtitleWithSite } from '../helpers/siteField'
 
 export default defineType({
   name: 'redirect',
   title: 'Redirect',
   type: 'document',
   fields: [
+    ...getSiteField(),
     defineField({
       name: 'source',
       title: 'Fra (kilde)',
@@ -31,12 +33,14 @@ export default defineType({
     select: {
       source: 'source',
       destination: 'destination',
-      permanent: 'permanent'
+      permanent: 'permanent',
+      ...getSitePreviewSelect()
     },
-    prepare({ source, destination, permanent }) {
+    prepare({ source, destination, permanent, siteTitle }) {
+      const subtitle = permanent ? '301 (permanent)' : '302 (midlertidig)'
       return {
         title: `${source} → ${destination}`,
-        subtitle: permanent ? '301 (permanent)' : '302 (midlertidig)'
+        subtitle: formatSubtitleWithSite(subtitle, siteTitle)
       }
     }
   }

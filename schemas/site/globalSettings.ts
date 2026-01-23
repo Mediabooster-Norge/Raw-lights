@@ -1,10 +1,12 @@
 import { defineType, defineField } from 'sanity'
+import { getSiteField } from '../helpers/siteField'
 
 export default defineType({
   name: 'globalSettings',
   title: 'Globale innstillinger',
   type: 'document',
   fields: [
+    ...getSiteField(),
     defineField({
       name: 'siteTheme',
       title: 'Tema',

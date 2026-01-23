@@ -36,7 +36,7 @@ export function getPreviewClient(site?: string): SanityClient | null {
     // Enable stega encoding for visual editing
     stega: {
       enabled: true,
-      studioUrl: `/studio/${dataset}`
+      studioUrl: '/studio'
     }
   })
 }

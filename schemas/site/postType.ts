@@ -1,4 +1,5 @@
 import { defineType, defineField } from 'sanity'
+import { getSiteField, getSitePreviewSelect, formatSubtitleWithSite } from '../helpers/siteField'
 
 export default defineType({
   name: 'postType',
@@ -11,6 +12,7 @@ export default defineType({
     { name: 'single', title: 'Enkeltvisning' }
   ],
   fields: [
+    ...getSiteField({ group: 'general' }),
     // General fields
     defineField({
       name: 'title',
@@ -261,12 +263,14 @@ export default defineType({
     select: {
       title: 'title',
       singular: 'singularTitle',
-      slug: 'slug.current'
+      slug: 'slug.current',
+      ...getSitePreviewSelect()
     },
-    prepare({ title, singular, slug }) {
+    prepare({ title, singular, slug, siteTitle }) {
+      const subtitle = `/${slug} • Entall: ${singular}`
       return {
         title: title ?? 'Ny posttype',
-        subtitle: `/${slug} • Entall: ${singular}`
+        subtitle: formatSubtitleWithSite(subtitle, siteTitle)
       }
     }
   }

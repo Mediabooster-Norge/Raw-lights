@@ -8,124 +8,268 @@ import { schemaTypes } from './schemas'
 import { resolve } from './lib/sanity/presentation'
 
 const PROJECT_ID = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID ?? ''
+const DATASET = process.env.NEXT_PUBLIC_SANITY_DATASET || 'production'
+const IS_MULTISITE = process.env.NEXT_PUBLIC_MULTISITE_ENABLED === 'true'
 
-// Site configs - maps dataset to preview URL
-// In development, we use localhost with site parameter since subdomains don't work
-const siteConfigs: Record<string, { previewUrl: string; title: string; site: string }> = {
-  landstreff: {
-    previewUrl: process.env.NEXT_PUBLIC_VERCEL_URL 
-      ? `https://landstreff.${process.env.NEXT_PUBLIC_VERCEL_URL}`
-      : 'http://localhost:3000',
-    site: 'landstreff',
-    title: 'Landstreff Stavanger'
-  },
-  production: {
-    previewUrl: process.env.NEXT_PUBLIC_VERCEL_URL
-      ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}`
-      : 'http://localhost:3000',
-    site: 'production',
-    title: 'Delt (Ypsilon/Juli Vinterland)'
-  },
-  // Uncomment når datasett er opprettet:
-  // ypsilon: {
-  //   previewUrl: process.env.NEXT_PUBLIC_VERCEL_URL
-  //     ? `https://ypsilon.${process.env.NEXT_PUBLIC_VERCEL_URL}`
-  //     : 'http://localhost:3000',
-  //   site: 'ypsilon',
-  //   title: 'Ypsilon Festivalen'
-  // },
+// Preview URL for Sanity Studio presentation
+const PREVIEW_URL = process.env.NEXT_PUBLIC_VERCEL_URL 
+  ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}`
+  : 'http://localhost:3000'
+
+// Singletons som ikke skal vises i dokumentlisten
+const singletonTypes = IS_MULTISITE ? [] : ['navigation', 'globalSettings']
+
+/**
+ * Single-site Studio Structure
+ * Enkel struktur uten site-gruppering
+ */
+function getSingleSiteStructure(S: any) {
+  // Innlegg gruppert etter posttype
+  const postsListItem = S.listItem()
+    .title('Innlegg')
+    .id('posts')
+    .icon(() => '📄')
+    .child(
+      S.documentTypeList('postType')
+        .title('Velg posttype')
+        .child((postTypeId: string) =>
+          S.documentList()
+            .title('Innlegg')
+            .filter('_type == "post" && postType._ref == $postTypeId')
+            .params({ postTypeId })
+            .defaultOrdering([
+              { field: 'order', direction: 'asc' },
+              { field: 'publishDate', direction: 'desc' }
+            ])
+        )
+    )
+
+  // Posttyper administrasjon
+  const postTypesListItem = S.listItem()
+    .title('Posttyper')
+    .id('postTypes')
+    .icon(() => '📋')
+    .child(
+      S.documentTypeList('postType')
+        .title('Posttyper')
+    )
+
+  return S.list()
+    .title('Innhold')
+    .items([
+      // Singletons
+      S.listItem()
+        .title('Navigasjon')
+        .id('navigation')
+        .child(
+          S.document()
+            .schemaType('navigation')
+            .documentId('navigation')
+        ),
+      S.listItem()
+        .title('Globale innstillinger')
+        .id('globalSettings')
+        .child(
+          S.document()
+            .schemaType('globalSettings')
+            .documentId('globalSettings')
+        ),
+      S.divider(),
+      // Sider
+      S.listItem()
+        .title('Sider')
+        .id('pages')
+        .icon(() => '📄')
+        .child(S.documentTypeList('page').title('Sider')),
+      postsListItem,
+      postTypesListItem,
+      S.divider(),
+      // Redirects
+      S.listItem()
+        .title('Redirects')
+        .id('redirects')
+        .icon(() => '↪️')
+        .child(S.documentTypeList('redirect').title('Redirects')),
+    ])
 }
 
-// Aktive datasett - legg til flere når de er opprettet i Sanity
-const datasets = Object.entries(siteConfigs).map(([name, config]) => ({
-  name,
-  title: config.title,
-  previewUrl: config.previewUrl,
-  site: config.site
-}))
+/**
+ * Multisite Studio Structure
+ * Innhold gruppert etter nettsted
+ */
+function getMultisiteStructure(S: any) {
+  // Nettsted-administrasjon
+  const sitesListItem = S.listItem()
+    .title('Nettsteder')
+    .id('sites')
+    .icon(() => '🌐')
+    .child(
+      S.documentTypeList('site')
+        .title('Nettsteder')
+    )
+  
+  // Navigasjon gruppert etter nettsted
+  const navigationListItem = S.listItem()
+    .title('Navigasjon')
+    .id('navigation')
+    .icon(() => '🧭')
+    .child(
+      S.documentTypeList('site')
+        .title('Velg nettsted')
+        .child((siteId: string) =>
+          S.documentList()
+            .title('Navigasjon')
+            .filter('_type == "navigation" && site._ref == $siteId')
+            .params({ siteId })
+        )
+    )
 
-const singletons = ['navigation', 'globalSettings']
+  // Globale innstillinger gruppert etter nettsted
+  const globalSettingsListItem = S.listItem()
+    .title('Globale innstillinger')
+    .id('globalSettings')
+    .icon(() => '⚙️')
+    .child(
+      S.documentTypeList('site')
+        .title('Velg nettsted')
+        .child((siteId: string) =>
+          S.documentList()
+            .title('Innstillinger')
+            .filter('_type == "globalSettings" && site._ref == $siteId')
+            .params({ siteId })
+        )
+    )
 
-export default defineConfig(
-  datasets.map(({ name, title, previewUrl, site }) => ({
-    name,
-    title,
-    projectId: PROJECT_ID,
-    dataset: name,
-    basePath: `/studio/${name}`,
-    plugins: [
-      structureTool({
-        structure: (S, context) => {
-          const singletonItems = singletons.map((type) =>
-            S.listItem()
-              .title(type === 'navigation' ? 'Navigasjon' : 'Globale innstillinger')
-              .id(type)
-              .child(
-                S.document()
-                  .schemaType(type)
-                  .documentId(type)
-              )
-          )
+  // Sider gruppert etter nettsted
+  const pagesListItem = S.listItem()
+    .title('Sider')
+    .id('pages')
+    .icon(() => '📄')
+    .child(
+      S.documentTypeList('site')
+        .title('Velg nettsted')
+        .child((siteId: string) =>
+          S.documentList()
+            .title('Sider')
+            .filter('_type == "page" && site._ref == $siteId')
+            .params({ siteId })
+            .defaultOrdering([{ field: 'title', direction: 'asc' }])
+        )
+    )
 
-          // Innlegg gruppert etter posttype
-          const postsListItem = S.listItem()
-            .title('Innlegg')
-            .id('posts')
-            .icon(() => '📄')
-            .child(
-              S.documentTypeList('postType')
-                .title('Velg posttype')
-                .child((postTypeId) =>
+  // Innlegg gruppert etter nettsted -> posttype
+  const postsListItem = S.listItem()
+    .title('Innlegg')
+    .id('posts')
+    .icon(() => '📝')
+    .child(
+      S.documentTypeList('site')
+        .title('Velg nettsted')
+        .child((siteId: string) =>
+          S.list()
+            .title('Posttyper')
+            .items([
+              S.listItem()
+                .title('Alle innlegg')
+                .child(
                   S.documentList()
-                    .title('Innlegg')
-                    .filter('_type == "post" && postType._ref == $postTypeId')
-                    .params({ postTypeId })
+                    .title('Alle innlegg')
+                    .filter('_type == "post" && site._ref == $siteId')
+                    .params({ siteId })
                     .defaultOrdering([
                       { field: 'order', direction: 'asc' },
                       { field: 'publishDate', direction: 'desc' }
                     ])
+                ),
+              S.divider(),
+              S.listItem()
+                .title('Etter posttype')
+                .child(
+                  S.documentList()
+                    .title('Velg posttype')
+                    .filter('_type == "postType" && site._ref == $siteId')
+                    .params({ siteId })
+                    .child((postTypeId: string) =>
+                      S.documentList()
+                        .title('Innlegg')
+                        .filter('_type == "post" && site._ref == $siteId && postType._ref == $postTypeId')
+                        .params({ siteId, postTypeId })
+                        .defaultOrdering([
+                          { field: 'order', direction: 'asc' },
+                          { field: 'publishDate', direction: 'desc' }
+                        ])
+                    )
                 )
-            )
-
-          // Posttyper administrasjon
-          const postTypesListItem = S.listItem()
-            .title('Posttyper')
-            .id('postTypes')
-            .icon(() => '📋')
-            .child(
-              S.documentTypeList('postType')
-                .title('Posttyper')
-            )
-
-          // Andre dokumenttyper (ekskluder singletons, post og postType)
-          const otherDocumentItems = S.documentTypeListItems()
-            .filter((item) => {
-              const id = item.getId() ?? ''
-              return !singletons.includes(id) && !['post', 'postType'].includes(id)
-            })
-
-          return S.list()
-            .title('Innhold')
-            .items([
-              ...singletonItems,
-              S.divider(),
-              postsListItem,
-              postTypesListItem,
-              S.divider(),
-              ...otherDocumentItems
             ])
-        }
-      }),
-      presentationTool({
-        previewUrl: `${previewUrl}/api/draft?site=${site}&redirect=/`,
-        resolve
-      }),
-      visionTool(),
-      colorInput(),
-      media()
-    ],
-    schema: {
-      types: schemaTypes
-    }
-  }))
-)
+        )
+    )
+
+  // Posttyper gruppert etter nettsted
+  const postTypesListItem = S.listItem()
+    .title('Posttyper')
+    .id('postTypes')
+    .icon(() => '📋')
+    .child(
+      S.documentTypeList('site')
+        .title('Velg nettsted')
+        .child((siteId: string) =>
+          S.documentList()
+            .title('Posttyper')
+            .filter('_type == "postType" && site._ref == $siteId')
+            .params({ siteId })
+        )
+    )
+
+  // Redirects gruppert etter nettsted
+  const redirectsListItem = S.listItem()
+    .title('Redirects')
+    .id('redirects')
+    .icon(() => '↪️')
+    .child(
+      S.documentTypeList('site')
+        .title('Velg nettsted')
+        .child((siteId: string) =>
+          S.documentList()
+            .title('Redirects')
+            .filter('_type == "redirect" && site._ref == $siteId')
+            .params({ siteId })
+        )
+    )
+
+  return S.list()
+    .title('Innhold')
+    .items([
+      sitesListItem,
+      S.divider(),
+      pagesListItem,
+      postsListItem,
+      postTypesListItem,
+      S.divider(),
+      navigationListItem,
+      globalSettingsListItem,
+      redirectsListItem
+    ])
+}
+
+export default defineConfig({
+  name: 'default',
+  title: IS_MULTISITE ? 'Multisite CMS' : 'CMS',
+  projectId: PROJECT_ID,
+  dataset: DATASET,
+  basePath: '/studio',
+  plugins: [
+    structureTool({
+      structure: (S) => IS_MULTISITE ? getMultisiteStructure(S) : getSingleSiteStructure(S)
+    }),
+    presentationTool({
+      previewUrl: `${PREVIEW_URL}/api/draft?redirect=/`,
+      resolve
+    }),
+    visionTool(),
+    colorInput(),
+    media()
+  ],
+  schema: {
+    types: schemaTypes
+  }
+})

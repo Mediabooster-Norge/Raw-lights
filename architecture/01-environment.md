@@ -1,38 +1,49 @@
 # Environment Variables
 
 ## Required .env.local
+
 ```env
 # Sanity
-NEXT_PUBLIC_SANITY_PROJECT_ID=
+NEXT_PUBLIC_SANITY_PROJECT_ID=your-project-id
 NEXT_PUBLIC_SANITY_DATASET=production
-SANITY_API_TOKEN=
-SANITY_PREVIEW_SECRET=
-SANITY_WEBHOOK_SECRET=
+SANITY_API_TOKEN=your-token
+SANITY_PREVIEW_SECRET=your-preview-secret
+SANITY_WEBHOOK_SECRET=your-webhook-secret
 
 # Site
-NEXT_PUBLIC_SITE_URL=
+NEXT_PUBLIC_SITE_URL=https://your-site.com
 
-# Site-specific URLs (Required for multisite)
-SITE_URL_LANDSTREFF=https://landstreffstavanger.no
-SITE_URL_YPSILON=https://ypsilonfestivalen.no
-SITE_URL_JULIVINTERLAND=https://julivinterland.no
+# Multisite (valgfri - default: false)
+NEXT_PUBLIC_MULTISITE_ENABLED=false
 
 # Revalidation
-REVALIDATE_SECRET=
+REVALIDATE_SECRET=your-revalidate-secret
 ```
 
-## Dataset per site (optional override)
+---
+
+## Single-site vs Multisite
+
+### Single-site (default)
 ```env
-SANITY_DATASET_LANDSTREFF=landstreff
-SANITY_DATASET_YPSILON=ypsilon
-SANITY_DATASET_JULIVINTERLAND=julivinterland
+NEXT_PUBLIC_MULTISITE_ENABLED=false
+# eller bare utelat variabelen
+```
+
+### Multisite
+```env
+NEXT_PUBLIC_MULTISITE_ENABLED=true
+
+# Site-spesifikke URLer (kun for multisite)
+SITE_URL_SITE1=https://site1.com
+SITE_URL_SITE2=https://site2.com
 ```
 
 ---
 
 ## Environment Validation Pattern
 
-### File
+### Fil
 ```
 /lib/env.ts
 ```
@@ -42,6 +53,7 @@ SANITY_DATASET_JULIVINTERLAND=julivinterland
 import { z } from 'zod'
 
 const envSchema = z.object({
+  // Required
   NEXT_PUBLIC_SANITY_PROJECT_ID: z.string().min(1),
   NEXT_PUBLIC_SANITY_DATASET: z.string().default('production'),
   SANITY_API_TOKEN: z.string().min(1),
@@ -50,10 +62,8 @@ const envSchema = z.object({
   NEXT_PUBLIC_SITE_URL: z.string().url(),
   REVALIDATE_SECRET: z.string().min(1),
   
-  // Site URLs
-  SITE_URL_LANDSTREFF: z.string().url(),
-  SITE_URL_YPSILON: z.string().url(),
-  SITE_URL_JULIVINTERLAND: z.string().url(),
+  // Optional
+  NEXT_PUBLIC_MULTISITE_ENABLED: z.string().optional(),
 })
 
 export const env = envSchema.parse(process.env)
@@ -61,28 +71,64 @@ export const env = envSchema.parse(process.env)
 
 ---
 
-## Multisite Base URL Rules (Required)
+## Multisite URL Resolver
 
-### Problem
-Multisite architecture requires site-specific canonical URLs for:
-- SEO (canonical tags)
-- Sitemap generation
-- OpenGraph URLs
-- Absolute links
-
-### Rule
-Each site **must** have its own canonical base URL.
-
-### URL Resolver
 ```ts
 // /lib/utils/getSiteUrl.ts
+
+const DEFAULT_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000'
+
+// Single-site: Bruker alltid NEXT_PUBLIC_SITE_URL
+// Multisite: Bruker site-spesifikke URLer
 const siteUrls: Record<string, string> = {
-  landstreff: process.env.SITE_URL_LANDSTREFF ?? process.env.NEXT_PUBLIC_SITE_URL ?? '',
-  ypsilon: process.env.SITE_URL_YPSILON ?? process.env.NEXT_PUBLIC_SITE_URL ?? '',
-  julivinterland: process.env.SITE_URL_JULIVINTERLAND ?? process.env.NEXT_PUBLIC_SITE_URL ?? ''
+  site1: process.env.SITE_URL_SITE1 ?? DEFAULT_URL,
+  site2: process.env.SITE_URL_SITE2 ?? DEFAULT_URL,
 }
 
 export function getSiteUrl(site: string): string {
-  return siteUrls[site] ?? siteUrls.landstreff
+  // Single-site modus
+  if (process.env.NEXT_PUBLIC_MULTISITE_ENABLED !== 'true') {
+    return DEFAULT_URL
+  }
+  // Multisite modus
+  return siteUrls[site] ?? DEFAULT_URL
 }
 ```
+
+---
+
+## Konfigurasjonsfil
+
+```ts
+// /lib/config/multisite.ts
+
+export function isMultisiteEnabled(): boolean {
+  return process.env.NEXT_PUBLIC_MULTISITE_ENABLED === 'true'
+}
+
+export function getDefaultSiteId(): string {
+  return process.env.NEXT_PUBLIC_DEFAULT_SITE_ID || 'default'
+}
+
+export const multisiteConfig = {
+  get enabled(): boolean {
+    return isMultisiteEnabled()
+  },
+  get defaultSiteId(): string {
+    return getDefaultSiteId()
+  }
+}
+```
+
+---
+
+## Oppsummering
+
+| Variabel | Required | Single-site | Multisite |
+|----------|----------|-------------|-----------|
+| `NEXT_PUBLIC_SANITY_PROJECT_ID` | ✅ | ✅ | ✅ |
+| `NEXT_PUBLIC_SANITY_DATASET` | ✅ | ✅ | ✅ |
+| `SANITY_API_TOKEN` | ✅ | ✅ | ✅ |
+| `NEXT_PUBLIC_SITE_URL` | ✅ | ✅ | ✅ |
+| `NEXT_PUBLIC_MULTISITE_ENABLED` | ❌ | `false` | `true` |
+| `SITE_URL_*` | ❌ | ❌ | Anbefalt |

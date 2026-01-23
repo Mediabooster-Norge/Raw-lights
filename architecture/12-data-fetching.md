@@ -14,6 +14,35 @@ export const revalidate = 60
 
 ---
 
+## SiteId-basert Filtrering
+
+Alle queries MÅ inkludere site-filter for å hente riktig innhold:
+
+```groq
+const SITE_FILTER = `site->siteId.current == $siteId`
+```
+
+### Fetcher Pattern
+```ts
+import { datasetRouter } from './datasetRouter'
+
+function getSiteId(site: string): string {
+  const config = datasetRouter(site)
+  return config.siteId
+}
+
+export async function getPage(slug: string, site: string) {
+  const client = getClient(site)
+  const siteId = getSiteId(site)
+  
+  return client.fetch(pageQuery, { slug, siteId }, {
+    next: { tags: ['pages', `page-${slug}`] }
+  })
+}
+```
+
+---
+
 ## GROQ Queries Collection
 
 ### File Structure
@@ -23,6 +52,7 @@ export const revalidate = 60
   page.ts
   navigation.ts
   globalSettings.ts
+  posts.ts
 ```
 
 ### Queries Index
@@ -31,6 +61,7 @@ export const revalidate = 60
 export * from './page'
 export * from './navigation'
 export * from './globalSettings'
+export * from './posts'
 ```
 
 ### Page Queries
@@ -38,11 +69,15 @@ export * from './globalSettings'
 // /lib/sanity/queries/page.ts
 import { groq } from 'next-sanity'
 
+const SITE_FILTER = `site->siteId.current == $siteId`
+const PUBLISH_FILTER = `(visibility == "public" || !defined(visibility)) && (!defined(publishDate) || publishDate <= now())`
+
 export const pageFields = groq`
   _id,
   _type,
   title,
   "slug": slug.current,
+  "siteId": site->siteId.current,
   blocks[] {
     _key,
     _type,
@@ -58,19 +93,15 @@ export const pageFields = groq`
 `
 
 export const pageQuery = groq`
-  *[_type == "page" && slug.current == $slug][0] {
+  *[_type == "page" && slug.current == $slug && ${SITE_FILTER} && ${PUBLISH_FILTER}][0] {
     ${pageFields}
   }
 `
 
-export const allPagesQuery = groq`
-  *[_type == "page" && defined(slug.current)] {
+export const pagePreviewQuery = groq`
+  *[_type == "page" && slug.current == $slug && ${SITE_FILTER}][0] {
     ${pageFields}
   }
-`
-
-export const pageSlugsQuery = groq`
-  *[_type == "page" && defined(slug.current)].slug.current
 `
 ```
 
@@ -79,20 +110,11 @@ export const pageSlugsQuery = groq`
 // /lib/sanity/queries/navigation.ts
 import { groq } from 'next-sanity'
 
-export const linkFields = groq`
-  _type,
-  type,
-  label,
-  openInNewTab,
-  externalUrl,
-  internalLink-> {
-    _type,
-    "slug": slug.current
-  }
-`
+const SITE_FILTER = `site->siteId.current == $siteId`
 
 export const navigationQuery = groq`
-  *[_type == "navigation"][0] {
+  *[_type == "navigation" && ${SITE_FILTER}][0] {
+    "siteId": site->siteId.current,
     mainNav[] {
       label,
       link { ${linkFields} },
@@ -122,32 +144,14 @@ export const navigationQuery = groq`
 // /lib/sanity/queries/globalSettings.ts
 import { groq } from 'next-sanity'
 
+const SITE_FILTER = `site->siteId.current == $siteId`
+
 export const globalSettingsQuery = groq`
-  *[_type == "globalSettings"][0] {
+  *[_type == "globalSettings" && ${SITE_FILTER}][0] {
+    "siteId": site->siteId.current,
     siteTheme {
       logo { asset->, alt },
-      logoDark { asset-> },
-      favicon { asset-> },
-      ogImage { asset-> },
-      colors {
-        primary { hex },
-        secondary { hex },
-        tertiary { hex },
-        background { hex },
-        surface { hex },
-        textPrimary { hex },
-        textSecondary { hex }
-      },
-      buttonColors {
-        primary { background { hex }, text { hex } },
-        secondary { background { hex }, text { hex } }
-      },
-      typography {
-        headingFont,
-        bodyFont,
-        customHeadingFont,
-        customBodyFont
-      }
+      // ... other theme fields
     },
     seo {
       metaTitle,
@@ -164,6 +168,33 @@ export const globalSettingsQuery = groq`
 `
 ```
 
+### Post Queries
+```ts
+// /lib/sanity/queries/posts.ts
+import { groq } from 'next-sanity'
+
+const SITE_FILTER = `site->siteId.current == $siteId`
+
+export const allPostTypesQuery = groq`
+  *[_type == "postType" && ${SITE_FILTER}] | order(title asc) {
+    _id,
+    title,
+    singularTitle,
+    "slug": slug.current,
+    // ... other fields
+  }
+`
+
+export const postsByTypeQuery = groq`
+  *[_type == "post" && postType->slug.current == $postTypeSlug && ${SITE_FILTER} && visibility == "public"] | order(order asc, publishDate desc) {
+    _id,
+    title,
+    "slug": slug.current,
+    // ... other fields
+  }
+`
+```
+
 ---
 
 ## Caching Strategy (Tags per Content Type)
@@ -174,7 +205,8 @@ export const globalSettingsQuery = groq`
 | Page | `pages`, `page-{slug}` | Page updated |
 | Navigation | `navigation` | Nav document updated |
 | Global Settings | `global-settings` | Settings updated |
-| Forms | `forms`, `form-{id}` | Form config updated |
+| Posts | `posts`, `post-{slug}` | Post updated |
+| Post Types | `post-types`, `post-type-{slug}` | PostType updated |
 | Redirects | `redirects` | Redirect added/changed |
 
 ### Fetcher Tag Rules
@@ -182,32 +214,23 @@ export const globalSettingsQuery = groq`
 // /lib/sanity/fetcher.ts
 
 export async function getPage(slug: string, site: string) {
-  return getClient(site).fetch(pageQuery, { slug }, {
+  const siteId = getSiteId(site)
+  return getClient(site).fetch(pageQuery, { slug, siteId }, {
     next: { tags: ['pages', `page-${slug}`] }
   })
 }
 
 export async function getNavigation(site: string) {
-  return getClient(site).fetch(navigationQuery, {}, {
+  const siteId = getSiteId(site)
+  return getClient(site).fetch(navigationQuery, { siteId }, {
     next: { tags: ['navigation'] }
   })
 }
 
 export async function getGlobalSettings(site: string) {
-  return getClient(site).fetch(globalSettingsQuery, {}, {
+  const siteId = getSiteId(site)
+  return getClient(site).fetch(globalSettingsQuery, { siteId }, {
     next: { tags: ['global-settings'] }
-  })
-}
-
-export async function getForm(id: string, site: string) {
-  return getClient(site).fetch(formQuery, { id }, {
-    next: { tags: ['forms', `form-${id}`] }
-  })
-}
-
-export async function getRedirects(site: string) {
-  return getClient(site).fetch(redirectsQuery, {}, {
-    next: { tags: ['redirects'] }
   })
 }
 ```
@@ -220,23 +243,14 @@ const typeToTags: Record<string, (body: any) => string[]> = {
   page: (b) => ['pages', `page-${b.slug?.current}`],
   navigation: () => ['navigation'],
   globalSettings: () => ['global-settings'],
-  form: (b) => ['forms', `form-${b._id}`],
+  post: (b) => ['posts', `post-${b.slug?.current}`],
+  postType: (b) => ['post-types', `post-type-${b.slug?.current}`],
   redirect: () => ['redirects']
 }
 
 // In webhook handler:
 const tags = typeToTags[body._type]?.(body) ?? [body._type]
 tags.forEach(tag => revalidateTag(tag))
-```
-
-### Layout-Level Revalidation
-Navigation og Global Settings påvirker alle sider:
-```ts
-case 'navigation':
-case 'globalSettings':
-  revalidateTag(body._type === 'navigation' ? 'navigation' : 'global-settings')
-  revalidatePath('/', 'layout') // Revalidate entire layout
-  break
 ```
 
 ### Default TTL (fallback)
@@ -254,47 +268,28 @@ Forhindre at upublisert eller skjult innhold vises på frontend.
 
 ## Rule
 All queries fetching public content **MUST** include:
+- `site->siteId.current == $siteId` (site filter)
 - `visibility == "public"`
 - `publishDate` is undefined OR `publishDate <= now()`
 
-## Applies to
-- `page`
-- `eventItem`
-- `contentItem`
-- `partner`
-
 ## GROQ Filter Pattern
 ```groq
-// Base publish filter (reusable)
-const publishFilter = `visibility == "public" && (!defined(publishDate) || publishDate <= now())`
+const SITE_FILTER = `site->siteId.current == $siteId`
+const PUBLISH_FILTER = `(visibility == "public" || !defined(visibility)) && (!defined(publishDate) || publishDate <= now())`
 ```
 
 ## Query Examples
 
 ### Page Query
 ```groq
-*[_type == "page" && slug.current == $slug && visibility == "public" && (!defined(publishDate) || publishDate <= now())][0] {
+*[_type == "page" && slug.current == $slug && site->siteId.current == $siteId && visibility == "public" && (!defined(publishDate) || publishDate <= now())][0] {
   ${pageFields}
 }
 ```
 
-### eventItem Query
+### Posts Query
 ```groq
-*[_type == "eventItem" && visibility == "public" && (!defined(publishDate) || publishDate <= now())] | order(startDate asc) {
-  ...
-}
-```
-
-### contentItem Query
-```groq
-*[_type == "contentItem" && visibility == "public" && (!defined(publishDate) || publishDate <= now())] | order(publishDate desc) {
-  ...
-}
-```
-
-### Partner Query
-```groq
-*[_type == "partner" && visibility == "public"] | order(tier asc) {
+*[_type == "post" && postType->slug.current == $postTypeSlug && site->siteId.current == $siteId && visibility == "public"] | order(order asc, publishDate desc) {
   ...
 }
 ```
@@ -302,18 +297,16 @@ const publishFilter = `visibility == "public" && (!defined(publishDate) || publi
 ## Fetcher Integration
 ```ts
 // /lib/sanity/fetcher.ts
-const PUBLISH_FILTER = `visibility == "public" && (!defined(publishDate) || publishDate <= now())`
 
 export async function getPage(slug: string, site: string) {
-  const { isEnabled: isPreview } = draftMode()
+  const { isEnabled: isPreview } = await draftMode()
+  const siteId = getSiteId(site)
   const client = isPreview ? getPreviewClient(site) : getClient(site)
   
-  // Preview mode bypasses publish filter
-  const filter = isPreview 
-    ? `_type == "page" && slug.current == $slug`
-    : `_type == "page" && slug.current == $slug && ${PUBLISH_FILTER}`
+  // Preview mode uses query without publish filter
+  const query = isPreview ? pagePreviewQuery : pageQuery
   
-  return client.fetch(`*[${filter}][0] { ${pageFields} }`, { slug })
+  return client.fetch(query, { slug, siteId })
 }
 ```
 

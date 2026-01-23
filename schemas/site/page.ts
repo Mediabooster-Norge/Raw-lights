@@ -1,10 +1,12 @@
 import { defineType, defineField } from 'sanity'
+import { getSiteField, getSitePreviewSelect, formatSubtitleWithSite } from '../helpers/siteField'
 
 export default defineType({
   name: 'page',
   title: 'Side',
   type: 'document',
   fields: [
+    ...getSiteField(),
     defineField({
       name: 'title',
       title: 'Tittel',
@@ -33,9 +35,9 @@ export default defineType({
         { type: 'marqueeBlock' },
         { type: 'mediaTextBlock' },
         { type: 'accordionBlock' },
-        { type: 'postGridBlock' }, // Innlegg-visning
+        { type: 'postGridBlock' },
         { type: 'spacerBlock' },
-        { type: 'sectionBlock' } // Gruppe-blokk for spesielle tilfeller
+        { type: 'sectionBlock' }
       ]
     }),
     defineField({
@@ -66,12 +68,14 @@ export default defineType({
   preview: {
     select: {
       title: 'title',
-      slug: 'slug.current'
+      slug: 'slug.current',
+      ...getSitePreviewSelect()
     },
-    prepare({ title, slug }) {
+    prepare({ title, slug, siteTitle }) {
+      const subtitle = `/${slug ?? ''}`
       return {
         title,
-        subtitle: `/${slug ?? ''}`
+        subtitle: formatSubtitleWithSite(subtitle, siteTitle)
       }
     }
   }

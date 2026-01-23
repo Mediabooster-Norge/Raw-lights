@@ -1,7 +1,11 @@
 import { groq } from 'next-sanity'
 
+// Site filter - betinget basert på om siteId er gitt
+// Hvis siteId er null (single-site modus), hent første globalSettings dokument
+const SITE_FILTER = `(!defined($siteId) || site->siteId.current == $siteId)`
+
 export const globalSettingsQuery = groq`
-  *[_type == "globalSettings"][0] {
+  *[_type == "globalSettings" && ${SITE_FILTER}][0] {
     siteTheme {
       logo { asset->, alt },
       logoDark { asset-> },

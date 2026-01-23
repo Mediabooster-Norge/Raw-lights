@@ -1,4 +1,5 @@
 // Document types
+import site from './site/site'
 import page from './site/page'
 import navigation from './site/navigation'
 import globalSettings from './site/globalSettings'
@@ -24,7 +25,11 @@ import marqueeBlock from './blocks/marqueeBlock'
 import mediaTextBlock from './blocks/mediaTextBlock'
 import postGridBlock from './blocks/postGridBlock'
 
-export const schemaTypes = [
+// Sjekk om multisite er aktivert
+const isMultisiteEnabled = process.env.NEXT_PUBLIC_MULTISITE_ENABLED === 'true'
+
+// Base schema types (alltid inkludert)
+const baseSchemaTypes = [
   // Documents
   page,
   navigation,
@@ -49,3 +54,13 @@ export const schemaTypes = [
   mediaTextBlock,
   postGridBlock,
 ]
+
+// Multisite-only schema types
+const multisiteSchemaTypes = [
+  site,
+]
+
+// Kombiner basert på konfigurasjon
+export const schemaTypes = isMultisiteEnabled 
+  ? [site, ...baseSchemaTypes]
+  : baseSchemaTypes

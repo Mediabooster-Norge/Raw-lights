@@ -1,11 +1,12 @@
 import { defineType, defineField } from 'sanity'
+import { getSiteField } from '../helpers/siteField'
 
 export default defineType({
   name: 'navigation',
   title: 'Navigasjon',
   type: 'document',
-  __experimental_actions: ['update', 'publish'],
   fields: [
+    ...getSiteField(),
     defineField({
       name: 'mainNav',
       title: 'Hovedmeny',
