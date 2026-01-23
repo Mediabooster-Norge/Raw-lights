@@ -1,12 +1,9 @@
-# Lund-gruppen Multisite
+# Sanity starter Multisite
 
-A multisite Next.js + Sanity CMS setup for managing multiple festival websites from a single codebase.
+A multisite Next.js + Sanity CMS setup for managing multiple  websites from a single codebase.
 
 ## Sites
 
-- **Landstreff Stavanger** - landstreffstavanger.no
-- **Ypsilon Festivalen** - ypsilonfestivalen.no
-- **Juli Vinterland** - julivinterland.no
 
 ## Tech Stack
 
