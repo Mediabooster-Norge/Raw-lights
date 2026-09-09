@@ -98,6 +98,8 @@ const singlePostFields = groq`
     externalUrl,
     externalUrlLabel,
     publishDate,
+    _updatedAt,
+    jsonLdType,
     seo {
       metaTitle,
       metaDescription,

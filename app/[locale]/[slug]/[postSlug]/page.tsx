@@ -7,6 +7,7 @@ import { getSiteUrl } from '@/lib/utils/getSiteUrl'
 import { isLocale, locales, localizedPath, publicUrl, type Locale } from '@/lib/i18n'
 import { metadataAlternates } from '@/lib/i18n/alternates'
 import { buildPostJsonLd, imageAssetUrl, parseJsonLdOverride } from '@/lib/seo/buildJsonLd'
+import { resolvePostJsonLdType } from '@/lib/seo/types'
 
 type Props = {
   params: Promise<{ locale: string; slug: string; postSlug: string }>
@@ -87,7 +88,7 @@ export default async function PostPage({ params }: Props) {
     <>
       <JsonLd
         data={buildPostJsonLd({
-          type: post.postType?.jsonLdType,
+          type: resolvePostJsonLdType(post.postType?.jsonLdType, post.jsonLdType),
           override: parseJsonLdOverride(post.seo?.jsonLd),
           title: post.title,
           description: post.seo?.metaDescription ?? post.excerpt,
@@ -96,6 +97,12 @@ export default async function PostPage({ params }: Props) {
           locale,
           imageUrl: imageAssetUrl(post.seo?.metaImage) || imageAssetUrl(post.featuredImage),
           datePublished: post.publishDate,
+          dateModified: post._updatedAt,
+          sameAs: post.externalUrl,
+          breadcrumbs: [
+            { name: post.postType?.title ?? postTypeSlug, path: localizedPath(locale, `/${postTypeSlug}`) },
+            { name: post.title, path: localizedPath(locale, `/${postTypeSlug}/${postSlug}`) },
+          ],
         })}
       />
       <PostSingle post={post} />

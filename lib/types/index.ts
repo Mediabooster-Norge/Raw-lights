@@ -119,6 +119,8 @@ export type Post = {
   externalUrl?: string
   externalUrlLabel?: string
   publishDate?: string
+  _updatedAt?: string
+  jsonLdType?: string
   visibility: 'public' | 'hidden'
   order?: number
   seo?: SEO
