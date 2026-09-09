@@ -84,6 +84,6 @@ export const baseTheme = {
       altBackground: '#f8fafc'
     }
   }
-} as const
+}
 
 export type Theme = typeof baseTheme

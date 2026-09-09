@@ -1,15 +1,13 @@
+import { ThLargeIcon } from '@sanity/icons'
 import { defineType, defineField } from 'sanity'
+import { appearanceGroup, contentGroup, displayGroup } from '../studio/groups'
 
 export default defineType({
   name: 'postGridBlock',
   title: 'Innlegg-visning',
   type: 'object',
-  icon: () => '📰',
-  groups: [
-    { name: 'content', title: 'Innhold', default: true },
-    { name: 'display', title: 'Visning' },
-    { name: 'styling', title: 'Styling' }
-  ],
+  icon: ThLargeIcon,
+  groups: [contentGroup, displayGroup, appearanceGroup],
   fields: [
     // Content
     defineField({
@@ -178,7 +176,6 @@ export default defineType({
       group: 'display'
     }),
     
-    // Styling
     defineField({
       name: 'background',
       title: 'Bakgrunn',
@@ -193,7 +190,7 @@ export default defineType({
         ]
       },
       initialValue: 'transparent',
-      group: 'styling'
+      group: 'appearance'
     }),
     defineField({
       name: 'spacing',
@@ -209,22 +206,8 @@ export default defineType({
         ]
       },
       initialValue: 'medium',
-      group: 'styling'
+      group: 'appearance'
     }),
-    defineField({
-      name: 'containerWidth',
-      title: 'Bredde',
-      type: 'string',
-      options: {
-        list: [
-          { title: 'Full bredde', value: 'full' },
-          { title: 'Container', value: 'container' }
-        ],
-        layout: 'radio'
-      },
-      initialValue: 'container',
-      group: 'styling'
-    })
   ],
   preview: {
     select: {

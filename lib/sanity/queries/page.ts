@@ -9,13 +9,11 @@ export const pageFields = groq`
     _key,
     _type,
     ...,
-    // Hero video support
     backgroundVideo {
       asset-> {
         url
       }
     },
-    // MediaTextBlock video support (root level)
     video {
       asset-> {
         url
@@ -26,7 +24,6 @@ export const pageFields = groq`
         url
       }
     },
-    // Gallery images with metadata for masonry
     images[] {
       ...,
       asset-> {
@@ -41,7 +38,6 @@ export const pageFields = groq`
         }
       }
     },
-    // PostGridBlock - resolve postType and fetch posts
     _type == "postGridBlock" => {
       ...,
       "postType": postType-> {
@@ -61,7 +57,6 @@ export const pageFields = groq`
         publishDate
       }
     },
-    // Nested children blocks (for sectionBlock)
     children[] {
       _key,
       _type,
@@ -81,7 +76,6 @@ export const pageFields = groq`
           url
         }
       },
-      // Gallery images in nested blocks
       images[] {
         ...,
         asset-> {
@@ -96,7 +90,6 @@ export const pageFields = groq`
           }
         }
       },
-      // PostGridBlock in nested blocks
       _type == "postGridBlock" => {
         ...,
         "postType": postType-> {
@@ -123,84 +116,31 @@ export const pageFields = groq`
     metaDescription,
     metaImage { asset-> },
     canonicalUrl,
-    robots
+    robots,
+    jsonLd
   }
 `
 
 export const PUBLISH_FILTER = `(visibility == "public" || !defined(visibility)) && (!defined(publishDate) || publishDate <= now())`
 
-// Site filter - betinget basert på om siteId er gitt
-// Hvis siteId er null (single-site modus), ingen filtrering
-export const SITE_FILTER = `(!defined($siteId) || site->siteId.current == $siteId)`
-
-// === SINGLE-SITE QUERIES (brukes når multisite er deaktivert) ===
-
-export const pageQuerySingleSite = groq`
+export const pageQuery = groq`
   *[_type == "page" && slug.current == $slug && ${PUBLISH_FILTER}][0] {
     ${pageFields}
   }
 `
 
-export const pagePreviewQuerySingleSite = groq`
+export const pagePreviewQuery = groq`
   *[_type == "page" && slug.current == $slug][0] {
     ${pageFields}
   }
 `
 
-export const allPagesQuerySingleSite = groq`
+export const allPagesQuery = groq`
   *[_type == "page" && defined(slug.current) && ${PUBLISH_FILTER}] {
     ${pageFields}
   }
 `
 
-export const pageSlugsQuerySingleSite = groq`
-  *[_type == "page" && defined(slug.current)].slug.current
-`
-
-// === MULTISITE QUERIES (brukes når multisite er aktivert) ===
-
-export const pageQueryMultisite = groq`
-  *[_type == "page" && slug.current == $slug && site->siteId.current == $siteId && ${PUBLISH_FILTER}][0] {
-    ${pageFields}
-  }
-`
-
-export const pagePreviewQueryMultisite = groq`
-  *[_type == "page" && slug.current == $slug && site->siteId.current == $siteId][0] {
-    ${pageFields}
-  }
-`
-
-export const allPagesQueryMultisite = groq`
-  *[_type == "page" && defined(slug.current) && site->siteId.current == $siteId && ${PUBLISH_FILTER}] {
-    ${pageFields}
-  }
-`
-
-export const pageSlugsQueryMultisite = groq`
-  *[_type == "page" && defined(slug.current) && site->siteId.current == $siteId].slug.current
-`
-
-// === DYNAMISKE QUERIES (velger riktig basert på siteId) ===
-
-export const pageQuery = groq`
-  *[_type == "page" && slug.current == $slug && ${SITE_FILTER} && ${PUBLISH_FILTER}][0] {
-    ${pageFields}
-  }
-`
-
-export const pagePreviewQuery = groq`
-  *[_type == "page" && slug.current == $slug && ${SITE_FILTER}][0] {
-    ${pageFields}
-  }
-`
-
-export const allPagesQuery = groq`
-  *[_type == "page" && defined(slug.current) && ${SITE_FILTER} && ${PUBLISH_FILTER}] {
-    ${pageFields}
-  }
-`
-
 export const pageSlugsQuery = groq`
-  *[_type == "page" && defined(slug.current) && ${SITE_FILTER}].slug.current
+  *[_type == "page" && defined(slug.current)].slug.current
 `

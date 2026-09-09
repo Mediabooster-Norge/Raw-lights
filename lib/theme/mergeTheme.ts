@@ -1,18 +1,15 @@
 import { baseTheme, type Theme } from './baseTheme'
 
-// Sanity color type includes hex, alpha, rgb, hsl
 type SanityColor = {
   hex?: string
   alpha?: number
-  rgb?: { r: number; g: number; b: number; a: number }
-  hsl?: { h: number; s: number; l: number; a: number }
 }
 
 type SanityTheme = {
-  colors?: Record<string, SanityColor>
-  buttonColors?: {
-    primary?: { background?: SanityColor; text?: SanityColor }
-    secondary?: { background?: SanityColor; text?: SanityColor }
+  colors?: {
+    primary?: SanityColor
+    background?: SanityColor
+    textPrimary?: SanityColor
   }
   typography?: {
     headingFont?: string
@@ -22,72 +19,119 @@ type SanityTheme = {
   }
 }
 
-/**
- * Converts Sanity color to CSS color string with alpha support
- */
 function toColorString(color: SanityColor | undefined, fallback: string): string {
   if (!color?.hex) return fallback
-  
-  // If alpha is defined and not 1, use rgba
+
   if (color.alpha !== undefined && color.alpha < 1) {
-    // Convert hex to rgb
     const hex = color.hex.replace('#', '')
     const r = parseInt(hex.substring(0, 2), 16)
     const g = parseInt(hex.substring(2, 4), 16)
     const b = parseInt(hex.substring(4, 6), 16)
     return `rgba(${r}, ${g}, ${b}, ${color.alpha})`
   }
-  
+
   return color.hex
 }
 
-/**
- * Returns just the hex color (solid, no alpha) for borders
- */
-function toSolidColor(color: SanityColor | undefined, fallback: string): string {
+function hexToRgb(hex: string): { r: number; g: number; b: number } | null {
+  const cleaned = hex.replace('#', '')
+  if (cleaned.length !== 6 || /[^0-9a-f]/i.test(cleaned)) return null
+  return {
+    r: parseInt(cleaned.slice(0, 2), 16),
+    g: parseInt(cleaned.slice(2, 4), 16),
+    b: parseInt(cleaned.slice(4, 6), 16)
+  }
+}
+
+function rgbToHex(r: number, g: number, b: number): string {
+  const to = (n: number) => Math.max(0, Math.min(255, Math.round(n))).toString(16).padStart(2, '0')
+  return `#${to(r)}${to(g)}${to(b)}`
+}
+
+function mixHex(a: string, b: string, amount: number): string {
+  const from = hexToRgb(a)
+  const to = hexToRgb(b)
+  if (!from || !to) return a
+  return rgbToHex(
+    from.r + (to.r - from.r) * amount,
+    from.g + (to.g - from.g) * amount,
+    from.b + (to.b - from.b) * amount
+  )
+}
+
+function relativeLuminance(hex: string): number {
+  const rgb = hexToRgb(hex)
+  if (!rgb) return 0
+  const toLinear = (channel: number) => {
+    const value = channel / 255
+    return value <= 0.03928 ? value / 12.92 : ((value + 0.055) / 1.055) ** 2.4
+  }
+  return 0.2126 * toLinear(rgb.r) + 0.7152 * toLinear(rgb.g) + 0.0722 * toLinear(rgb.b)
+}
+
+function onColor(hex: string): string {
+  return relativeLuminance(hex) > 0.45 ? '#0f172a' : '#ffffff'
+}
+
+function toHex(color: SanityColor | undefined, fallback: string): string {
   return color?.hex ?? fallback
 }
 
 export function mergeTheme(sanityTheme?: SanityTheme): Theme {
   if (!sanityTheme) return baseTheme
 
+  const primarySolid = toHex(sanityTheme.colors?.primary, baseTheme.palette.primary)
+  const backgroundSolid = toHex(sanityTheme.colors?.background, baseTheme.palette.background)
+  const textPrimarySolid = toHex(sanityTheme.colors?.textPrimary, baseTheme.palette.textPrimary)
+
+  const primary = toColorString(sanityTheme.colors?.primary, primarySolid)
+  const background = toColorString(sanityTheme.colors?.background, backgroundSolid)
+  const textPrimary = toColorString(sanityTheme.colors?.textPrimary, textPrimarySolid)
+
+  const secondary = mixHex(primarySolid, textPrimarySolid, 0.28)
+  const tertiary = mixHex(primarySolid, backgroundSolid, 0.4)
+  const surface = mixHex(backgroundSolid, textPrimarySolid, 0.06)
+  const textSecondary = mixHex(textPrimarySolid, backgroundSolid, 0.42)
+  const onPrimary = onColor(primarySolid)
+  const onSecondary = onColor(secondary)
+
   return {
     ...baseTheme,
     palette: {
       ...baseTheme.palette,
-      ...(sanityTheme.colors && {
-        primary: toColorString(sanityTheme.colors.primary, baseTheme.palette.primary),
-        secondary: toColorString(sanityTheme.colors.secondary, baseTheme.palette.secondary),
-        tertiary: toColorString(sanityTheme.colors.tertiary, baseTheme.palette.tertiary),
-        background: toColorString(sanityTheme.colors.background, baseTheme.palette.background),
-        surface: toColorString(sanityTheme.colors.surface, baseTheme.palette.surface),
-        textPrimary: toColorString(sanityTheme.colors.textPrimary, baseTheme.palette.textPrimary),
-        textSecondary: toColorString(sanityTheme.colors.textSecondary, baseTheme.palette.textSecondary)
-      })
+      primary,
+      secondary,
+      tertiary,
+      background,
+      surface,
+      textPrimary,
+      textSecondary,
+      onPrimary,
+      onSecondary
     },
     components: {
       ...baseTheme.components,
       cta: {
         primary: {
-          background: toColorString(sanityTheme.buttonColors?.primary?.background, baseTheme.components.cta.primary.background),
-          text: toColorString(sanityTheme.buttonColors?.primary?.text, baseTheme.components.cta.primary.text),
-          border: toSolidColor(sanityTheme.buttonColors?.primary?.background, baseTheme.components.cta.primary.background)
+          background: primary,
+          text: onPrimary,
+          border: primary
         },
         secondary: {
-          background: toColorString(sanityTheme.buttonColors?.secondary?.background, baseTheme.components.cta.secondary.background),
-          text: toColorString(sanityTheme.buttonColors?.secondary?.text, baseTheme.components.cta.secondary.text),
-          border: toSolidColor(sanityTheme.buttonColors?.secondary?.background, baseTheme.components.cta.secondary.background)
+          background: secondary,
+          text: onSecondary,
+          border: secondary
         }
       }
     },
     typography: {
       ...baseTheme.typography,
       fontFamily: {
-        heading: sanityTheme.typography?.customHeadingFont 
-          ?? sanityTheme.typography?.headingFont 
+        heading: sanityTheme.typography?.customHeadingFont
+          ?? sanityTheme.typography?.headingFont
           ?? baseTheme.typography.fontFamily.heading,
-        body: sanityTheme.typography?.customBodyFont 
-          ?? sanityTheme.typography?.bodyFont 
+        body: sanityTheme.typography?.customBodyFont
+          ?? sanityTheme.typography?.bodyFont
           ?? baseTheme.typography.fontFamily.body
       }
     }

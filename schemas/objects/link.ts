@@ -1,9 +1,11 @@
+import { LinkIcon } from '@sanity/icons'
 import { defineType, defineField } from 'sanity'
 
 export default defineType({
   name: 'link',
   title: 'Lenke',
   type: 'object',
+  icon: LinkIcon,
   fields: [
     defineField({
       name: 'type',
@@ -29,8 +31,8 @@ export default defineType({
       type: 'reference',
       to: [
         { type: 'page' },
-        { type: 'postType' },  // Arkivsider (f.eks. /artister)
-        { type: 'post' }       // Enkeltinnlegg (f.eks. /artister/aurora)
+        { type: 'postType' },
+        { type: 'post' }
       ],
       hidden: ({ parent }) => parent?.type !== 'internal'
     }),
@@ -46,5 +48,18 @@ export default defineType({
       type: 'boolean',
       initialValue: false
     })
-  ]
+  ],
+  preview: {
+    select: {
+      title: 'label',
+      type: 'type',
+      url: 'externalUrl'
+    },
+    prepare({ title, type, url }) {
+      return {
+        title: title || 'Lenke',
+        subtitle: type === 'external' ? url : 'Intern'
+      }
+    }
+  }
 })

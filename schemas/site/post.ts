@@ -1,26 +1,29 @@
+import { DocumentIcon } from '@sanity/icons'
 import { defineType, defineField } from 'sanity'
-import { getSiteField, getSitePreviewSelect, formatSubtitleWithSite } from '../helpers/siteField'
+import { contentGroup, mediaGroup, seoGroup, visibilityGroup } from '../studio/groups'
 
 export default defineType({
   name: 'post',
   title: 'Innlegg',
   type: 'document',
-  icon: () => '📄',
+  icon: DocumentIcon,
+  groups: [contentGroup, mediaGroup, seoGroup, visibilityGroup],
   fields: [
-    ...getSiteField(),
     defineField({
       name: 'postType',
       title: 'Posttype',
       type: 'reference',
       to: [{ type: 'postType' }],
       validation: Rule => Rule.required(),
-      description: 'Velg hvilken type innlegg dette er'
+      description: 'Velg hvilken type innlegg dette er',
+      group: 'content'
     }),
     defineField({
       name: 'title',
       title: 'Tittel',
       type: 'string',
-      validation: Rule => Rule.required()
+      validation: Rule => Rule.required(),
+      group: 'content'
     }),
     defineField({
       name: 'slug',
@@ -30,7 +33,38 @@ export default defineType({
         source: 'title',
         maxLength: 96
       },
-      validation: Rule => Rule.required()
+      validation: Rule => Rule.required(),
+      group: 'content'
+    }),
+    defineField({
+      name: 'excerpt',
+      title: 'Utdrag',
+      type: 'text',
+      rows: 3,
+      description: 'Kort beskrivelse som vises i arkiv/lister',
+      group: 'content'
+    }),
+    defineField({
+      name: 'content',
+      title: 'Innhold',
+      type: 'richText',
+      description: 'Hovedinnholdet på enkeltvisningen',
+      group: 'content'
+    }),
+    defineField({
+      name: 'externalUrl',
+      title: 'Ekstern lenke',
+      type: 'url',
+      description: 'Valgfri lenke til ekstern side (f.eks. Spotify, Facebook)',
+      group: 'content'
+    }),
+    defineField({
+      name: 'externalUrlLabel',
+      title: 'Lenketekst',
+      type: 'string',
+      description: 'Tekst på knappen (f.eks. "Lytt på Spotify")',
+      hidden: ({ parent }) => !parent?.externalUrl,
+      group: 'content'
     }),
     defineField({
       name: 'featuredImage',
@@ -43,53 +77,36 @@ export default defineType({
           title: 'Alt-tekst',
           type: 'string'
         })
-      ]
-    }),
-    defineField({
-      name: 'excerpt',
-      title: 'Utdrag',
-      type: 'text',
-      rows: 3,
-      description: 'Kort beskrivelse som vises i arkiv/lister'
-    }),
-    defineField({
-      name: 'content',
-      title: 'Innhold',
-      type: 'richText',
-      description: 'Hovedinnholdet på enkeltvisningen'
+      ],
+      group: 'media'
     }),
     defineField({
       name: 'gallery',
       title: 'Bildegalleri',
       type: 'array',
-      of: [{ 
-        type: 'image', 
+      of: [{
+        type: 'image',
         options: { hotspot: true },
         fields: [
           defineField({ name: 'alt', title: 'Alt-tekst', type: 'string' }),
           defineField({ name: 'caption', title: 'Bildetekst', type: 'string' })
         ]
       }],
-      description: 'Valgfritt bildegalleri'
+      description: 'Valgfritt bildegalleri',
+      group: 'media'
     }),
     defineField({
-      name: 'externalUrl',
-      title: 'Ekstern lenke',
-      type: 'url',
-      description: 'Valgfri lenke til ekstern side (f.eks. Spotify, Facebook)'
-    }),
-    defineField({
-      name: 'externalUrlLabel',
-      title: 'Lenketekst',
-      type: 'string',
-      description: 'Tekst på knappen (f.eks. "Lytt på Spotify")',
-      hidden: ({ parent }) => !parent?.externalUrl
+      name: 'seo',
+      title: 'SEO',
+      type: 'seo',
+      group: 'seo'
     }),
     defineField({
       name: 'publishDate',
       title: 'Publiseringsdato',
       type: 'datetime',
-      initialValue: () => new Date().toISOString()
+      initialValue: () => new Date().toISOString(),
+      group: 'visibility'
     }),
     defineField({
       name: 'visibility',
@@ -102,19 +119,16 @@ export default defineType({
         ],
         layout: 'radio'
       },
-      initialValue: 'public'
+      initialValue: 'public',
+      group: 'visibility'
     }),
     defineField({
       name: 'order',
       title: 'Sorteringsrekkefølge',
       type: 'number',
       description: 'Lavere tall = vises først (valgfritt)',
-      initialValue: 0
-    }),
-    defineField({
-      name: 'seo',
-      title: 'SEO',
-      type: 'seo'
+      initialValue: 0,
+      group: 'visibility'
     })
   ],
   orderings: [
@@ -146,15 +160,15 @@ export default defineType({
     select: {
       title: 'title',
       postType: 'postType.singularTitle',
+      slug: 'slug.current',
       media: 'featuredImage',
-      visibility: 'visibility',
-      ...getSitePreviewSelect()
+      visibility: 'visibility'
     },
-    prepare({ title, postType, media, visibility, siteTitle }) {
-      const subtitle = `${postType ?? 'Ingen type'} ${visibility === 'hidden' ? '(Skjult)' : ''}`
+    prepare({ title, postType, slug, media, visibility }) {
+      const hidden = visibility === 'hidden' ? ' (Skjult)' : ''
       return {
         title: title ?? 'Uten tittel',
-        subtitle: formatSubtitleWithSite(subtitle, siteTitle),
+        subtitle: `${postType ?? 'Ingen type'} · /${slug ?? ''}${hidden}`,
         media
       }
     }

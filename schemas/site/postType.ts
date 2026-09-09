@@ -1,19 +1,14 @@
+import { TagsIcon } from '@sanity/icons'
 import { defineType, defineField } from 'sanity'
-import { getSiteField, getSitePreviewSelect, formatSubtitleWithSite } from '../helpers/siteField'
+import { archiveGroup, generalGroup, seoGroup } from '../studio/groups'
 
 export default defineType({
   name: 'postType',
   title: 'Posttype',
   type: 'document',
-  icon: () => '📁',
-  groups: [
-    { name: 'general', title: 'Generelt', default: true },
-    { name: 'archive', title: 'Arkivside' },
-    { name: 'single', title: 'Enkeltvisning' }
-  ],
+  icon: TagsIcon,
+  groups: [generalGroup, archiveGroup, seoGroup],
   fields: [
-    ...getSiteField({ group: 'general' }),
-    // General fields
     defineField({
       name: 'title',
       title: 'Navn (flertall)',
@@ -66,8 +61,6 @@ export default defineType({
       initialValue: true,
       group: 'general'
     }),
-    
-    // Archive settings
     defineField({
       name: 'archiveLayout',
       title: 'Layout',
@@ -104,41 +97,11 @@ export default defineType({
       group: 'archive'
     }),
     defineField({
-      name: 'archiveTitleColor',
-      title: 'Overskriftfarge',
-      type: 'string',
-      options: {
-        list: [
-          { title: 'Primær', value: 'primary' },
-          { title: 'Sekundær', value: 'secondary' }
-        ],
-        layout: 'radio'
-      },
-      initialValue: 'primary',
-      hidden: ({ parent }) => !parent?.hasArchive,
-      group: 'archive'
-    }),
-    defineField({
       name: 'archiveDescription',
       title: 'Beskrivelse',
       type: 'text',
       rows: 2,
       description: 'Intro-tekst på arkivsiden',
-      hidden: ({ parent }) => !parent?.hasArchive,
-      group: 'archive'
-    }),
-    defineField({
-      name: 'archiveDescriptionColor',
-      title: 'Beskrivelsefarge',
-      type: 'string',
-      options: {
-        list: [
-          { title: 'Primær', value: 'primary' },
-          { title: 'Sekundær', value: 'secondary' }
-        ],
-        layout: 'radio'
-      },
-      initialValue: 'secondary',
       hidden: ({ parent }) => !parent?.hasArchive,
       group: 'archive'
     }),
@@ -167,110 +130,22 @@ export default defineType({
       group: 'archive'
     }),
     defineField({
-      name: 'cardTitleColor',
-      title: 'Kort-tittel farge',
-      type: 'string',
-      options: {
-        list: [
-          { title: 'Primær', value: 'primary' },
-          { title: 'Sekundær', value: 'secondary' }
-        ],
-        layout: 'radio'
-      },
-      initialValue: 'primary',
-      hidden: ({ parent }) => !parent?.hasArchive,
-      group: 'archive'
-    }),
-    defineField({
-      name: 'cardExcerptColor',
-      title: 'Kort-utdrag farge',
-      type: 'string',
-      options: {
-        list: [
-          { title: 'Primær', value: 'primary' },
-          { title: 'Sekundær', value: 'secondary' }
-        ],
-        layout: 'radio'
-      },
-      initialValue: 'secondary',
-      hidden: ({ parent }) => !parent?.hasArchive || !parent?.showExcerpt,
-      group: 'archive'
-    }),
-    
-    // Single view settings
-    defineField({
-      name: 'singleTitleColor',
-      title: 'Tittel farge',
-      type: 'string',
-      options: {
-        list: [
-          { title: 'Primær', value: 'primary' },
-          { title: 'Sekundær', value: 'secondary' }
-        ],
-        layout: 'radio'
-      },
-      initialValue: 'primary',
-      hidden: ({ parent }) => !parent?.hasSingleView,
-      group: 'single'
-    }),
-    defineField({
-      name: 'singleExcerptColor',
-      title: 'Utdrag farge',
-      type: 'string',
-      options: {
-        list: [
-          { title: 'Primær', value: 'primary' },
-          { title: 'Sekundær', value: 'secondary' }
-        ],
-        layout: 'radio'
-      },
-      initialValue: 'secondary',
-      hidden: ({ parent }) => !parent?.hasSingleView,
-      group: 'single'
-    }),
-    defineField({
-      name: 'singleContentColor',
-      title: 'Brødtekst farge',
-      type: 'string',
-      options: {
-        list: [
-          { title: 'Primær', value: 'primary' },
-          { title: 'Sekundær', value: 'secondary' }
-        ],
-        layout: 'radio'
-      },
-      initialValue: 'primary',
-      hidden: ({ parent }) => !parent?.hasSingleView,
-      group: 'single'
-    }),
-    defineField({
-      name: 'singleDateColor',
-      title: 'Dato farge',
-      type: 'string',
-      options: {
-        list: [
-          { title: 'Primær', value: 'primary' },
-          { title: 'Sekundær', value: 'secondary' }
-        ],
-        layout: 'radio'
-      },
-      initialValue: 'secondary',
-      hidden: ({ parent }) => !parent?.hasSingleView,
-      group: 'single'
+      name: 'seo',
+      title: 'SEO',
+      type: 'seo',
+      group: 'seo'
     })
   ],
   preview: {
     select: {
       title: 'title',
       singular: 'singularTitle',
-      slug: 'slug.current',
-      ...getSitePreviewSelect()
+      slug: 'slug.current'
     },
-    prepare({ title, singular, slug, siteTitle }) {
-      const subtitle = `/${slug} • Entall: ${singular}`
+    prepare({ title, singular, slug }) {
       return {
         title: title ?? 'Ny posttype',
-        subtitle: formatSubtitleWithSite(subtitle, siteTitle)
+        subtitle: `/${slug ?? ''} · Entall: ${singular ?? ''}`
       }
     }
   }

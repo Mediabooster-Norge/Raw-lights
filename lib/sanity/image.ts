@@ -1,13 +1,14 @@
 import imageUrlBuilder from '@sanity/image-url'
 import { createClient } from 'next-sanity'
+import { getSanityConfig } from './client'
 
-const projectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID
+const { projectId, dataset, apiVersion } = getSanityConfig()
 
 const client = projectId
   ? createClient({
       projectId,
-      dataset: process.env.NEXT_PUBLIC_SANITY_DATASET ?? 'production',
-      apiVersion: '2024-01-01',
+      dataset,
+      apiVersion,
       useCdn: true
     })
   : null

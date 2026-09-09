@@ -8,9 +8,6 @@ const envSchema = z.object({
   SANITY_WEBHOOK_SECRET: z.string().min(1),
   NEXT_PUBLIC_SITE_URL: z.string().url(),
   REVALIDATE_SECRET: z.string().min(1),
-  SITE_URL_LANDSTREFF: z.string().url(),
-  SITE_URL_YPSILON: z.string().url(),
-  SITE_URL_JULIVINTERLAND: z.string().url(),
 })
 
 export const env = envSchema.parse(process.env)

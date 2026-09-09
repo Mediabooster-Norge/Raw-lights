@@ -1,7 +1,6 @@
-import { defineLocations, type DocumentLocationResolver } from 'sanity/presentation'
+import { defineLocations } from 'sanity/presentation'
 
-// Resolve document locations based on URL path
-export const resolve: DocumentLocationResolver = {
+export const resolve = {
   locations: {
     // Settings documents affect all pages
     globalSettings: defineLocations({

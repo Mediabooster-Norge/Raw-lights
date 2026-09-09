@@ -34,7 +34,6 @@ type MediaTextBlockProps = {
     // Styling
     background?: 'transparent' | 'background' | 'surface' | 'primary' | 'secondary'
     spacing?: 'none' | 'small' | 'medium' | 'large' | 'xlarge'
-    containerWidth?: 'full' | 'container'
   }
 }
 
@@ -184,7 +183,6 @@ export function MediaTextBlock({ data }: MediaTextBlockProps) {
       <BlockContainer
         background={data.background}
         spacing={data.spacing}
-        containerWidth={data.containerWidth}
       >
         <div className="flex flex-col items-center text-center max-w-4xl mx-auto">
           <TextContent animationDirection="up" animationDelay={0} />
@@ -203,7 +201,6 @@ export function MediaTextBlock({ data }: MediaTextBlockProps) {
     <BlockContainer
       background={data.background}
       spacing={data.spacing}
-      containerWidth={data.containerWidth}
     >
       <div className={`grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 ${verticalAlignClasses[verticalAlign]}`}>
         {/* Text side */}

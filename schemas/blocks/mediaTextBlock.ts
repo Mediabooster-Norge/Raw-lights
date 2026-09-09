@@ -1,14 +1,13 @@
+import { SplitHorizontalIcon } from '@sanity/icons'
 import { defineType, defineField } from 'sanity'
+import { appearanceGroup, contentGroup, mediaGroup } from '../studio/groups'
 
 export default defineType({
   name: 'mediaTextBlock',
   title: 'Media & Tekst',
   type: 'object',
-  groups: [
-    { name: 'content', title: 'Innhold', default: true },
-    { name: 'media', title: 'Media' },
-    { name: 'styling', title: 'Styling' }
-  ],
+  icon: SplitHorizontalIcon,
+  groups: [contentGroup, mediaGroup, appearanceGroup],
   fields: [
     defineField({
       name: 'layout',
@@ -178,7 +177,6 @@ export default defineType({
       hidden: ({ parent }) => parent?.layout === 'centered',
       group: 'media'
     }),
-    // Styling
     defineField({
       name: 'background',
       title: 'Bakgrunn',
@@ -193,7 +191,7 @@ export default defineType({
         ]
       },
       initialValue: 'transparent',
-      group: 'styling'
+      group: 'appearance'
     }),
     defineField({
       name: 'spacing',
@@ -209,22 +207,8 @@ export default defineType({
         ]
       },
       initialValue: 'medium',
-      group: 'styling'
+      group: 'appearance'
     }),
-    defineField({
-      name: 'containerWidth',
-      title: 'Bredde',
-      type: 'string',
-      options: {
-        list: [
-          { title: 'Full bredde', value: 'full' },
-          { title: 'Container', value: 'container' }
-        ],
-        layout: 'radio'
-      },
-      initialValue: 'container',
-      group: 'styling'
-    })
   ],
   preview: {
     select: {

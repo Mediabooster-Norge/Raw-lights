@@ -12,26 +12,22 @@ type CtaBlockProps = {
     textColor?: 'primary' | 'secondary'
     primaryCta?: { link: any }
     secondaryCta?: { link: any }
-    // Styling
     background?: 'transparent' | 'background' | 'surface' | 'primary' | 'secondary'
     spacing?: 'none' | 'small' | 'medium' | 'large' | 'xlarge'
-    containerWidth?: 'full' | 'container'
   }
 }
 
 export function CtaBlock({ data }: CtaBlockProps) {
-  // Clean stega encoding from config values
   const headingColor = cleanStegaString(data.headingColor)
   const textColor = cleanStegaString(data.textColor)
-  
+
   const headingColorClass = headingColor === 'secondary' ? 'text-text-secondary' : 'text-text-primary'
   const textColorClass = textColor === 'primary' ? 'text-text-primary' : 'text-text-secondary'
-  
+
   return (
     <BlockContainer
       background={data.background}
       spacing={data.spacing}
-      containerWidth={data.containerWidth}
     >
       <div className="text-center">
         {data.heading && (
@@ -42,7 +38,7 @@ export function CtaBlock({ data }: CtaBlockProps) {
             {data.text}
           </p>
         )}
-        <CtaButtons 
+        <CtaButtons
           primaryCta={data.primaryCta}
           secondaryCta={data.secondaryCta}
           alignment="center"

@@ -1,12 +1,10 @@
 import { Metadata } from 'next'
-import './globals.css'
 
 export const metadata: Metadata = {
   title: {
-    template: '%s | Lund-gruppen',
-    default: 'Lund-gruppen'
-  },
-  description: 'Festivaler og events i Norge'
+    template: '%s',
+    default: 'Nettsted'
+  }
 }
 
 export default function RootLayout({
@@ -14,5 +12,9 @@ export default function RootLayout({
 }: {
   children: React.ReactNode
 }) {
-  return children
+  return (
+    <html lang="no">
+      <body>{children}</body>
+    </html>
+  )
 }

@@ -1,6 +1,8 @@
+import './studio.css'
+
 export const metadata = {
   title: 'Sanity Studio',
-  description: 'CMS for Lund-gruppen',
+  description: 'CMS',
 }
 
 export default function StudioLayout({
@@ -8,9 +10,5 @@ export default function StudioLayout({
 }: {
   children: React.ReactNode
 }) {
-  return (
-    <html lang="no">
-      <body>{children}</body>
-    </html>
-  )
+  return children
 }

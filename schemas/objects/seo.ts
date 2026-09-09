@@ -1,16 +1,27 @@
+import { JsonIcon, SearchIcon } from '@sanity/icons'
 import { defineType, defineField } from 'sanity'
+
+function isJsonLdValue(value: unknown): boolean {
+  return typeof value === 'object' && value !== null
+}
 
 export default defineType({
   name: 'seo',
   title: 'SEO',
   type: 'object',
+  icon: SearchIcon,
+  groups: [
+    { name: 'meta', title: 'Meta', default: true, icon: SearchIcon },
+    { name: 'schema', title: 'JSON-LD', icon: JsonIcon }
+  ],
   fields: [
     defineField({
       name: 'metaTitle',
       title: 'Meta-tittel',
       type: 'string',
       description: 'Tittel som vises i søkemotorer',
-      validation: (Rule) => Rule.max(60).warning('Tittel bør være under 60 tegn')
+      validation: (Rule) => Rule.max(60).warning('Tittel bør være under 60 tegn'),
+      group: 'meta'
     }),
     defineField({
       name: 'metaDescription',
@@ -18,19 +29,22 @@ export default defineType({
       type: 'text',
       rows: 3,
       description: 'Beskrivelse som vises i søkemotorer',
-      validation: (Rule) => Rule.max(160).warning('Beskrivelse bør være under 160 tegn')
+      validation: (Rule) => Rule.max(160).warning('Beskrivelse bør være under 160 tegn'),
+      group: 'meta'
     }),
     defineField({
       name: 'metaImage',
       title: 'OG-bilde',
       type: 'image',
-      description: 'Bilde som vises ved deling på sosiale medier'
+      description: 'Bilde som vises ved deling på sosiale medier',
+      group: 'meta'
     }),
     defineField({
       name: 'canonicalUrl',
       title: 'Kanonisk URL',
       type: 'url',
-      description: 'Overstyr standard kanonisk URL'
+      description: 'Overstyr standard kanonisk URL',
+      group: 'meta'
     }),
     defineField({
       name: 'robots',
@@ -43,7 +57,29 @@ export default defineType({
           { title: 'Ikke følg lenker', value: 'index, nofollow' }
         ]
       },
-      initialValue: 'index, follow'
+      initialValue: 'index, follow',
+      group: 'meta'
+    }),
+    defineField({
+      name: 'jsonLd',
+      title: 'JSON-LD',
+      type: 'text',
+      rows: 8,
+      description: 'Valgfri schema.org-markup. Lim inn et JSON-objekt eller en array. Lagres som tekst, ikke HTML.',
+      group: 'schema',
+      validation: (Rule) =>
+        Rule.custom((value) => {
+          if (!value || typeof value !== 'string' || !value.trim()) return true
+          try {
+            const parsed = JSON.parse(value)
+            if (!isJsonLdValue(parsed)) {
+              return 'JSON-LD må være et objekt eller en array'
+            }
+            return true
+          } catch {
+            return 'Ugyldig JSON'
+          }
+        })
     })
   ]
 })

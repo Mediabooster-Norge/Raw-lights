@@ -1,5 +1,4 @@
 export * from './client'
-export * from './datasetRouter'
 export * from './fetcher'
 export * from './image'
 export * from './preview'

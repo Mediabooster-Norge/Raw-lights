@@ -1,13 +1,13 @@
+import { UlistIcon } from '@sanity/icons'
 import { defineType, defineField, defineArrayMember } from 'sanity'
+import { appearanceGroup, contentGroup } from '../studio/groups'
 
 export default defineType({
   name: 'accordionBlock',
   title: 'Spørsmål og svar',
   type: 'object',
-  groups: [
-    { name: 'content', title: 'Innhold', default: true },
-    { name: 'styling', title: 'Styling' }
-  ],
+  icon: UlistIcon,
+  groups: [contentGroup, appearanceGroup],
   fields: [
     defineField({
       name: 'heading',
@@ -65,7 +65,6 @@ export default defineType({
       ],
       group: 'content'
     }),
-    // Styling
     defineField({
       name: 'background',
       title: 'Bakgrunn',
@@ -80,7 +79,7 @@ export default defineType({
         ]
       },
       initialValue: 'transparent',
-      group: 'styling'
+      group: 'appearance'
     }),
     defineField({
       name: 'spacing',
@@ -96,22 +95,8 @@ export default defineType({
         ]
       },
       initialValue: 'medium',
-      group: 'styling'
+      group: 'appearance'
     }),
-    defineField({
-      name: 'containerWidth',
-      title: 'Bredde',
-      type: 'string',
-      options: {
-        list: [
-          { title: 'Full bredde', value: 'full' },
-          { title: 'Container', value: 'container' }
-        ],
-        layout: 'radio'
-      },
-      initialValue: 'container',
-      group: 'styling'
-    })
   ],
   preview: {
     select: {

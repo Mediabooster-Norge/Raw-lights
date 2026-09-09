@@ -1,3 +1,4 @@
+import { CodeIcon } from '@sanity/icons'
 import { defineType, defineField } from 'sanity'
 
 const BLOCKED_PATTERNS = [
@@ -24,7 +25,12 @@ export default defineType({
   name: 'customCode',
   title: 'Egendefinert kode',
   type: 'object',
+  icon: CodeIcon,
   description: 'Kun administratorer skal kunne redigere dette',
+  groups: [
+    { name: 'head', title: 'Head', default: true, icon: CodeIcon },
+    { name: 'body', title: 'Body', icon: CodeIcon }
+  ],
   fields: [
     defineField({
       name: 'headScripts',
@@ -32,7 +38,8 @@ export default defineType({
       type: 'text',
       description: 'Scripts som legges i <head> (f.eks. analytics)',
       rows: 5,
-      validation: (Rule) => Rule.custom(validateScript)
+      validation: (Rule) => Rule.custom(validateScript),
+      group: 'head'
     }),
     defineField({
       name: 'bodyStartScripts',
@@ -40,7 +47,8 @@ export default defineType({
       type: 'text',
       description: 'Scripts som legges rett etter <body>',
       rows: 5,
-      validation: (Rule) => Rule.custom(validateScript)
+      validation: (Rule) => Rule.custom(validateScript),
+      group: 'body'
     }),
     defineField({
       name: 'footerScripts',
@@ -48,7 +56,8 @@ export default defineType({
       type: 'text',
       description: 'Scripts som legges før </body>',
       rows: 5,
-      validation: (Rule) => Rule.custom(validateScript)
+      validation: (Rule) => Rule.custom(validateScript),
+      group: 'body'
     })
   ]
 })

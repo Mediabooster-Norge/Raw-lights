@@ -8,36 +8,42 @@
  */
 
 @layer base {
-  html {
+  html:not(.sanity-studio) {
     scroll-behavior: smooth;
   }
 
-  body {
+  body:not(.sanity-studio) {
     @apply bg-background text-text-primary font-body;
   }
 
-  h1, h2, h3, h4, h5, h6 {
+  html:not(.sanity-studio) h1,
+  html:not(.sanity-studio) h2,
+  html:not(.sanity-studio) h3,
+  html:not(.sanity-studio) h4,
+  html:not(.sanity-studio) h5,
+  html:not(.sanity-studio) h6 {
     @apply font-heading;
   }
 
-  /* All interactive elements should have pointer cursor */
-  a, button, [role="button"], input[type="submit"], input[type="button"] {
+  html:not(.sanity-studio) a,
+  html:not(.sanity-studio) button,
+  html:not(.sanity-studio) [role="button"],
+  html:not(.sanity-studio) input[type="submit"],
+  html:not(.sanity-studio) input[type="button"] {
     @apply cursor-pointer;
   }
 
-  /* Focus visible styles for accessibility */
-  *:focus-visible {
+  html:not(.sanity-studio) *:focus-visible {
     @apply outline-2 outline-offset-2 outline-primary;
   }
 
-  /* Remove focus outline for mouse users */
-  *:focus:not(:focus-visible) {
+  html:not(.sanity-studio) *:focus:not(:focus-visible) {
     @apply outline-none;
   }
 }
 
 @layer components {
-  .container {
+  .site-container {
     @apply max-w-7xl mx-auto px-4;
   }
 

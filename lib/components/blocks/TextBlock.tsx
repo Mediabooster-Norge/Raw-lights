@@ -10,27 +10,16 @@ type TextBlockProps = {
     content?: any
     alignment?: 'left' | 'center' | 'right'
     textColor?: 'primary' | 'secondary'
-    textWidth?: 'narrow' | 'medium' | 'wide'
     primaryCta?: { link: any }
     secondaryCta?: { link: any }
-    // Styling
     background?: 'transparent' | 'background' | 'surface' | 'primary' | 'secondary'
     spacing?: 'none' | 'small' | 'medium' | 'large' | 'xlarge'
-    containerWidth?: 'full' | 'container'
   }
 }
 
 export function TextBlock({ data }: TextBlockProps) {
-  // Clean stega encoding from config values
   const alignment = cleanStegaString(data.alignment) ?? 'left'
-  const textWidth = cleanStegaString(data.textWidth) ?? 'medium'
   const textColor = cleanStegaString(data.textColor) ?? 'primary'
-  
-  const textWidthClasses: Record<string, string> = {
-    narrow: 'max-w-2xl',
-    medium: 'max-w-4xl',
-    wide: 'max-w-6xl'
-  }
 
   const textColorClasses: Record<string, string> = {
     primary: 'text-text-primary',
@@ -47,11 +36,10 @@ export function TextBlock({ data }: TextBlockProps) {
     <BlockContainer
       background={data.background}
       spacing={data.spacing}
-      containerWidth={data.containerWidth}
     >
-      <div className={`${textWidthClasses[textWidth] ?? textWidthClasses.medium} ${textColorClasses[textColor] ?? textColorClasses.primary} ${alignmentClasses[alignment] ?? alignmentClasses.left} mx-auto`}>
+      <div className={`max-w-4xl ${textColorClasses[textColor] ?? textColorClasses.primary} ${alignmentClasses[alignment] ?? alignmentClasses.left} mx-auto`}>
         <PortableText value={data.content} className="prose prose-lg prose-inherit" />
-        <CtaButtons 
+        <CtaButtons
           primaryCta={data.primaryCta}
           secondaryCta={data.secondaryCta}
           className="mt-8"
