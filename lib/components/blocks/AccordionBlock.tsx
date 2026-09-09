@@ -22,7 +22,6 @@ type AccordionBlockProps = {
     // Styling
     background?: 'transparent' | 'background' | 'surface' | 'primary' | 'secondary'
     spacing?: 'none' | 'small' | 'medium' | 'large' | 'xlarge'
-    containerWidth?: 'full' | 'container'
   }
 }
 
@@ -36,7 +35,6 @@ export function AccordionBlock({ data }: AccordionBlockProps) {
     <BlockContainer
       background={data.background}
       spacing={data.spacing}
-      containerWidth={data.containerWidth}
     >
       {data.heading && (
         <h2 className={`text-2xl font-bold mb-6 ${headingColorClass}`}>{data.heading}</h2>

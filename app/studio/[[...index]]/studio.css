@@ -1,0 +1,18 @@
+html,
+body {
+  margin: 0;
+  height: 100%;
+}
+
+/* Keep Studio chrome and icons monochrome */
+[data-ui='Navbar'] [data-ui='Box'] svg,
+[data-ui='PaneHeader'] svg,
+[data-ui='Tab'] svg,
+[data-ui='MenuItem'] svg,
+[data-ui='Button'] svg {
+  color: currentColor;
+}
+
+[data-ui='Tab'][data-selected] {
+  font-weight: 600;
+}

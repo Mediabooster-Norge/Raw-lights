@@ -1,13 +1,13 @@
+import { InlineIcon } from '@sanity/icons'
 import { defineType, defineField, defineArrayMember } from 'sanity'
+import { appearanceGroup, contentGroup } from '../studio/groups'
 
 export default defineType({
   name: 'marqueeBlock',
   title: 'Marquee',
   type: 'object',
-  groups: [
-    { name: 'content', title: 'Innhold', default: true },
-    { name: 'styling', title: 'Styling' }
-  ],
+  icon: InlineIcon,
+  groups: [contentGroup, appearanceGroup],
   fields: [
     defineField({
       name: 'contentType',
@@ -140,7 +140,6 @@ export default defineType({
       hidden: ({ parent }) => parent?.contentType !== 'images',
       group: 'content'
     }),
-    // Styling
     defineField({
       name: 'background',
       title: 'Bakgrunn',
@@ -155,7 +154,7 @@ export default defineType({
         ]
       },
       initialValue: 'transparent',
-      group: 'styling'
+      group: 'appearance'
     }),
     defineField({
       name: 'spacing',
@@ -171,22 +170,8 @@ export default defineType({
         ]
       },
       initialValue: 'medium',
-      group: 'styling'
+      group: 'appearance'
     }),
-    defineField({
-      name: 'containerWidth',
-      title: 'Bredde',
-      type: 'string',
-      options: {
-        list: [
-          { title: 'Full bredde', value: 'full' },
-          { title: 'Container', value: 'container' }
-        ],
-        layout: 'radio'
-      },
-      initialValue: 'full',
-      group: 'styling'
-    })
   ],
   preview: {
     select: {

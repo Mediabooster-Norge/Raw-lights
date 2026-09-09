@@ -3,7 +3,6 @@
 import Link from 'next/link'
 import { SanityImage } from '@/lib/components/ui/SanityImage'
 import { PortableText } from '@/lib/components/ui/PortableText'
-import { cleanStegaString } from '@/lib/utils/stegaClean'
 
 type Post = {
   _id: string
@@ -20,21 +19,11 @@ type Post = {
     title: string
     singularTitle: string
     slug: string
-    singleTitleColor?: 'primary' | 'secondary'
-    singleExcerptColor?: 'primary' | 'secondary'
-    singleContentColor?: 'primary' | 'secondary'
-    singleDateColor?: 'primary' | 'secondary'
   }
 }
 
 type PostSingleProps = {
   post: Post
-}
-
-// Helper function to get text color class
-function getTextColorClass(color?: string, defaultColor: 'primary' | 'secondary' = 'primary') {
-  const cleanColor = cleanStegaString(color) ?? defaultColor
-  return cleanColor === 'secondary' ? 'text-text-secondary' : 'text-text-primary'
 }
 
 export function PostSingle({ post }: PostSingleProps) {
@@ -46,11 +35,10 @@ export function PostSingle({ post }: PostSingleProps) {
     })
   }
   
-  // Color classes from postType settings
-  const titleColorClass = getTextColorClass(post.postType.singleTitleColor, 'primary')
-  const excerptColorClass = getTextColorClass(post.postType.singleExcerptColor, 'secondary')
-  const contentColorClass = getTextColorClass(post.postType.singleContentColor, 'primary')
-  const dateColorClass = getTextColorClass(post.postType.singleDateColor, 'secondary')
+  const titleColorClass = 'text-text-primary'
+  const excerptColorClass = 'text-text-secondary'
+  const contentColorClass = 'text-text-primary'
+  const dateColorClass = 'text-text-secondary'
 
   return (
     <article className="py-16">

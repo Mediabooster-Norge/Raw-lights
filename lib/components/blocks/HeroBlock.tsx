@@ -22,8 +22,6 @@ type HeroBlockProps = {
     secondaryCta?: { link: any }
     alignment?: 'left' | 'center' | 'right'
     animateText?: boolean
-    // Styling
-    containerWidth?: 'full' | 'container'
   }
 }
 
@@ -33,7 +31,6 @@ export function HeroBlock({ data }: HeroBlockProps) {
   const backgroundType = cleanStegaString(data.backgroundType)
   const isVideo = backgroundType === 'video'
   const animateText = data.animateText ?? false
-  const containerWidth = cleanStegaString(data.containerWidth) ?? 'container'
   
   const alignmentClasses = {
     left: 'text-left items-start',
@@ -85,8 +82,8 @@ export function HeroBlock({ data }: HeroBlockProps) {
         </div>
       )}
 
-      <div className={`relative z-10 w-full py-16 ${containerWidth === 'container' ? 'px-4 md:px-8' : ''}`}>
-        <div className={`flex flex-col ${containerWidth === 'container' ? 'max-w-4xl' : 'max-w-6xl'} ${alignment === 'center' ? 'mx-auto' : alignment === 'right' ? 'ml-auto' : ''} ${containerWidth === 'full' ? 'px-4 md:px-8' : ''} ${alignmentClasses[alignment]}`}>
+      <div className="relative z-10 w-full py-16 px-4 md:px-8">
+        <div className={`flex flex-col max-w-4xl ${alignment === 'center' ? 'mx-auto' : alignment === 'right' ? 'ml-auto' : ''} ${alignmentClasses[alignment]}`}>
           {data.heading && (
             <h1 className={`text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold text-white mb-6 ${headingAnimation}`}>
               {data.heading}

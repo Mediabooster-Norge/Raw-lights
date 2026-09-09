@@ -1,13 +1,15 @@
+import { HomeIcon, ImageIcon } from '@sanity/icons'
 import { defineType, defineField } from 'sanity'
+import { contentGroup } from '../studio/groups'
 
 export default defineType({
   name: 'heroBlock',
   title: 'Hero',
   type: 'object',
+  icon: HomeIcon,
   groups: [
-    { name: 'content', title: 'Innhold', default: true },
-    { name: 'background', title: 'Bakgrunn' },
-    { name: 'styling', title: 'Styling' }
+    contentGroup,
+    { name: 'background', title: 'Bakgrunn', icon: ImageIcon },
   ],
   fields: [
     defineField({
@@ -105,22 +107,6 @@ export default defineType({
       hidden: ({ parent }) => parent?.backgroundType !== 'video',
       group: 'background'
     }),
-    // Styling - Hero har alltid full bredde og håndterer egen padding
-    defineField({
-      name: 'containerWidth',
-      title: 'Innholdsbredde',
-      type: 'string',
-      options: {
-        list: [
-          { title: 'Full bredde', value: 'full' },
-          { title: 'Container', value: 'container' }
-        ],
-        layout: 'radio'
-      },
-      initialValue: 'container',
-      description: 'Bestemmer om innholdet skal begrenses eller gå helt ut',
-      group: 'styling'
-    })
   ],
   preview: {
     select: { title: 'heading' },

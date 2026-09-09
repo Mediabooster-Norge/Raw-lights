@@ -1,6 +1,9 @@
 import { MetadataRoute } from 'next'
+import { getSiteUrl } from '@/lib/utils/getSiteUrl'
 
 export default function robots(): MetadataRoute.Robots {
+  const siteUrl = getSiteUrl()
+
   return {
     rules: [
       {
@@ -9,10 +12,6 @@ export default function robots(): MetadataRoute.Robots {
         disallow: ['/studio/', '/api/']
       }
     ],
-    sitemap: [
-      'https://landstreffstavanger.no/sitemap.xml',
-      'https://ypsilonfestivalen.no/sitemap.xml',
-      'https://julivinterland.no/sitemap.xml'
-    ]
+    sitemap: `${siteUrl}/sitemap.xml`
   }
 }

@@ -9,6 +9,7 @@ type SanityImageProps = {
   height?: number
   priority?: boolean
   fill?: boolean
+  style?: React.CSSProperties
 }
 
 export function SanityImage({ 
@@ -18,7 +19,8 @@ export function SanityImage({
   width = 1200,
   height = 800,
   priority = false,
-  fill = false
+  fill = false,
+  style
 }: SanityImageProps) {
   if (!image?.asset) return null
 
@@ -31,6 +33,7 @@ export function SanityImage({
         alt={image.alt ?? alt}
         fill
         className={className}
+        style={style}
         priority={priority}
       />
     )
@@ -43,6 +46,7 @@ export function SanityImage({
       width={width}
       height={height}
       className={className}
+      style={style}
       priority={priority}
     />
   )

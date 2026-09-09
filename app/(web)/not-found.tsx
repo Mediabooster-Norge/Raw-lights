@@ -9,7 +9,7 @@ export default function NotFound() {
         <p className="text-text-secondary mb-8">
           Beklager, vi kunne ikke finne siden du leter etter.
         </p>
-        <Link 
+        <Link
           href="/"
           className="inline-block px-6 py-3 bg-primary text-on-primary rounded-lg font-semibold hover:opacity-90 transition-opacity"
         >

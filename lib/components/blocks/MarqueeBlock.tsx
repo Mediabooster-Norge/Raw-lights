@@ -21,7 +21,6 @@ type MarqueeBlockProps = {
     // Styling
     background?: 'transparent' | 'background' | 'surface' | 'primary' | 'secondary'
     spacing?: 'none' | 'small' | 'medium' | 'large' | 'xlarge'
-    containerWidth?: 'full' | 'container'
   }
 }
 
@@ -162,7 +161,7 @@ export function MarqueeBlock({ data }: MarqueeBlockProps) {
     <BlockContainer
       background={data.background}
       spacing={data.spacing}
-      containerWidth={data.containerWidth}
+      fullBleed
     >
       <div className="overflow-hidden">
         <div

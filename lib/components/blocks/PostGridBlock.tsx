@@ -44,7 +44,6 @@ type PostGridBlockProps = {
     // Styling
     background?: 'transparent' | 'background' | 'surface' | 'primary' | 'secondary'
     spacing?: 'none' | 'small' | 'medium' | 'large' | 'xlarge'
-    containerWidth?: 'full' | 'container'
   }
 }
 
@@ -89,7 +88,6 @@ export function PostGridBlock({ data }: PostGridBlockProps) {
     <BlockContainer
       background={data.background}
       spacing={data.spacing}
-      containerWidth={data.containerWidth}
     >
       {/* Header */}
       {(data.heading || data.description) && (

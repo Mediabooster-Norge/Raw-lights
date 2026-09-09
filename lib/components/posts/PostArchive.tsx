@@ -25,26 +25,16 @@ type PostType = {
   archiveLayout?: 'grid' | 'list' | 'masonry'
   archiveColumns?: number
   archiveTitle?: string
-  archiveTitleColor?: 'primary' | 'secondary'
   archiveDescription?: string
-  archiveDescriptionColor?: 'primary' | 'secondary'
   showExcerpt?: boolean
   showImage?: boolean
   showDate?: boolean
   hasSingleView?: boolean
-  cardTitleColor?: 'primary' | 'secondary'
-  cardExcerptColor?: 'primary' | 'secondary'
 }
 
 type PostArchiveProps = {
   postType: PostType
   posts: Post[]
-}
-
-// Helper function to get text color class
-function getTextColorClass(color?: string, defaultColor: 'primary' | 'secondary' = 'primary') {
-  const cleanColor = cleanStegaString(color) ?? defaultColor
-  return cleanColor === 'secondary' ? 'text-text-secondary' : 'text-text-primary'
 }
 
 export function PostArchive({ postType, posts }: PostArchiveProps) {
@@ -55,12 +45,10 @@ export function PostArchive({ postType, posts }: PostArchiveProps) {
   const showImage = postType.showImage ?? true
   const showDate = postType.showDate ?? false
   const hasSingleView = postType.hasSingleView ?? true
-  
-  // Color classes
-  const titleColorClass = getTextColorClass(postType.archiveTitleColor, 'primary')
-  const descriptionColorClass = getTextColorClass(postType.archiveDescriptionColor, 'secondary')
-  const cardTitleColorClass = getTextColorClass(postType.cardTitleColor, 'primary')
-  const cardExcerptColorClass = getTextColorClass(postType.cardExcerptColor, 'secondary')
+  const titleColorClass = 'text-text-primary'
+  const descriptionColorClass = 'text-text-secondary'
+  const cardTitleColorClass = 'text-text-primary'
+  const cardExcerptColorClass = 'text-text-secondary'
 
   const gridColumnsClass = {
     2: 'grid-cols-1 sm:grid-cols-2',
@@ -68,15 +56,6 @@ export function PostArchive({ postType, posts }: PostArchiveProps) {
     4: 'grid-cols-2 sm:grid-cols-3 lg:grid-cols-4'
   }[columns] ?? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3'
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('nb-NO', {
-      day: 'numeric',
-      month: 'long',
-      year: 'numeric'
-    })
-  }
-
-  // Grid Layout
   if (layout === 'grid') {
     return (
       <div className="py-16">

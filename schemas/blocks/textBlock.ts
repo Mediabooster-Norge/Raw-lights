@@ -1,13 +1,13 @@
+import { TextIcon } from '@sanity/icons'
 import { defineType, defineField } from 'sanity'
+import { appearanceGroup, contentGroup } from '../studio/groups'
 
 export default defineType({
   name: 'textBlock',
   title: 'Tekst',
   type: 'object',
-  groups: [
-    { name: 'content', title: 'Innhold', default: true },
-    { name: 'styling', title: 'Styling' }
-  ],
+  icon: TextIcon,
+  groups: [contentGroup, appearanceGroup],
   fields: [
     // Innhold
     defineField({
@@ -45,20 +45,6 @@ export default defineType({
       group: 'content'
     }),
     defineField({
-      name: 'textWidth',
-      title: 'Tekstbredde',
-      type: 'string',
-      options: {
-        list: [
-          { title: 'Smal', value: 'narrow' },
-          { title: 'Medium', value: 'medium' },
-          { title: 'Bred', value: 'wide' }
-        ]
-      },
-      initialValue: 'medium',
-      group: 'content'
-    }),
-    defineField({
       name: 'primaryCta',
       title: 'Primær CTA',
       type: 'object',
@@ -76,7 +62,6 @@ export default defineType({
       ],
       group: 'content'
     }),
-    // Styling
     defineField({
       name: 'background',
       title: 'Bakgrunn',
@@ -91,7 +76,7 @@ export default defineType({
         ]
       },
       initialValue: 'transparent',
-      group: 'styling'
+      group: 'appearance'
     }),
     defineField({
       name: 'spacing',
@@ -107,22 +92,8 @@ export default defineType({
         ]
       },
       initialValue: 'medium',
-      group: 'styling'
+      group: 'appearance'
     }),
-    defineField({
-      name: 'containerWidth',
-      title: 'Bredde',
-      type: 'string',
-      options: {
-        list: [
-          { title: 'Full bredde', value: 'full' },
-          { title: 'Container', value: 'container' }
-        ],
-        layout: 'radio'
-      },
-      initialValue: 'container',
-      group: 'styling'
-    })
   ],
   preview: {
     prepare() {

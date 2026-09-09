@@ -6,10 +6,9 @@ type SectionBlockProps = {
     _type: string
     background?: 'transparent' | 'primary' | 'secondary' | 'background' | 'surface'
     spacing?: 'none' | 'small' | 'medium' | 'large' | 'xlarge'
-    containerWidth?: 'full' | 'container'
     children?: any[]
   }
-  renderChildren: (children: any[]) => ReactNode
+  renderChildren?: (children: any[]) => ReactNode
 }
 
 export function SectionBlock({ data, renderChildren }: SectionBlockProps) {
@@ -29,20 +28,15 @@ export function SectionBlock({ data, renderChildren }: SectionBlockProps) {
     xlarge: 'py-32 md:py-48'
   }
 
-  const containerClasses = {
-    full: 'w-full',
-    container: 'max-w-7xl mx-auto px-4'
-  }
-
   return (
-    <section 
+    <section
       className={`
         ${backgroundClasses[data.background ?? 'background']}
         ${spacingClasses[data.spacing ?? 'medium']}
       `}
     >
-      <div className={containerClasses[data.containerWidth ?? 'container']}>
-        {data.children && renderChildren(data.children)}
+      <div className="max-w-7xl mx-auto px-4">
+        {data.children && renderChildren?.(data.children)}
       </div>
     </section>
   )

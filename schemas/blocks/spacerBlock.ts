@@ -1,9 +1,11 @@
+import { ExpandIcon } from '@sanity/icons'
 import { defineType, defineField } from 'sanity'
 
 export default defineType({
   name: 'spacerBlock',
   title: 'Mellomrom',
   type: 'object',
+  icon: ExpandIcon,
   fields: [
     defineField({
       name: 'size',

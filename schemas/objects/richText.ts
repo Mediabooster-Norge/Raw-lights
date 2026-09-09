@@ -1,3 +1,4 @@
+import { DocumentIcon, ImageIcon, LinkIcon, PlayIcon } from '@sanity/icons'
 import { defineType, defineArrayMember } from 'sanity'
 
 export default defineType({
@@ -29,6 +30,7 @@ export default defineType({
             name: 'link',
             type: 'object',
             title: 'Ekstern lenke',
+            icon: LinkIcon,
             fields: [
               { name: 'href', type: 'url', title: 'URL' },
               { name: 'blank', type: 'boolean', title: 'Åpne i ny fane', initialValue: false }
@@ -38,6 +40,7 @@ export default defineType({
             name: 'internalLink',
             type: 'object',
             title: 'Intern lenke',
+            icon: DocumentIcon,
             fields: [
               {
                 name: 'reference',
@@ -45,8 +48,8 @@ export default defineType({
                 title: 'Side',
                 to: [
                   { type: 'page' },
-                  { type: 'postType' },  // Arkivsider
-                  { type: 'post' }       // Enkeltinnlegg
+                  { type: 'postType' },
+                  { type: 'post' }
                 ]
               }
             ]
@@ -56,6 +59,7 @@ export default defineType({
     }),
     defineArrayMember({
       type: 'image',
+      icon: ImageIcon,
       options: { hotspot: true },
       fields: [
         { name: 'alt', type: 'string', title: 'Alt tekst' },
@@ -66,6 +70,7 @@ export default defineType({
       name: 'youtube',
       type: 'object',
       title: 'YouTube-video',
+      icon: PlayIcon,
       fields: [
         { name: 'videoId', type: 'string', title: 'Video-ID' }
       ],

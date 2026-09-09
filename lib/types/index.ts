@@ -10,16 +10,15 @@ export type Page = {
   seo?: SEO
 }
 
-// SEO types
 export type SEO = {
   metaTitle?: string
   metaDescription?: string
   metaImage?: SanityImage
   canonicalUrl?: string
   robots?: string
+  jsonLd?: string
 }
 
-// Block types
 export type SanityBlock = {
   _key: string
   _type: string
@@ -27,7 +26,6 @@ export type SanityBlock = {
   [key: string]: unknown
 }
 
-// Image types
 export type SanityImage = {
   asset: {
     _id: string
@@ -52,7 +50,6 @@ export type SanityImage = {
   }
 }
 
-// Link types
 export type SanityLink = {
   _type: 'link'
   type: 'internal' | 'external'
@@ -65,7 +62,6 @@ export type SanityLink = {
   openInNewTab?: boolean
 }
 
-// Navigation types
 export type NavItem = {
   label: string
   link?: SanityLink
@@ -88,7 +84,6 @@ export type Navigation = {
   }[]
 }
 
-// Post Type types
 export type PostType = {
   _id: string
   _type: 'postType'
@@ -105,9 +100,9 @@ export type PostType = {
   showExcerpt?: boolean
   showImage?: boolean
   showDate?: boolean
+  seo?: SEO
 }
 
-// Post types
 export type Post = {
   _id: string
   _type: 'post'
@@ -126,24 +121,13 @@ export type Post = {
   seo?: SEO
 }
 
-// Theme types
 export type SiteTheme = {
   logo?: SanityImage
-  logoDark?: SanityImage
   favicon?: SanityImage
-  ogImage?: SanityImage
   colors?: {
-    primary?: { hex: string }
-    secondary?: { hex: string }
-    tertiary?: { hex: string }
-    background?: { hex: string }
-    surface?: { hex: string }
-    textPrimary?: { hex: string }
-    textSecondary?: { hex: string }
-  }
-  buttonColors?: {
-    primary?: { background?: { hex: string }; text?: { hex: string } }
-    secondary?: { background?: { hex: string }; text?: { hex: string } }
+    primary?: { hex: string; alpha?: number }
+    background?: { hex: string; alpha?: number }
+    textPrimary?: { hex: string; alpha?: number }
   }
   typography?: {
     headingFont?: string
@@ -153,8 +137,8 @@ export type SiteTheme = {
   }
 }
 
-// Global settings types
 export type GlobalSettings = {
+  siteName?: string
   siteTheme?: SiteTheme
   seo?: SEO
   customCode?: {
