@@ -8,8 +8,17 @@ type ImageLike = {
   alt?: string
 }
 
+const ARTICLE_TYPES = new Set(['Article', 'NewsArticle', 'BlogPosting'])
+const PERSON_LIKE = new Set(['Person', 'MusicGroup', 'PerformingGroup'])
+const ORG_LIKE = new Set(['Organization', 'LocalBusiness'])
+
 function imageUrl(image?: ImageLike | null): string | undefined {
   return image?.asset?.url
+}
+
+function imageObject(url?: string): GraphNode | undefined {
+  if (!url) return undefined
+  return { '@type': 'ImageObject', url }
 }
 
 function breadcrumbList(baseUrl: string, segments: { name: string; path: string }[]): GraphNode {
@@ -32,6 +41,86 @@ function breadcrumbList(baseUrl: string, segments: { name: string; path: string 
   }
 }
 
+function organizationRef(siteUrl: string) {
+  return { '@id': `${siteUrl}/#organization` }
+}
+
+function applySharedEntityFields(
+  node: GraphNode,
+  input: {
+    title: string
+    url: string
+    locale: string
+    description?: string
+    imageUrl?: string
+    sameAs?: string
+  }
+) {
+  node.name = input.title
+  node.url = input.url
+  node.inLanguage = input.locale
+  if (input.description) node.description = input.description
+  const image = imageObject(input.imageUrl)
+  if (image) node.image = image
+  if (input.sameAs) node.sameAs = [input.sameAs]
+}
+
+function applyTypeFields(
+  type: string,
+  node: GraphNode,
+  input: {
+    title: string
+    url: string
+    siteUrl: string
+    description?: string
+    imageUrl?: string
+    datePublished?: string
+    dateModified?: string
+    sameAs?: string
+  }
+) {
+  if (ARTICLE_TYPES.has(type)) {
+    node.headline = input.title
+    node.mainEntityOfPage = { '@type': 'WebPage', '@id': input.url }
+    node.publisher = organizationRef(input.siteUrl)
+    node.author = organizationRef(input.siteUrl)
+    if (input.datePublished) node.datePublished = input.datePublished
+    if (input.dateModified) node.dateModified = input.dateModified
+  }
+
+  if (PERSON_LIKE.has(type) && input.sameAs) {
+    node.sameAs = [input.sameAs]
+  }
+
+  if (ORG_LIKE.has(type)) {
+    const logo = imageObject(input.imageUrl)
+    if (logo) node.logo = logo
+  }
+
+  if (type === 'Event') {
+    if (input.datePublished) node.startDate = input.datePublished
+    node.organizer = organizationRef(input.siteUrl)
+  }
+
+  if (type === 'VideoObject') {
+    if (input.imageUrl) node.thumbnailUrl = input.imageUrl
+    if (input.datePublished) node.uploadDate = input.datePublished
+  }
+
+  if (type === 'ImageObject' && input.imageUrl) {
+    node.contentUrl = input.imageUrl
+  }
+
+  if (type === 'Offer' && input.sameAs) {
+    node.url = input.sameAs
+  }
+
+  if (type === 'Review' && input.description) {
+    node.reviewBody = input.description
+    node.itemReviewed = { '@type': 'CreativeWork', name: input.title }
+  }
+}
+
 export function buildOrganizationGraph(input: {
   siteName?: string
   siteUrl: string
@@ -45,7 +134,7 @@ export function buildOrganizationGraph(input: {
     url: input.siteUrl,
   }
   if (input.logoUrl) {
-    organization.logo = input.logoUrl
+    organization.logo = imageObject(input.logoUrl)
   }
 
   const website: GraphNode = {
@@ -53,7 +142,7 @@ export function buildOrganizationGraph(input: {
     '@id': `${input.siteUrl}/#website`,
     url: input.siteUrl,
     name: input.siteName || 'Website',
-    publisher: { '@id': `${input.siteUrl}/#organization` },
+    publisher: organizationRef(input.siteUrl),
     inLanguage: input.locale || 'nb',
   }
 
@@ -103,6 +192,14 @@ export function buildPageJsonLd(input: {
     }))
   }
 
+  if (type === 'Event') {
+    applyTypeFields(type, node, {
+      title: input.title,
+      url: input.url,
+      siteUrl: input.siteUrl,
+    })
+  }
+
   return {
     '@context': 'https://schema.org',
     '@graph': [
@@ -122,6 +219,9 @@ export function buildPostJsonLd(input: {
   locale: string
   imageUrl?: string
   datePublished?: string
+  dateModified?: string
+  sameAs?: string
+  breadcrumbs?: { name: string; path: string }[]
 }): GraphNode | null {
   if (input.override && typeof input.override === 'object') {
     return input.override as GraphNode
@@ -130,27 +230,45 @@ export function buildPostJsonLd(input: {
   const type = input.type && input.type !== 'None' ? input.type : null
   if (!type) return null
 
+  if (type === 'ProfilePage') {
+    const person: GraphNode = {
+      '@type': 'Person',
+      '@id': `${input.url}#person`,
+    }
+    applySharedEntityFields(person, input)
+    applyTypeFields('Person', person, input)
+
+    return {
+      '@context': 'https://schema.org',
+      '@graph': [
+        {
+          '@type': 'ProfilePage',
+          '@id': `${input.url}#webpage`,
+          url: input.url,
+          name: input.title,
+          inLanguage: input.locale,
+          isPartOf: { '@id': `${input.siteUrl}/#website` },
+          mainEntity: { '@id': `${input.url}#person` },
+        },
+        person,
+        breadcrumbList(input.siteUrl, input.breadcrumbs ?? []),
+      ],
+    }
+  }
+
   const node: GraphNode = {
     '@type': type,
-    '@id': `${input.url}#${type.toLowerCase()}`,
-    name: input.title,
-    url: input.url,
-    inLanguage: input.locale,
+    '@id': `${input.url}#entity`,
   }
-
-  if (type === 'Article' || type === 'NewsArticle') {
-    node.headline = input.title
-    node.mainEntityOfPage = input.url
-    if (input.datePublished) node.datePublished = input.datePublished
-    node.publisher = { '@id': `${input.siteUrl}/#organization` }
-  }
-
-  if (input.description) node.description = input.description
-  if (input.imageUrl) node.image = input.imageUrl
+  applySharedEntityFields(node, input)
+  applyTypeFields(type, node, input)
 
   return {
     '@context': 'https://schema.org',
-    '@graph': [node],
+    '@graph': [
+      node,
+      breadcrumbList(input.siteUrl, input.breadcrumbs ?? []),
+    ],
   }
 }
 

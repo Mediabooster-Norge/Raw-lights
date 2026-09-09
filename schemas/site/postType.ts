@@ -136,12 +136,14 @@ export default defineType({
       name: 'jsonLdType',
       title: 'JSON-LD-type for innlegg',
       type: 'string',
-      group: 'seo',
+      group: 'general',
       options: {
         list: [...jsonLdPostTypes],
+        layout: 'dropdown',
       },
       initialValue: 'None',
-      description: 'Alle enkeltinnlegg av denne typen arver denne schema.org-typen.',
+      description:
+        'Schema.org-type alle enkeltinnlegg arver. Koden fyller tittel, URL, bilde, utdrag og dato. Velg typen som matcher innholdet (Person for artister, NewsArticle for nyheter). Ikke lim JSON.',
     }),
     defineField({
       name: 'seo',

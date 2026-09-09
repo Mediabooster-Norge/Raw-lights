@@ -2,6 +2,7 @@ import { DocumentIcon } from '@sanity/icons'
 import { defineType, defineField } from 'sanity'
 import { contentGroup, mediaGroup, seoGroup, visibilityGroup } from '../studio/groups'
 import { languageField } from '../helpers/languageField'
+import { jsonLdPostTypeOverrides } from '../../lib/seo/types'
 
 export default defineType({
   name: 'post',
@@ -96,6 +97,19 @@ export default defineType({
       }],
       description: 'Valgfritt bildegalleri',
       group: 'media'
+    }),
+    defineField({
+      name: 'jsonLdType',
+      title: 'JSON-LD-type',
+      type: 'string',
+      group: 'seo',
+      options: {
+        list: [...jsonLdPostTypeOverrides],
+        layout: 'dropdown',
+      },
+      initialValue: 'inherit',
+      description:
+        'Arver schema.org-type fra posttypen. Overstyr bare når dette innlegget er en annen type enn resten i gruppen.',
     }),
     defineField({
       name: 'seo',

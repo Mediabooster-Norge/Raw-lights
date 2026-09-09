@@ -56,9 +56,11 @@ export default defineType({
       group: 'seo',
       options: {
         list: [...jsonLdPageTypes],
+        layout: 'dropdown',
       },
       initialValue: 'WebPage',
-      description: 'Schema.org-type for siden. FAQPage kan også bygges automatisk fra spørsmål og svar.',
+      description:
+        'Schema.org-type for siden. FAQPage bygges automatisk fra accordion. BreadcrumbList legges alltid på. Bruk overstyring bare når den genererte grafen ikke holder.',
     }),
     defineField({
       name: 'jsonLdOverride',
