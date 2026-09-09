@@ -4,6 +4,6 @@
 
 Untranslated documents (`!defined(language)`) match `nb`.
 
-Webhook `POST /api/revalidate` calls `revalidateTag(tag, { expire: 0 })` in Next 16.
+Webhook `POST /api/revalidate` uses `revalidateTag(tag, { expire: 0 })` and locale-aware `revalidatePath` (`/` and `/en`, plus slug paths). See README for the GROQ projection.
 
 Do not enable Cache Components / PPR unless a project needs them. ISR + tags is the default.

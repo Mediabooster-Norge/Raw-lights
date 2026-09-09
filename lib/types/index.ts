@@ -148,6 +148,8 @@ export type GlobalSettings = {
   homePageId?: string
   homePageSlug?: string
   notFoundPageId?: string
+  privacyPageId?: string
+  privacyPageSlug?: string
   siteTheme?: SiteTheme
   seo?: SEO
   customCode?: {

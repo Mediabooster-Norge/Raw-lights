@@ -8,6 +8,7 @@ import { isLocale, locales, localizedPath, publicUrl, type Locale } from '@/lib/
 import { metadataAlternates } from '@/lib/i18n/alternates'
 import { buildPostJsonLd, imageAssetUrl, parseJsonLdOverride } from '@/lib/seo/buildJsonLd'
 import { resolvePostJsonLdType } from '@/lib/seo/types'
+import { socialMetadata } from '@/lib/seo/socialMetadata'
 
 type Props = {
   params: Promise<{ locale: string; slug: string; postSlug: string }>
@@ -48,20 +49,24 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 
   const baseUrl = getSiteUrl()
+  const title = post.seo?.metaTitle ?? post.title
+  const description = post.seo?.metaDescription ?? post.excerpt
+  const imageUrl = post.seo?.metaImage?.asset?.url || post.featuredImage?.asset?.url
+  const canonical = post.seo?.canonicalUrl ?? publicUrl(baseUrl, locale, `/${postTypeSlug}/${postSlug}`)
 
   return {
-    title: post.seo?.metaTitle ?? post.title,
-    description: post.seo?.metaDescription ?? post.excerpt,
-    openGraph: {
-      title: post.seo?.metaTitle ?? post.title,
-      description: post.seo?.metaDescription ?? post.excerpt,
-      images: (post.seo?.metaImage?.asset?.url || post.featuredImage?.asset?.url)
-        ? [{ url: post.seo?.metaImage?.asset?.url || post.featuredImage?.asset?.url }]
-        : []
-    },
+    title,
+    description,
+    ...socialMetadata({
+      title,
+      description,
+      imageUrl,
+      locale,
+      url: canonical,
+    }),
     alternates: await metadataAlternates(
       localizedPath(locale, `/${postTypeSlug}/${postSlug}`),
-      post.seo?.canonicalUrl ?? publicUrl(baseUrl, locale, `/${postTypeSlug}/${postSlug}`)
+      canonical
     ),
     robots: post.seo?.robots
   }

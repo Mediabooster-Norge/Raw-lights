@@ -1,6 +1,7 @@
 import { InlineIcon } from '@sanity/icons'
 import { defineType, defineField, defineArrayMember } from 'sanity'
 import { appearanceGroup, contentGroup } from '../studio/groups'
+import { altField } from '../helpers/altField'
 
 export default defineType({
   name: 'marqueeBlock',
@@ -50,7 +51,7 @@ export default defineType({
           type: 'image',
           options: { hotspot: true },
           fields: [
-            defineField({ name: 'alt', title: 'Alt tekst', type: 'string' })
+            altField
           ]
         })
       ],

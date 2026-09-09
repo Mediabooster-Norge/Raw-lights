@@ -1,4 +1,5 @@
 import {
+  CheckmarkCircleIcon,
   CogIcon,
   DocumentsIcon,
   DocumentIcon,
@@ -8,6 +9,7 @@ import {
   TransferIcon,
 } from '@sanity/icons'
 import type { StructureResolver } from 'sanity/structure'
+import { SetupChecklist } from './SetupChecklist'
 
 export const structure: StructureResolver = (S) => {
   const postsListItem = S.listItem()
@@ -38,6 +40,11 @@ export const structure: StructureResolver = (S) => {
   return S.list()
     .title('Innhold')
     .items([
+      S.listItem()
+        .title('Oppstart')
+        .id('setup')
+        .icon(CheckmarkCircleIcon)
+        .child(S.component(SetupChecklist).id('setup-checklist').title('Oppstart')),
       S.listItem()
         .title('Globale innstillinger')
         .id('globalSettings')

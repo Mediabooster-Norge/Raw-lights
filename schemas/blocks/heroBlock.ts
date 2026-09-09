@@ -1,6 +1,7 @@
 import { HomeIcon, ImageIcon } from '@sanity/icons'
 import { defineType, defineField } from 'sanity'
 import { contentGroup } from '../studio/groups'
+import { altField } from '../helpers/altField'
 
 export default defineType({
   name: 'heroBlock',
@@ -85,6 +86,7 @@ export default defineType({
       title: 'Bakgrunnsbilde',
       type: 'image',
       options: { hotspot: true },
+      fields: [altField],
       hidden: ({ parent }) => parent?.backgroundType === 'video',
       group: 'background'
     }),
@@ -104,6 +106,7 @@ export default defineType({
       description: 'Vises mens video laster eller på enheter som ikke støtter video',
       type: 'image',
       options: { hotspot: true },
+      fields: [altField],
       hidden: ({ parent }) => parent?.backgroundType !== 'video',
       group: 'background'
     }),

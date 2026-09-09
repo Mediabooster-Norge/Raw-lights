@@ -2,6 +2,7 @@ import { DocumentsIcon } from '@sanity/icons'
 import { defineType, defineField } from 'sanity'
 import { contentGroup, seoGroup, visibilityGroup } from '../studio/groups'
 import { languageField } from '../helpers/languageField'
+import { uniqueLocalizedSlug } from '../helpers/uniqueSlug'
 import { jsonLdPageTypes } from '../../lib/seo/types'
 
 export default defineType({
@@ -28,7 +29,7 @@ export default defineType({
         source: 'title',
         maxLength: 96
       },
-      validation: (Rule) => Rule.required()
+      validation: (Rule) => Rule.required().custom(uniqueLocalizedSlug)
     }),
     defineField({
       name: 'blocks',

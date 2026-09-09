@@ -21,9 +21,11 @@ function writeConsent(value: Consent) {
 export function CookieConsent({
   locale,
   enabled,
+  privacyHref,
 }: {
   locale: Locale
   enabled?: boolean
+  privacyHref?: string | null
 }) {
   const [visible, setVisible] = useState(false)
 
@@ -36,7 +38,17 @@ export function CookieConsent({
 
   return (
     <div className="fixed bottom-4 right-4 z-50 max-w-sm rounded-xl bg-surface p-4 shadow-lg border border-text-secondary/10">
-      <p className="text-sm text-text-secondary mb-4">{t(locale, 'cookieMessage')}</p>
+      <p className="text-sm text-text-secondary mb-4">
+        {t(locale, 'cookieMessage')}
+        {privacyHref ? (
+          <>
+            {' '}
+            <a href={privacyHref} className="underline hover:text-text-primary">
+              {t(locale, 'cookiePrivacy')}
+            </a>
+          </>
+        ) : null}
+      </p>
       <div className="flex gap-2">
         <button
           type="button"

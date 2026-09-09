@@ -1,7 +1,8 @@
 'use client'
 
-import { LocaleLink } from '@/lib/i18n'
-import { SanityImage } from '@/lib/components/ui/SanityImage'
+import { LocaleLink, t, useLocale } from '@/lib/i18n'
+import { SanityImage, IMAGE_SIZES } from '@/lib/components/ui/SanityImage'
+import { archivePageHref } from '@/lib/posts/pagination'
 import { cleanStegaString } from '@/lib/utils/stegaClean'
 
 type Post = {
@@ -35,9 +36,13 @@ type PostType = {
 type PostArchiveProps = {
   postType: PostType
   posts: Post[]
+  pagination?: {
+    page: number
+    totalPages: number
+  }
 }
 
-export function PostArchive({ postType, posts }: PostArchiveProps) {
+export function PostArchive({ postType, posts, pagination }: PostArchiveProps) {
   // Clean stega encoding from config values
   const layout = cleanStegaString(postType.archiveLayout) ?? 'grid'
   const columns = postType.archiveColumns ?? 3
@@ -94,6 +99,7 @@ export function PostArchive({ postType, posts }: PostArchiveProps) {
               Ingen {postType.title.toLowerCase()} ennå.
             </p>
           )}
+          <ArchivePagination slug={postType.slug} pagination={pagination} />
         </div>
       </div>
     )
@@ -138,6 +144,7 @@ export function PostArchive({ postType, posts }: PostArchiveProps) {
               Ingen {postType.title.toLowerCase()} ennå.
             </p>
           )}
+          <ArchivePagination slug={postType.slug} pagination={pagination} />
         </div>
       </div>
     )
@@ -200,8 +207,42 @@ export function PostArchive({ postType, posts }: PostArchiveProps) {
             Ingen {postType.title.toLowerCase()} ennå.
           </p>
         )}
+        <ArchivePagination slug={postType.slug} pagination={pagination} />
       </div>
     </div>
+  )
+}
+
+function ArchivePagination({
+  slug,
+  pagination,
+}: {
+  slug: string
+  pagination?: { page: number; totalPages: number }
+}) {
+  const locale = useLocale()
+  if (!pagination || pagination.totalPages <= 1) return null
+
+  return (
+    <nav className="mt-12 flex items-center justify-center gap-6 text-sm" aria-label={t(locale, 'pagination')}>
+      {pagination.page > 1 ? (
+        <LocaleLink href={archivePageHref(slug, pagination.page - 1)} className="text-primary">
+          {t(locale, 'previousPage')}
+        </LocaleLink>
+      ) : (
+        <span className="text-text-secondary/40">{t(locale, 'previousPage')}</span>
+      )}
+      <span className="text-text-secondary">
+        {pagination.page} / {pagination.totalPages}
+      </span>
+      {pagination.page < pagination.totalPages ? (
+        <LocaleLink href={archivePageHref(slug, pagination.page + 1)} className="text-primary">
+          {t(locale, 'nextPage')}
+        </LocaleLink>
+      ) : (
+        <span className="text-text-secondary/40">{t(locale, 'nextPage')}</span>
+      )}
+    </nav>
   )
 }
 
@@ -232,6 +273,7 @@ function PostCard({
           <SanityImage
             image={post.featuredImage}
             fill
+            sizes={IMAGE_SIZES.card}
             className="object-cover group-hover:scale-105 transition-transform duration-300"
             alt={post.featuredImage?.alt || post.title}
           />
@@ -297,6 +339,7 @@ function PostListItem({
           <SanityImage
             image={post.featuredImage}
             fill
+            sizes={IMAGE_SIZES.listThumb}
             className="object-cover group-hover:scale-105 transition-transform duration-300"
             alt={post.featuredImage?.alt || post.title}
           />

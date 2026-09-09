@@ -2,6 +2,7 @@ import { TagsIcon } from '@sanity/icons'
 import { defineType, defineField } from 'sanity'
 import { archiveGroup, generalGroup, seoGroup } from '../studio/groups'
 import { languageField } from '../helpers/languageField'
+import { uniqueLocalizedSlug } from '../helpers/uniqueSlug'
 import { jsonLdPostTypes } from '../../lib/seo/types'
 
 export default defineType({
@@ -37,7 +38,7 @@ export default defineType({
         maxLength: 96
       },
       description: 'Brukes i URL: /artister, /nyheter, etc.',
-      validation: Rule => Rule.required(),
+      validation: (Rule) => Rule.required().custom(uniqueLocalizedSlug),
       group: 'general'
     }),
     defineField({

@@ -5,7 +5,7 @@ import { draftMode, headers } from 'next/headers'
 import { VisualEditing } from 'next-sanity/visual-editing'
 import { notFound } from 'next/navigation'
 import '../globals.css'
-import { getNavigation, getGlobalSettings, getHomePageSlug } from '@/lib/sanity/fetcher'
+import { getNavigation, getGlobalSettings, getHomePageSlug, getPrivacyPageSlug } from '@/lib/sanity/fetcher'
 import { mergeTheme } from '@/lib/theme/mergeTheme'
 import { googleFontsHref } from '@/lib/theme/loadFonts'
 import { Header } from '@/lib/components/layout/Header'
@@ -19,6 +19,7 @@ import { getSiteUrl } from '@/lib/utils/getSiteUrl'
 import { LocaleProvider, isLocale, localizedPath, locales, type Locale } from '@/lib/i18n'
 import { getAlternateUrls, languageMetadata } from '@/lib/i18n/alternates'
 import { buildOrganizationGraph } from '@/lib/seo/buildJsonLd'
+import { socialMetadata } from '@/lib/seo/socialMetadata'
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-body' })
 
@@ -41,19 +42,24 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const alternates = await getAlternateUrls(pathname)
   const baseUrl = getSiteUrl()
   const siteName = settings?.siteName ?? settings?.seo?.metaTitle ?? 'Nettsted'
+  const title = settings?.seo?.metaTitle ?? siteName
+  const description = settings?.seo?.metaDescription ?? ''
+  const imageUrl = settings?.seo?.metaImage?.asset?.url
 
   return {
     metadataBase: new URL(baseUrl),
     title: {
-      template: `%s | ${settings?.seo?.metaTitle ?? siteName}`,
-      default: settings?.seo?.metaTitle ?? siteName
+      template: `%s | ${title}`,
+      default: title
     },
-    description: settings?.seo?.metaDescription ?? '',
-    openGraph: {
-      images: settings?.seo?.metaImage?.asset?.url
-        ? [{ url: settings.seo.metaImage.asset.url }]
-        : []
-    },
+    description,
+    ...socialMetadata({
+      title,
+      description,
+      imageUrl,
+      locale: localeParam,
+      url: baseUrl,
+    }),
     icons: settings?.siteTheme?.favicon?.asset?.url
       ? { icon: settings.siteTheme.favicon.asset.url }
       : undefined,
@@ -73,11 +79,12 @@ export default async function LocaleLayout({ children, params }: Props) {
   const headerList = await headers()
   const pathname = headerList.get('x-pathname') || localizedPath(locale, '/')
 
-  const [navigation, settings, alternates, homeSlug] = await Promise.all([
+  const [navigation, settings, alternates, homeSlug, privacySlug] = await Promise.all([
     getNavigation(locale),
     getGlobalSettings(),
     getAlternateUrls(pathname),
     getHomePageSlug(locale),
+    getPrivacyPageSlug(locale),
   ])
 
   const theme = mergeTheme(settings?.siteTheme)
@@ -87,6 +94,10 @@ export default async function LocaleLayout({ children, params }: Props) {
   ])
   const homeHref = localizedPath(locale, '/')
   const cookieEnabled = settings?.enableCookieConsent !== false
+  const privacyHref = privacySlug ? localizedPath(locale, `/${privacySlug}`) : null
+  const sameAs = (navigation?.socialLinks ?? [])
+    .map((link: { url?: string }) => link.url)
+    .filter((url: string | undefined): url is string => Boolean(url))
 
   const cssVariables = {
     '--color-primary': theme.palette.primary,
@@ -115,6 +126,7 @@ export default async function LocaleLayout({ children, params }: Props) {
       siteUrl: getSiteUrl(),
       logoUrl: settings?.siteTheme?.logo?.asset?.url,
       locale,
+      sameAs,
     }),
   }
 
@@ -150,7 +162,7 @@ export default async function LocaleLayout({ children, params }: Props) {
           socialLinks={navigation?.socialLinks}
           homeHref={homeHref}
         />
-        <CookieConsent locale={locale} enabled={cookieEnabled} />
+        <CookieConsent locale={locale} enabled={cookieEnabled} privacyHref={privacyHref} />
         {isDraftMode && <VisualEditing />}
       </div>
     </LocaleProvider>

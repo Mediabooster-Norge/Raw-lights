@@ -1,7 +1,7 @@
 'use client'
 
 import { useRef, useEffect, useState } from 'react'
-import { SanityImage } from '@/lib/components/ui/SanityImage'
+import { SanityImage, IMAGE_SIZES } from '@/lib/components/ui/SanityImage'
 import { PortableText } from '@/lib/components/ui/PortableText'
 import { CtaButtons } from './BlockWrapper'
 import { BlockContainer } from './BlockContainer'
@@ -164,7 +164,8 @@ export function MediaTextBlock({ data }: MediaTextBlockProps) {
         ) : data.image ? (
           <SanityImage 
             image={data.image} 
-            fill 
+            fill
+            sizes={IMAGE_SIZES.media}
             className="object-cover"
             alt={data.image?.alt || data.heading || ''}
           />

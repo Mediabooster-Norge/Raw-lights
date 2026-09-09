@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react'
 import { LocaleLink } from '@/lib/i18n'
-import { SanityImage } from '@/lib/components/ui/SanityImage'
+import { SanityImage, IMAGE_SIZES } from '@/lib/components/ui/SanityImage'
 import { BlockContainer } from './BlockContainer'
 import { cleanStegaString } from '@/lib/utils/stegaClean'
 
@@ -229,6 +229,7 @@ function PostCard({
           <SanityImage
             image={post.featuredImage}
             fill
+            sizes={IMAGE_SIZES.card}
             className="object-cover group-hover:scale-105 transition-transform duration-300"
             alt={post.featuredImage?.alt || post.title}
           />
@@ -296,6 +297,7 @@ function PostListItem({
           <SanityImage
             image={post.featuredImage}
             fill
+            sizes={IMAGE_SIZES.listThumb}
             className="object-cover group-hover:scale-105 transition-transform duration-300"
             alt={post.featuredImage?.alt || post.title}
           />
@@ -546,6 +548,7 @@ function FeaturedListItem({
           <SanityImage
             image={post.featuredImage}
             fill
+            sizes={IMAGE_SIZES.listThumb}
             className="object-cover"
             alt={post.featuredImage?.alt || post.title}
           />

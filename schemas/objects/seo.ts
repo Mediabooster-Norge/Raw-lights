@@ -1,5 +1,6 @@
 import { JsonIcon, SearchIcon } from '@sanity/icons'
 import { defineType, defineField } from 'sanity'
+import { altField } from '../helpers/altField'
 
 function isJsonLdValue(value: unknown): boolean {
   return typeof value === 'object' && value !== null
@@ -37,6 +38,7 @@ export default defineType({
       title: 'OG-bilde',
       type: 'image',
       description: 'Bilde som vises ved deling på sosiale medier',
+      fields: [altField],
       group: 'meta'
     }),
     defineField({

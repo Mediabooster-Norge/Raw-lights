@@ -7,6 +7,7 @@ import { getSiteUrl } from '@/lib/utils/getSiteUrl'
 import { isLocale, localizedPath, t, type Locale } from '@/lib/i18n'
 import { metadataAlternates } from '@/lib/i18n/alternates'
 import { buildPageJsonLd, parseJsonLdOverride } from '@/lib/seo/buildJsonLd'
+import { socialMetadata } from '@/lib/seo/socialMetadata'
 
 type Props = {
   params: Promise<{ locale: string }>
@@ -20,20 +21,23 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   const baseUrl = getSiteUrl()
   const url = localizedPath(localeParam, '/')
+  const title = page.seo?.metaTitle ?? page.title
+  const description = page.seo?.metaDescription
+  const canonical = page.seo?.canonicalUrl ?? `${baseUrl}${url === '/' ? '' : url}`
 
   return {
-    title: page.seo?.metaTitle ?? page.title,
-    description: page.seo?.metaDescription,
-    openGraph: {
-      title: page.seo?.metaTitle ?? page.title,
-      description: page.seo?.metaDescription,
-      images: page.seo?.metaImage?.asset?.url
-        ? [{ url: page.seo.metaImage.asset.url }]
-        : []
-    },
+    title,
+    description,
+    ...socialMetadata({
+      title,
+      description,
+      imageUrl: page.seo?.metaImage?.asset?.url,
+      locale: localeParam,
+      url: canonical,
+    }),
     alternates: await metadataAlternates(
       localizedPath(localeParam, '/'),
-      page.seo?.canonicalUrl ?? `${baseUrl}${url === '/' ? '' : url}`
+      canonical
     ),
     robots: page.seo?.robots
   }

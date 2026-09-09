@@ -30,6 +30,8 @@ npm run dev
 
 Studio is at `/studio`. The public site uses one URL (`NEXT_PUBLIC_SITE_URL`) and one dataset.
 
+Open **Oppstart** in Studio for a first-run checklist (homepage, 404, privacy page, navigation per language, JSON-LD types).
+
 ### Environment variables
 
 ```env
@@ -65,6 +67,22 @@ Add the same keys in Production, Preview and Development:
 
 Without `NEXT_PUBLIC_SANITY_PROJECT_ID` the site builds empty.
 
+### Sanity webhook
+
+Create a webhook on the dataset with header `x-webhook-secret` matching `SANITY_WEBHOOK_SECRET`, URL `https://<domain>/api/revalidate`, and this projection so English routes are purged too:
+
+```groq
+{
+  _id,
+  _type,
+  slug,
+  language,
+  "postTypeSlug": postType->slug.current
+}
+```
+
+The route revalidates `/` and `/en` layouts, plus slug paths in both locales.
+
 ## Project structure
 
 ```
@@ -87,11 +105,13 @@ Without `NEXT_PUBLIC_SANITY_PROJECT_ID` the site builds empty.
 
 - Page builder (hero, text, CTA, gallery, marquee, accordion, form, …)
 - Posts with archive and single views
-- Global settings: logo, three colors, fonts, homepage and 404 page
+- Global settings: logo, three colors, fonts, homepage, 404 and privacy page
 - JSON-LD generated in code (Organization/WebSite, post type inheritance, FAQ from accordion)
 - Draft mode via `/api/draft` and Presentation
 - CMS redirects in `proxy.ts`
 - Forms sent with Resend
-- Optional cookie banner that gates `customCode` scripts
+- Optional cookie banner that gates `customCode` scripts, with a link to the CMS privacy page
+- Archive pagination (12 posts per page)
+- GitHub Actions CI: typecheck, tests and build
 
 See `architecture/` for the internal model.

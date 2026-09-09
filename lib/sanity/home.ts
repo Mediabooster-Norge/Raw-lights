@@ -69,3 +69,25 @@ export async function getHomePageSlugs(): Promise<Set<string>> {
   }
   return slugs
 }
+
+export async function getPrivacyPageSlug(locale: Locale): Promise<string | null> {
+  const client = getClient()
+  if (!client) return null
+
+  const settings = await client.fetch(
+    globalSettingsQuery,
+    {},
+    { next: { tags: ['global-settings'] } }
+  )
+
+  if (!settings?.privacyPageId) return null
+  if (locale === defaultLocale) return settings.privacyPageSlug ?? null
+
+  const result = await client.fetch(
+    translationsQuery,
+    { id: settings.privacyPageId },
+    { next: { tags: ['translations', `translation-${settings.privacyPageId}`] } }
+  )
+  const match = translationDocs(result).find((item) => parseLocale(item.language) === locale)
+  return match?.slug ?? settings.privacyPageSlug ?? null
+}

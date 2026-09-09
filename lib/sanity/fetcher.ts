@@ -133,7 +133,7 @@ export function isHomePageSlug(slug: string, homeSlug?: string | null) {
   return slug === 'forside' || slug === 'home' || (homeSlug ? slug === homeSlug : false)
 }
 
-export { getHomePageSlug, getHomePageSlugs } from './home'
+export { getHomePageSlug, getHomePageSlugs, getPrivacyPageSlug } from './home'
 
 export async function getAllPostTypes(locale: Locale) {
   const { isPreview, client } = await publishedOrPreview()

@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
-import { SanityImage } from '@/lib/components/ui/SanityImage'
+import { SanityImage, IMAGE_SIZES } from '@/lib/components/ui/SanityImage'
 import { CtaButtons } from './BlockWrapper'
 import { BlockContainer } from './BlockContainer'
 import { cleanStegaString } from '@/lib/utils/stegaClean'
@@ -145,7 +145,8 @@ export function GalleryBlock({ data }: GalleryBlockProps) {
               <div className="relative aspect-square overflow-hidden rounded-lg group">
                 <SanityImage 
                   image={image} 
-                  fill 
+                  fill
+                  sizes={IMAGE_SIZES.gallery} 
                   className="object-cover group-hover:scale-105 transition-transform duration-300"
                 />
               </div>
@@ -195,6 +196,7 @@ export function GalleryBlock({ data }: GalleryBlockProps) {
                     <SanityImage 
                       image={image} 
                       fill
+                      sizes={IMAGE_SIZES.gallery}
                       className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                     />
                   </div>
@@ -254,7 +256,8 @@ export function GalleryBlock({ data }: GalleryBlockProps) {
               >
                 <SanityImage 
                   image={image} 
-                  fill 
+                  fill
+                  sizes={IMAGE_SIZES.gallery} 
                   className="object-cover"
                 />
               </div>
