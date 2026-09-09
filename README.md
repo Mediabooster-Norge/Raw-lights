@@ -44,6 +44,17 @@ REVALIDATE_SECRET=your-revalidate-secret
 
 The app only uses the dataset *name*. Create or migrate a dataset called `production` in [Sanity Manage](https://www.sanity.io/manage). Existing content in another dataset (for example `landstreff`) must be copied there separately.
 
+### Vercel
+
+Add the same keys in the Vercel project (Production, Preview and Development) before the first production build:
+
+- `NEXT_PUBLIC_SANITY_PROJECT_ID` (required, **not** Sensitive — Next.js inlines this at build)
+- `NEXT_PUBLIC_SANITY_DATASET` (`production`, not Sensitive)
+- `NEXT_PUBLIC_SITE_URL` (full `https://…` production URL, not Sensitive)
+- `SANITY_API_TOKEN`, `SANITY_PREVIEW_SECRET`, `SANITY_WEBHOOK_SECRET`, `REVALIDATE_SECRET` (can be Sensitive)
+
+Without `NEXT_PUBLIC_SANITY_PROJECT_ID` the site builds empty. Do not mark `NEXT_PUBLIC_*` variables as Sensitive — Vercel then hides them from `next build`, which crashes the homepage.
+
 ## Project structure
 
 ```
