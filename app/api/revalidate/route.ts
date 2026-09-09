@@ -1,60 +1,38 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { revalidateTag, revalidatePath } from 'next/cache'
+import { revalidatePath, revalidateTag } from 'next/cache'
+import { revalidateSpec } from '@/lib/sanity/revalidateTargets'
 
 export async function POST(request: NextRequest) {
   const secret = request.headers.get('x-webhook-secret')
+  const expected = process.env.SANITY_WEBHOOK_SECRET
 
-  if (secret !== process.env.SANITY_WEBHOOK_SECRET) {
+  if (!expected || secret !== expected) {
     return NextResponse.json({ message: 'Invalid secret' }, { status: 401 })
   }
 
   try {
     const body = await request.json()
-    const { _type, slug } = body
+    const spec = revalidateSpec(body)
 
-    // Revalidate based on document type
-    switch (_type) {
-      case 'page':
-        revalidateTag('pages', { expire: 0 })
-        if (slug?.current) {
-          revalidateTag(`page-${slug.current}`, { expire: 0 })
-          revalidatePath(`/${slug.current}`)
-        }
-        break
-      case 'post':
-        revalidateTag('posts', { expire: 0 })
-        if (slug?.current) {
-          revalidateTag(`post-${slug.current}`, { expire: 0 })
-        }
-        break
-      case 'postType':
-        revalidateTag('post-types', { expire: 0 })
-        break
-      case 'navigation':
-        revalidateTag('navigation', { expire: 0 })
-        break
-      case 'redirect':
-        revalidateTag('redirects', { expire: 0 })
-        break
-      case 'form':
-        revalidateTag('forms', { expire: 0 })
-        break
-      case 'globalSettings':
-        revalidateTag('global-settings', { expire: 0 })
-        break
-      default:
-        revalidateTag('all', { expire: 0 })
+    for (const tag of spec.tags) {
+      revalidateTag(tag, { expire: 0 })
+    }
+    for (const item of spec.paths) {
+      if (item.type) {
+        revalidatePath(item.path, item.type)
+      } else {
+        revalidatePath(item.path)
+      }
     }
 
-    return NextResponse.json({ 
-      revalidated: true, 
-      type: _type,
-      timestamp: Date.now() 
+    return NextResponse.json({
+      revalidated: true,
+      type: body._type,
+      tags: spec.tags,
+      paths: spec.paths.map((item) => item.path),
+      timestamp: Date.now(),
     })
-  } catch (error) {
-    return NextResponse.json(
-      { message: 'Error revalidating' }, 
-      { status: 500 }
-    )
+  } catch {
+    return NextResponse.json({ message: 'Error revalidating' }, { status: 500 })
   }
 }

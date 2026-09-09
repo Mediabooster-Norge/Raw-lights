@@ -1,6 +1,6 @@
 'use client'
 
-import { SanityImage } from '@/lib/components/ui/SanityImage'
+import { SanityImage, IMAGE_SIZES } from '@/lib/components/ui/SanityImage'
 import { CtaButtons } from './BlockWrapper'
 import { cleanStegaString } from '@/lib/utils/stegaClean'
 
@@ -57,7 +57,8 @@ export function HeroBlock({ data }: HeroBlockProps) {
         <div className="absolute inset-0">
           <SanityImage 
             image={data.backgroundImage} 
-            fill 
+            fill
+            sizes={IMAGE_SIZES.hero}
             className="object-cover"
             priority
           />

@@ -1,7 +1,7 @@
 'use client'
 
 import { useRef, useEffect, useState } from 'react'
-import { SanityImage } from '@/lib/components/ui/SanityImage'
+import { SanityImage, IMAGE_SIZES } from '@/lib/components/ui/SanityImage'
 import { BlockContainer } from './BlockContainer'
 import { cleanStegaString } from '@/lib/utils/stegaClean'
 
@@ -135,6 +135,7 @@ export function MarqueeBlock({ data }: MarqueeBlockProps) {
           <SanityImage
             image={image}
             fill
+            sizes={IMAGE_SIZES.marquee}
             className={`object-contain ${imageStyle === 'grayscale' ? 'grayscale' : ''}`}
             style={getImageStyle()}
             alt={image.alt || ''}

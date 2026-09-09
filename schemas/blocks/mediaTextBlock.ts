@@ -1,6 +1,7 @@
 import { SplitHorizontalIcon } from '@sanity/icons'
 import { defineType, defineField } from 'sanity'
 import { appearanceGroup, contentGroup, mediaGroup } from '../studio/groups'
+import { altField } from '../helpers/altField'
 
 export default defineType({
   name: 'mediaTextBlock',
@@ -123,7 +124,7 @@ export default defineType({
       type: 'image',
       options: { hotspot: true },
       fields: [
-        defineField({ name: 'alt', title: 'Alt tekst', type: 'string' })
+        altField
       ],
       hidden: ({ parent }) => parent?.mediaType === 'video',
       group: 'media'
@@ -143,6 +144,7 @@ export default defineType({
       title: 'Video poster (fallback-bilde)',
       type: 'image',
       options: { hotspot: true },
+      fields: [altField],
       hidden: ({ parent }) => parent?.mediaType !== 'video',
       group: 'media'
     }),

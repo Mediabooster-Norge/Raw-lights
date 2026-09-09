@@ -1,6 +1,7 @@
 import { ImagesIcon } from '@sanity/icons'
 import { defineType, defineField } from 'sanity'
 import { appearanceGroup, contentGroup } from '../studio/groups'
+import { altField } from '../helpers/altField'
 
 export default defineType({
   name: 'galleryBlock',
@@ -13,7 +14,7 @@ export default defineType({
       name: 'images',
       title: 'Bilder',
       type: 'array',
-      of: [{ type: 'image', options: { hotspot: true } }],
+      of: [{ type: 'image', options: { hotspot: true }, fields: [altField] }],
       group: 'content'
     }),
     defineField({

@@ -7,6 +7,8 @@ export const globalSettingsQuery = groq`
     "homePageId": homePage._ref,
     "homePageSlug": homePage->slug.current,
     "notFoundPageId": notFoundPage._ref,
+    "privacyPageId": privacyPage._ref,
+    "privacyPageSlug": privacyPage->slug.current,
     siteTheme {
       logo { asset->, alt },
       favicon { asset-> },

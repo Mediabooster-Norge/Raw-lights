@@ -1,7 +1,7 @@
 'use client'
 
 import { LocaleLink } from '@/lib/i18n'
-import { SanityImage } from '@/lib/components/ui/SanityImage'
+import { SanityImage, IMAGE_SIZES } from '@/lib/components/ui/SanityImage'
 import { PortableText } from '@/lib/components/ui/PortableText'
 
 type Post = {
@@ -69,6 +69,7 @@ export function PostSingle({ post }: PostSingleProps) {
             <SanityImage
               image={post.featuredImage}
               fill
+              sizes={IMAGE_SIZES.content}
               className="object-cover"
               alt={post.featuredImage?.alt || post.title}
               priority

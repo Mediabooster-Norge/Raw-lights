@@ -126,6 +126,7 @@ export function buildOrganizationGraph(input: {
   siteUrl: string
   logoUrl?: string
   locale?: string
+  sameAs?: string[]
 }): GraphNode[] {
   const organization: GraphNode = {
     '@type': 'Organization',
@@ -135,6 +136,9 @@ export function buildOrganizationGraph(input: {
   }
   if (input.logoUrl) {
     organization.logo = imageObject(input.logoUrl)
+  }
+  if (input.sameAs?.length) {
+    organization.sameAs = input.sameAs
   }
 
   const website: GraphNode = {

@@ -10,6 +10,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
+    "test": "tsx --test lib/sanity/revalidateTargets.test.ts lib/forms/honeypot.test.ts lib/posts/pagination.test.ts",
     "typegen": "sanity schema extract && sanity typegen generate"
   },
   "dependencies": {
@@ -45,6 +47,7 @@
     "eslint-config-next": "^16.3.4",
     "postcss": "^8.4.0",
     "tailwindcss": "^3.4.0",
+    "tsx": "^4.23.13",
     "typescript": "^5.9.0"
   }
 }

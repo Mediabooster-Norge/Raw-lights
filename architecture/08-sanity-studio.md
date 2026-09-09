@@ -8,4 +8,6 @@ Plugins: structure, Presentation, Vision, color input, media, document-internati
 
 Singleton `globalSettings` cannot be duplicated from the template list; delete/duplicate actions are filtered out.
 
-Desk: settings, navigation (per language), pages, posts by post type, forms, redirects.
+Desk: Oppstart checklist, settings, navigation (per language), pages, posts by post type, forms, redirects.
+
+`homePage` is required. Choose a privacy page if the cookie banner should link to it.

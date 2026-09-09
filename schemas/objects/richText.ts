@@ -1,5 +1,6 @@
 import { DocumentIcon, ImageIcon, LinkIcon, PlayIcon } from '@sanity/icons'
 import { defineType, defineArrayMember } from 'sanity'
+import { altField } from '../helpers/altField'
 
 export default defineType({
   name: 'richText',
@@ -62,7 +63,7 @@ export default defineType({
       icon: ImageIcon,
       options: { hotspot: true },
       fields: [
-        { name: 'alt', type: 'string', title: 'Alt tekst' },
+        altField,
         { name: 'caption', type: 'string', title: 'Bildetekst' }
       ]
     }),

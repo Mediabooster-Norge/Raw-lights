@@ -6,6 +6,7 @@ import { SelectField } from './SelectField'
 import { TextareaField } from './TextareaField'
 import { CheckboxField } from './CheckboxField'
 import { t, useLocale } from '@/lib/i18n'
+import { HONEYPOT_FIELD } from '@/lib/forms/honeypot'
 
 type FormField = {
   _key: string
@@ -76,7 +77,17 @@ export function FormRenderer({
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
+    <form onSubmit={handleSubmit} className="relative space-y-6">
+      <div className="absolute -left-[9999px] h-0 w-0 overflow-hidden" aria-hidden="true">
+        <label htmlFor={HONEYPOT_FIELD}>Company website</label>
+        <input
+          id={HONEYPOT_FIELD}
+          type="text"
+          name={HONEYPOT_FIELD}
+          tabIndex={-1}
+          autoComplete="off"
+        />
+      </div>
       {fields.map((field) => {
         const kind = fieldKind(field)
         switch (kind) {

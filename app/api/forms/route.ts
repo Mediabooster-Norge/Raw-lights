@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { Resend } from 'resend'
 import { rateLimit } from '@/lib/utils/rateLimit'
 import { getForm } from '@/lib/sanity/fetcher'
+import { isHoneypotSubmission, stripHoneypot } from '@/lib/forms/honeypot'
 import { z } from 'zod'
 
 const limiter = rateLimit({
@@ -38,6 +39,14 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ message: 'Unknown form' }, { status: 404 })
     }
 
+    if (isHoneypotSubmission(data)) {
+      return NextResponse.json({
+        success: true,
+        message: form.successMessage ?? 'Form submitted successfully',
+      })
+    }
+
+    const payload = stripHoneypot(data)
     const apiKey = process.env.RESEND_API_KEY
     const from = process.env.FORM_FROM_EMAIL
     const to = form.notifyEmail || process.env.FORM_TO_EMAIL
@@ -50,7 +59,7 @@ export async function POST(request: NextRequest) {
     }
 
     const resend = new Resend(apiKey)
-    const rows = Object.entries(data)
+    const rows = Object.entries(payload)
       .map(([key, value]) => `<tr><td><strong>${key}</strong></td><td>${String(value)}</td></tr>`)
       .join('')
 

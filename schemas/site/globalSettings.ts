@@ -1,6 +1,7 @@
 import { CogIcon } from '@sanity/icons'
 import { defineType, defineField } from 'sanity'
 import { brandGroup, codeGroup, seoGroup } from '../studio/groups'
+import { altField } from '../helpers/altField'
 
 const fontOptions = [
   'Inter',
@@ -43,7 +44,7 @@ export default defineType({
           title: 'Logo',
           type: 'image',
           options: { hotspot: true },
-          fields: [{ name: 'alt', title: 'Alt tekst', type: 'string' }]
+          fields: [altField]
         }),
         defineField({
           name: 'favicon',
@@ -91,6 +92,7 @@ export default defineType({
       type: 'reference',
       to: [{ type: 'page' }],
       group: 'brand',
+      validation: (Rule) => Rule.required(),
       description: 'Siden som vises på /. Oversettelser av denne siden brukes på /en.',
     }),
     defineField({
@@ -100,6 +102,14 @@ export default defineType({
       to: [{ type: 'page' }],
       group: 'brand',
       description: 'Valgfri CMS-side for 404. Oversettelser brukes per språk.',
+    }),
+    defineField({
+      name: 'privacyPage',
+      title: 'Personvernside',
+      type: 'reference',
+      to: [{ type: 'page' }],
+      group: 'brand',
+      description: 'Lenkes fra cookie-banneret. Oversettelser brukes per språk.',
     }),
     defineField({
       name: 'enableCookieConsent',
