@@ -1,6 +1,8 @@
 import { DocumentsIcon } from '@sanity/icons'
 import { defineType, defineField } from 'sanity'
 import { contentGroup, seoGroup, visibilityGroup } from '../studio/groups'
+import { languageField } from '../helpers/languageField'
+import { jsonLdPageTypes } from '../../lib/seo/types'
 
 export default defineType({
   name: 'page',
@@ -9,6 +11,7 @@ export default defineType({
   icon: DocumentsIcon,
   groups: [contentGroup, seoGroup, visibilityGroup],
   fields: [
+    languageField,
     defineField({
       name: 'title',
       title: 'Tittel',
@@ -41,9 +44,39 @@ export default defineType({
         { type: 'mediaTextBlock' },
         { type: 'accordionBlock' },
         { type: 'postGridBlock' },
+        { type: 'formBlock' },
         { type: 'spacerBlock' },
         { type: 'sectionBlock' }
       ]
+    }),
+    defineField({
+      name: 'jsonLdType',
+      title: 'JSON-LD-type',
+      type: 'string',
+      group: 'seo',
+      options: {
+        list: [...jsonLdPageTypes],
+      },
+      initialValue: 'WebPage',
+      description: 'Schema.org-type for siden. FAQPage kan også bygges automatisk fra spørsmål og svar.',
+    }),
+    defineField({
+      name: 'jsonLdOverride',
+      title: 'JSON-LD-overstyring',
+      type: 'text',
+      rows: 8,
+      group: 'seo',
+      description: 'Valgfri rå JSON som erstatter den genererte markupen for denne siden.',
+      validation: (Rule) =>
+        Rule.custom((value) => {
+          if (!value || typeof value !== 'string' || !value.trim()) return true
+          try {
+            JSON.parse(value)
+            return true
+          } catch {
+            return 'Ugyldig JSON'
+          }
+        }),
     }),
     defineField({
       name: 'seo',
@@ -59,7 +92,7 @@ export default defineType({
       options: {
         list: [
           { title: 'Offentlig', value: 'public' },
-          { title: 'Privat', value: 'private' }
+          { title: 'Skjult', value: 'hidden' }
         ],
         layout: 'radio'
       },

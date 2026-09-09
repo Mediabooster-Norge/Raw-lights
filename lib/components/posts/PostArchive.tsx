@@ -1,6 +1,6 @@
 'use client'
 
-import Link from 'next/link'
+import { LocaleLink } from '@/lib/i18n'
 import { SanityImage } from '@/lib/components/ui/SanityImage'
 import { cleanStegaString } from '@/lib/utils/stegaClean'
 
@@ -261,9 +261,9 @@ function PostCard({
 
   if (hasSingleView) {
     return (
-      <Link href={`/${postTypeSlug}/${post.slug}`}>
+      <LocaleLink href={`/${postTypeSlug}/${post.slug}`}>
         {content}
-      </Link>
+      </LocaleLink>
     )
   }
 
@@ -326,9 +326,9 @@ function PostListItem({
 
   if (hasSingleView) {
     return (
-      <Link href={`/${postTypeSlug}/${post.slug}`} className="block border-b pb-8">
+      <LocaleLink href={`/${postTypeSlug}/${post.slug}`} className="block border-b pb-8">
         {content}
-      </Link>
+      </LocaleLink>
     )
   }
 

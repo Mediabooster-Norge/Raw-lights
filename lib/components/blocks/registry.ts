@@ -8,6 +8,7 @@ import { SectionBlock } from './SectionBlock'
 import { MarqueeBlock } from './MarqueeBlock'
 import { MediaTextBlock } from './MediaTextBlock'
 import { PostGridBlock } from './PostGridBlock'
+import { FormBlock } from './FormBlock'
 import { ComponentType } from 'react'
 
 type BlockComponent = ComponentType<{ data: any; renderChildren?: (children: any[]) => React.ReactNode }>
@@ -23,4 +24,5 @@ export const blockRegistry: Record<string, BlockComponent> = {
   marqueeBlock: MarqueeBlock,
   mediaTextBlock: MediaTextBlock,
   postGridBlock: PostGridBlock,
+  formBlock: FormBlock,
 }

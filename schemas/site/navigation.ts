@@ -1,6 +1,7 @@
 import { MenuIcon } from '@sanity/icons'
 import { defineType, defineField } from 'sanity'
 import { footerGroup, headerGroup, socialGroup } from '../studio/groups'
+import { languageField } from '../helpers/languageField'
 
 const navLinkFields = [
   defineField({ name: 'label', title: 'Tekst', type: 'string' }),
@@ -14,6 +15,7 @@ export default defineType({
   icon: MenuIcon,
   groups: [headerGroup, footerGroup, socialGroup],
   fields: [
+    languageField,
     defineField({
       name: 'mainNav',
       title: 'Hovedmeny',

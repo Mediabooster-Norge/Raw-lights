@@ -1,6 +1,8 @@
+'use client'
+
 import { PortableText as SanityPortableText, PortableTextComponents } from '@portabletext/react'
-import Link from 'next/link'
 import { SanityImage } from './SanityImage'
+import { LocaleLink } from '@/lib/i18n'
 
 const components: PortableTextComponents = {
   block: {
@@ -18,9 +20,9 @@ const components: PortableTextComponents = {
     link: ({ children, value }) => {
       const target = value?.blank ? '_blank' : undefined
       return (
-        <a 
-          href={value?.href} 
-          target={target} 
+        <a
+          href={value?.href}
+          target={target}
           rel={target ? 'noopener noreferrer' : undefined}
           className="text-primary underline hover:no-underline"
         >
@@ -31,20 +33,18 @@ const components: PortableTextComponents = {
     internalLink: ({ children, value }) => {
       const ref = value?.reference
       const slug = ref?.slug?.current ?? ''
-      
-      // For posts: include the postType slug in the URL
       let href = `/${slug}`
       if (ref?._type === 'post' && ref?.postTypeSlug) {
         href = `/${ref.postTypeSlug}/${slug}`
       }
-      
+
       return (
-        <Link 
+        <LocaleLink
           href={href}
           className="text-primary underline hover:no-underline"
         >
           {children}
-        </Link>
+        </LocaleLink>
       )
     }
   },
@@ -69,7 +69,7 @@ type PortableTextProps = {
 
 export function PortableText({ value, className }: PortableTextProps) {
   if (!value) return null
-  
+
   return (
     <div className={className}>
       <SanityPortableText value={value} components={components} />

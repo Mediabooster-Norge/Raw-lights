@@ -5,8 +5,10 @@ export type Page = {
   title: string
   slug: string
   blocks: SanityBlock[]
-  visibility: 'public' | 'private'
+  visibility: 'public' | 'hidden'
   publishDate?: string
+  jsonLdType?: string
+  jsonLdOverride?: string
   seo?: SEO
 }
 
@@ -100,6 +102,7 @@ export type PostType = {
   showExcerpt?: boolean
   showImage?: boolean
   showDate?: boolean
+  jsonLdType?: string
   seo?: SEO
 }
 
@@ -139,6 +142,10 @@ export type SiteTheme = {
 
 export type GlobalSettings = {
   siteName?: string
+  enableCookieConsent?: boolean
+  homePageId?: string
+  homePageSlug?: string
+  notFoundPageId?: string
   siteTheme?: SiteTheme
   seo?: SEO
   customCode?: {

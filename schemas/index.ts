@@ -4,6 +4,7 @@ import globalSettings from './site/globalSettings'
 import postType from './site/postType'
 import post from './site/post'
 import redirect from './site/redirect'
+import form from './site/form'
 
 import link from './objects/link'
 import seo from './objects/seo'
@@ -20,6 +21,7 @@ import accordionBlock from './blocks/accordionBlock'
 import marqueeBlock from './blocks/marqueeBlock'
 import mediaTextBlock from './blocks/mediaTextBlock'
 import postGridBlock from './blocks/postGridBlock'
+import formBlock from './blocks/formBlock'
 
 export const schemaTypes = [
   page,
@@ -28,6 +30,7 @@ export const schemaTypes = [
   postType,
   post,
   redirect,
+  form,
   link,
   seo,
   richText,
@@ -42,4 +45,5 @@ export const schemaTypes = [
   marqueeBlock,
   mediaTextBlock,
   postGridBlock,
+  formBlock,
 ]

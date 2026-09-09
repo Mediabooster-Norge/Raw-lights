@@ -1,0 +1,58 @@
+import type { Locale } from './config'
+
+export const messages = {
+  nb: {
+    menu: 'Meny',
+    closeMenu: 'Lukk meny',
+    language: 'Språk',
+    notFoundTitle: 'Siden ble ikke funnet',
+    notFoundBody: 'Beklager, vi kunne ikke finne siden du leter etter.',
+    backHome: 'Tilbake til forsiden',
+    seeAll: 'Se alle',
+    preview: 'Forhåndsvisning',
+    exitPreview: 'Avslutt',
+    cookieMessage: 'Vi bruker informasjonskapsler for analyse og innebygd kode som du kan slå på i Studio.',
+    cookieAccept: 'Godta',
+    cookieReject: 'Bare nødvendige',
+    formSending: 'Sender...',
+    formError: 'Noe gikk galt. Prøv igjen senere.',
+    formDefaultSubmit: 'Send',
+    formDefaultSuccess: 'Takk for din henvendelse!',
+    home: 'Hjem',
+    welcome: 'Velkommen',
+    missingHome: 'Velg en forside i Globale innstillinger, eller opprett en side med slug forside.',
+    noPostsYet: 'Ingen innlegg ennå.',
+    gallery: 'Galleri',
+    sending: 'Sender...',
+  },
+  en: {
+    menu: 'Menu',
+    closeMenu: 'Close menu',
+    language: 'Language',
+    notFoundTitle: 'Page not found',
+    notFoundBody: 'Sorry, we could not find the page you are looking for.',
+    backHome: 'Back to the homepage',
+    seeAll: 'See all',
+    preview: 'Preview',
+    exitPreview: 'Exit',
+    cookieMessage: 'We use cookies for analytics and optional scripts configured in Studio.',
+    cookieAccept: 'Accept',
+    cookieReject: 'Necessary only',
+    formSending: 'Sending...',
+    formError: 'Something went wrong. Please try again later.',
+    formDefaultSubmit: 'Send',
+    formDefaultSuccess: 'Thanks for your message!',
+    home: 'Home',
+    welcome: 'Welcome',
+    missingHome: 'Pick a homepage in Global settings, or create a page with the slug forside.',
+    noPostsYet: 'No posts yet.',
+    gallery: 'Gallery',
+    sending: 'Sending...',
+  },
+} as const
+
+export type MessageKey = keyof typeof messages.nb
+
+export function t(locale: Locale, key: MessageKey): string {
+  return messages[locale][key]
+}

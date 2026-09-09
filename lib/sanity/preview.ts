@@ -26,7 +26,7 @@ export function getPreviewClient(): SanityClient | null {
     dataset,
     apiVersion,
     useCdn: false,
-    perspective: 'previewDrafts',
+    perspective: 'drafts',
     token,
     stega: {
       enabled: true,

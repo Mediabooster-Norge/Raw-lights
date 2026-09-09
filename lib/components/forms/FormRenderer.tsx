@@ -5,10 +5,12 @@ import { InputField } from './InputField'
 import { SelectField } from './SelectField'
 import { TextareaField } from './TextareaField'
 import { CheckboxField } from './CheckboxField'
+import { t, useLocale } from '@/lib/i18n'
 
 type FormField = {
   _key: string
-  _type: string
+  _type?: string
+  fieldType?: string
   name: string
   label: string
   placeholder?: string
@@ -28,12 +30,17 @@ type FormState = {
   message?: string
 }
 
-export function FormRenderer({ 
-  formId, 
-  fields, 
-  submitButtonText = 'Send', 
-  successMessage = 'Takk for din henvendelse!' 
+function fieldKind(field: FormField) {
+  return field.fieldType ?? field._type ?? 'text'
+}
+
+export function FormRenderer({
+  formId,
+  fields,
+  submitButtonText,
+  successMessage
 }: FormRendererProps) {
+  const locale = useLocale()
   const [state, setState] = useState<FormState>({ status: 'idle' })
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -47,16 +54,16 @@ export function FormRenderer({
       const response = await fetch('/api/forms', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ formId, data })
+        body: JSON.stringify({ formId, data, locale })
       })
 
       if (!response.ok) {
         throw new Error('Form submission failed')
       }
 
-      setState({ status: 'success', message: successMessage })
-    } catch (error) {
-      setState({ status: 'error', message: 'Noe gikk galt. Prøv igjen senere.' })
+      setState({ status: 'success', message: successMessage ?? t(locale, 'formDefaultSuccess') })
+    } catch {
+      setState({ status: 'error', message: t(locale, 'formError') })
     }
   }
 
@@ -71,20 +78,25 @@ export function FormRenderer({
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       {fields.map((field) => {
-        switch (field._type) {
+        const kind = fieldKind(field)
+        switch (kind) {
+          case 'text':
+          case 'email':
+          case 'tel':
           case 'textInput':
           case 'emailInput':
           case 'phoneInput':
             return (
               <InputField
                 key={field._key}
-                type={field._type === 'emailInput' ? 'email' : field._type === 'phoneInput' ? 'tel' : 'text'}
+                type={kind === 'email' || kind === 'emailInput' ? 'email' : kind === 'tel' || kind === 'phoneInput' ? 'tel' : 'text'}
                 name={field.name}
                 label={field.label}
                 placeholder={field.placeholder}
                 required={field.required}
               />
             )
+          case 'textarea':
           case 'textareaInput':
             return (
               <TextareaField
@@ -95,6 +107,7 @@ export function FormRenderer({
                 required={field.required}
               />
             )
+          case 'select':
           case 'selectInput':
             return (
               <SelectField
@@ -105,6 +118,7 @@ export function FormRenderer({
                 required={field.required}
               />
             )
+          case 'checkbox':
           case 'checkboxInput':
             return (
               <CheckboxField
@@ -130,7 +144,7 @@ export function FormRenderer({
         disabled={state.status === 'submitting'}
         className="w-full px-6 py-3 bg-primary text-on-primary rounded-lg font-semibold hover:opacity-90 transition-opacity disabled:opacity-50"
       >
-        {state.status === 'submitting' ? 'Sender...' : submitButtonText}
+        {state.status === 'submitting' ? t(locale, 'formSending') : (submitButtonText ?? t(locale, 'formDefaultSubmit'))}
       </button>
     </form>
   )
