@@ -6,15 +6,13 @@ import { colorInput } from '@sanity/color-input'
 import { media } from 'sanity-plugin-media'
 import { ComposeIcon } from '@sanity/icons'
 import { getSanityConfig } from './lib/sanity/client'
+import { getSiteUrl } from './lib/utils/getSiteUrl'
 import { schemaTypes } from './schemas'
 import { resolve } from './lib/sanity/presentation'
 import { structure } from './lib/sanity/structure'
 
 const { projectId: PROJECT_ID, dataset: DATASET } = getSanityConfig()
-
-const PREVIEW_URL = process.env.NEXT_PUBLIC_VERCEL_URL
-  ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}`
-  : 'http://localhost:3000'
+const PREVIEW_URL = getSiteUrl()
 
 const SINGLETON_TYPES = new Set(['globalSettings', 'navigation'])
 

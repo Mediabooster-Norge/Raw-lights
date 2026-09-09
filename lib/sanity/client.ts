@@ -1,26 +1,25 @@
 import { createClient, type SanityClient } from 'next-sanity'
 
-function firstEnv(...keys: string[]) {
-  for (const key of keys) {
-    const value = process.env[key]?.trim()
-    if (value) return value
-  }
-  return ''
-}
-
+// Next.js only inlines env vars with a static `process.env.NEXT_PUBLIC_*` access.
+// Dynamic `process.env[key]` is empty in the Studio browser bundle.
 export function getSanityConfig() {
+  const projectId = (
+    process.env.NEXT_PUBLIC_SANITY_PROJECT_ID ||
+    process.env.SANITY_STUDIO_PROJECT_ID ||
+    process.env.SANITY_API_PROJECT_ID ||
+    ''
+  ).trim()
+
+  const dataset = (
+    process.env.NEXT_PUBLIC_SANITY_DATASET ||
+    process.env.SANITY_STUDIO_DATASET ||
+    process.env.SANITY_API_DATASET ||
+    'production'
+  ).trim()
+
   return {
-    projectId: firstEnv(
-      'NEXT_PUBLIC_SANITY_PROJECT_ID',
-      'SANITY_STUDIO_PROJECT_ID',
-      'SANITY_API_PROJECT_ID'
-    ),
-    dataset:
-      firstEnv(
-        'NEXT_PUBLIC_SANITY_DATASET',
-        'SANITY_STUDIO_DATASET',
-        'SANITY_API_DATASET'
-      ) || 'production',
+    projectId,
+    dataset,
     apiVersion: '2024-01-01' as const,
   }
 }
