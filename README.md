@@ -13,7 +13,7 @@ A reusable Next.js + Sanity starter for one website. Clone it per customer, poin
 
 ### Prerequisites
 
-- Node.js 20.9+ (Sanity Studio works best on Node 22.12+)
+- Node.js 22.12+
 - npm
 - A Sanity project with a dataset named `production`
 

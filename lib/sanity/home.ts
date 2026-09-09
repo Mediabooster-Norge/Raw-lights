@@ -5,16 +5,23 @@ import { translationsQuery } from './queries/i18n'
 
 const FALLBACK_HOME_SLUGS = ['forside', 'home'] as const
 
+type HomeTranslation = {
+  slug?: string
+  language?: string
+}
+
 function translationDocs(result: {
   translations?: { language?: string; doc?: { slug?: string; language?: string } }[]
-}) {
-  return (result?.translations ?? [])
-    .map((item) => {
-      const language = item.language || item.doc?.language
-      if (!item.doc) return null
-      return { ...item.doc, language }
+}): HomeTranslation[] {
+  const docs: HomeTranslation[] = []
+  for (const item of result?.translations ?? []) {
+    if (!item.doc) continue
+    docs.push({
+      slug: item.doc.slug,
+      language: item.language || item.doc.language,
     })
-    .filter((item): item is { slug?: string; language?: string } => Boolean(item))
+  }
+  return docs
 }
 
 export async function getHomePageSlug(locale: Locale): Promise<string> {

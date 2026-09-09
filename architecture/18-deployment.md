@@ -1,6 +1,6 @@
 # Deployment
 
-Vercel, Next.js 16, Node 20.9+ (22.12+ recommended for Studio).
+Vercel, Next.js 16, Node 22.
 
 `NEXT_PUBLIC_*` variables must be Config, not Sensitive.
 
