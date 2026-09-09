@@ -1,6 +1,6 @@
 'use client'
 
-import Link from 'next/link'
+import { LocaleLink } from '@/lib/i18n'
 import { SanityImage } from '@/lib/components/ui/SanityImage'
 import { PortableText } from '@/lib/components/ui/PortableText'
 
@@ -45,9 +45,9 @@ export function PostSingle({ post }: PostSingleProps) {
       <div className="max-w-4xl mx-auto px-4">
         {/* Breadcrumb - visually hidden, accessible for screen readers */}
         <nav className="sr-only" aria-label="Brødsmulesti">
-          <Link href={`/${post.postType.slug}`}>
+          <LocaleLink href={`/${post.postType.slug}`}>
             Tilbake til {post.postType.title}
-          </Link>
+          </LocaleLink>
         </nav>
 
         {/* Header */}
@@ -130,9 +130,9 @@ export function PostSingle({ post }: PostSingleProps) {
 
         {/* Back link - visually hidden, accessible for screen readers */}
         <footer className="sr-only">
-          <Link href={`/${post.postType.slug}`}>
+          <LocaleLink href={`/${post.postType.slug}`}>
             Tilbake til {post.postType.title}
-          </Link>
+          </LocaleLink>
         </footer>
       </div>
     </article>

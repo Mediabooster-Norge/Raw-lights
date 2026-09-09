@@ -1,9 +1,10 @@
 'use client'
 
 import { useState } from 'react'
-import Link from 'next/link'
 import { Logo } from '@/lib/components/ui/Logo'
 import { SanityLink } from '@/lib/components/ui/SanityLink'
+import { LocaleLink, localeLabels, locales, t, useLocale } from '@/lib/i18n'
+import type { AlternateMap } from '@/lib/i18n/alternates'
 
 type NavItem = {
   label: string
@@ -18,10 +19,38 @@ type HeaderProps = {
     link: any
     variant: string
   }
+  homeHref?: string
+  alternates?: AlternateMap
 }
 
-export function Header({ logo, mainNav, headerCta }: HeaderProps) {
+function LanguageSwitcher({ alternates }: { alternates?: AlternateMap }) {
+  const locale = useLocale()
+
+  return (
+    <nav className="flex items-center gap-2 text-sm font-medium" aria-label={t(locale, 'language')}>
+      {locales.map((item) => {
+        const href = alternates?.[item] ?? (item === 'en' ? '/en' : '/')
+        const current = item === locale
+        return (
+          <a
+            key={item}
+            href={href}
+            hrefLang={item}
+            aria-current={current ? 'page' : undefined}
+            aria-label={localeLabels[item]}
+            className={current ? 'text-primary' : 'text-text-secondary hover:text-primary'}
+          >
+            {item.toUpperCase()}
+          </a>
+        )
+      })}
+    </nav>
+  )
+}
+
+export function Header({ logo, mainNav, headerCta, homeHref = '/', alternates }: HeaderProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const locale = useLocale()
 
   const ctaVariant = headerCta?.variant ?? 'primary'
   const ctaClasses = ctaVariant === 'secondary'
@@ -32,9 +61,9 @@ export function Header({ logo, mainNav, headerCta }: HeaderProps) {
     <header className="sticky top-0 z-40 bg-background border-b border-text-secondary/10">
       <div className="site-container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
-          <Link href="/" className="flex-shrink-0">
+          <LocaleLink href={homeHref} className="flex-shrink-0">
             <Logo logo={logo} className="h-10 w-auto" />
-          </Link>
+          </LocaleLink>
 
           <nav className="hidden md:flex items-center gap-8" aria-label="Main navigation">
             {mainNav?.map((item) => (
@@ -69,6 +98,9 @@ export function Header({ logo, mainNav, headerCta }: HeaderProps) {
           </nav>
 
           <div className="flex items-center gap-4">
+            <div className="hidden md:block">
+              <LanguageSwitcher alternates={alternates} />
+            </div>
             {headerCta?.link && (
               <SanityLink
                 link={headerCta.link}
@@ -79,7 +111,7 @@ export function Header({ logo, mainNav, headerCta }: HeaderProps) {
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
               className="md:hidden p-2 text-text-primary hover:text-primary transition-colors"
-              aria-label="Toggle menu"
+              aria-label={isMobileMenuOpen ? t(locale, 'closeMenu') : t(locale, 'menu')}
               aria-expanded={isMobileMenuOpen}
             >
               <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -114,6 +146,9 @@ export function Header({ logo, mainNav, headerCta }: HeaderProps) {
                 ))}
               </div>
             ))}
+            <div className="py-3">
+              <LanguageSwitcher alternates={alternates} />
+            </div>
             {headerCta?.link && (
               <SanityLink
                 link={headerCta.link}

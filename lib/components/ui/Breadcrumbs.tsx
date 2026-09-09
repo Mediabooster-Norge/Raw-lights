@@ -1,8 +1,10 @@
-import Link from 'next/link'
+'use client'
 
-type Breadcrumb = { 
+import { LocaleLink, t, useLocale } from '@/lib/i18n'
+
+type Breadcrumb = {
   title: string
-  slug: string 
+  slug: string
 }
 
 type BreadcrumbsProps = {
@@ -11,13 +13,15 @@ type BreadcrumbsProps = {
 }
 
 export function Breadcrumbs({ items, className }: BreadcrumbsProps) {
+  const locale = useLocale()
+
   return (
     <nav aria-label="Breadcrumb" className={`text-sm text-text-secondary ${className}`}>
       <ol className="flex items-center gap-2">
         <li>
-          <Link href="/" className="hover:text-primary">
-            Hjem
-          </Link>
+          <LocaleLink href="/" className="hover:text-primary">
+            {t(locale, 'home')}
+          </LocaleLink>
         </li>
         {items.map((item, i) => (
           <li key={item.slug} className="flex items-center gap-2">
@@ -27,9 +31,9 @@ export function Breadcrumbs({ items, className }: BreadcrumbsProps) {
                 {item.title}
               </span>
             ) : (
-              <Link href={`/${item.slug}`} className="hover:text-primary">
+              <LocaleLink href={`/${item.slug}`} className="hover:text-primary">
                 {item.title}
-              </Link>
+              </LocaleLink>
             )}
           </li>
         ))}

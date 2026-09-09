@@ -1,6 +1,8 @@
 import { TagsIcon } from '@sanity/icons'
 import { defineType, defineField } from 'sanity'
 import { archiveGroup, generalGroup, seoGroup } from '../studio/groups'
+import { languageField } from '../helpers/languageField'
+import { jsonLdPostTypes } from '../../lib/seo/types'
 
 export default defineType({
   name: 'postType',
@@ -9,6 +11,7 @@ export default defineType({
   icon: TagsIcon,
   groups: [generalGroup, archiveGroup, seoGroup],
   fields: [
+    languageField,
     defineField({
       name: 'title',
       title: 'Navn (flertall)',
@@ -128,6 +131,17 @@ export default defineType({
       initialValue: false,
       hidden: ({ parent }) => !parent?.hasArchive,
       group: 'archive'
+    }),
+    defineField({
+      name: 'jsonLdType',
+      title: 'JSON-LD-type for innlegg',
+      type: 'string',
+      group: 'seo',
+      options: {
+        list: [...jsonLdPostTypes],
+      },
+      initialValue: 'None',
+      description: 'Alle enkeltinnlegg av denne typen arver denne schema.org-typen.',
     }),
     defineField({
       name: 'seo',

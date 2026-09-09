@@ -1,6 +1,7 @@
 import { DocumentIcon } from '@sanity/icons'
 import { defineType, defineField } from 'sanity'
 import { contentGroup, mediaGroup, seoGroup, visibilityGroup } from '../studio/groups'
+import { languageField } from '../helpers/languageField'
 
 export default defineType({
   name: 'post',
@@ -9,6 +10,7 @@ export default defineType({
   icon: DocumentIcon,
   groups: [contentGroup, mediaGroup, seoGroup, visibilityGroup],
   fields: [
+    languageField,
     defineField({
       name: 'postType',
       title: 'Posttype',

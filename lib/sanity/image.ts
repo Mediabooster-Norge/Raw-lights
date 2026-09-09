@@ -1,4 +1,4 @@
-import imageUrlBuilder from '@sanity/image-url'
+import { createImageUrlBuilder } from '@sanity/image-url'
 import { createClient } from 'next-sanity'
 import { getSanityConfig } from './client'
 
@@ -13,7 +13,7 @@ const client = projectId
     })
   : null
 
-const builder = client ? imageUrlBuilder(client) : null
+const builder = client ? createImageUrlBuilder(client) : null
 
 export function urlFor(source: any) {
   if (!builder) {

@@ -1,5 +1,7 @@
-function parseJsonLd(value?: string | null): object | null {
-  if (!value || !value.trim()) return null
+function parseJsonLd(value?: string | object | null): object | null {
+  if (!value) return null
+  if (typeof value === 'object') return value
+  if (!value.trim()) return null
 
   try {
     const parsed = JSON.parse(value)
@@ -11,12 +13,13 @@ function parseJsonLd(value?: string | null): object | null {
 }
 
 type JsonLdProps = {
+  data?: object | string | null
   jsonLd?: string | null
-  fallback?: string | null
+  fallback?: string | object | null
 }
 
-export function JsonLd({ jsonLd, fallback }: JsonLdProps) {
-  const parsed = parseJsonLd(jsonLd) ?? parseJsonLd(fallback)
+export function JsonLd({ data, jsonLd, fallback }: JsonLdProps) {
+  const parsed = parseJsonLd(data) ?? parseJsonLd(jsonLd) ?? parseJsonLd(fallback)
   if (!parsed) return null
 
   return (

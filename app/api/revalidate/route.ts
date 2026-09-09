@@ -15,29 +15,35 @@ export async function POST(request: NextRequest) {
     // Revalidate based on document type
     switch (_type) {
       case 'page':
-        revalidateTag('pages')
+        revalidateTag('pages', { expire: 0 })
         if (slug?.current) {
-          revalidateTag(`page-${slug.current}`)
+          revalidateTag(`page-${slug.current}`, { expire: 0 })
           revalidatePath(`/${slug.current}`)
         }
         break
       case 'post':
-        revalidateTag('posts')
+        revalidateTag('posts', { expire: 0 })
         if (slug?.current) {
-          revalidateTag(`post-${slug.current}`)
+          revalidateTag(`post-${slug.current}`, { expire: 0 })
         }
         break
       case 'postType':
-        revalidateTag('post-types')
+        revalidateTag('post-types', { expire: 0 })
         break
       case 'navigation':
-        revalidateTag('navigation')
+        revalidateTag('navigation', { expire: 0 })
+        break
+      case 'redirect':
+        revalidateTag('redirects', { expire: 0 })
+        break
+      case 'form':
+        revalidateTag('forms', { expire: 0 })
         break
       case 'globalSettings':
-        revalidateTag('global-settings')
+        revalidateTag('global-settings', { expire: 0 })
         break
       default:
-        revalidateTag('all')
+        revalidateTag('all', { expire: 0 })
     }
 
     return NextResponse.json({ 

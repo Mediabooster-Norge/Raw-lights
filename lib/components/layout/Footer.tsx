@@ -1,6 +1,6 @@
-import Link from 'next/link'
 import { Logo } from '@/lib/components/ui/Logo'
 import { SanityLink } from '@/lib/components/ui/SanityLink'
+import { LocaleLink } from '@/lib/i18n'
 
 type FooterLink = {
   label: string
@@ -23,6 +23,7 @@ type FooterProps = {
   logo?: any
   footerNav?: FooterColumn[]
   socialLinks?: SocialLink[]
+  homeHref?: string
 }
 
 const socialIcons: Record<string, string> = {
@@ -33,15 +34,15 @@ const socialIcons: Record<string, string> = {
   linkedin: 'M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z'
 }
 
-export function Footer({ logo, footerNav, socialLinks }: FooterProps) {
+export function Footer({ logo, footerNav, socialLinks, homeHref = '/' }: FooterProps) {
   return (
     <footer className="bg-surface border-t border-text-secondary/10" role="contentinfo">
       <div className="site-container mx-auto px-4 py-12">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           <div>
-            <Link href="/" className="inline-block mb-4">
+            <LocaleLink href={homeHref} className="inline-block mb-4">
               <Logo logo={logo} className="h-10 w-auto" />
-            </Link>
+            </LocaleLink>
             {socialLinks && socialLinks.length > 0 && (
               <div className="flex gap-4 mt-4">
                 {socialLinks.map((social) => (

@@ -1,13 +1,15 @@
 import { z } from 'zod'
 
 const envSchema = z.object({
-  NEXT_PUBLIC_SANITY_PROJECT_ID: z.string().min(1),
-  NEXT_PUBLIC_SANITY_DATASET: z.string().default('production'),
-  SANITY_API_TOKEN: z.string().min(1),
-  SANITY_PREVIEW_SECRET: z.string().min(1),
-  SANITY_WEBHOOK_SECRET: z.string().min(1),
-  NEXT_PUBLIC_SITE_URL: z.string().url(),
-  REVALIDATE_SECRET: z.string().min(1),
+  NEXT_PUBLIC_SANITY_PROJECT_ID: z.string().optional(),
+  NEXT_PUBLIC_SANITY_DATASET: z.string().optional(),
+  SANITY_API_TOKEN: z.string().optional(),
+  SANITY_PREVIEW_SECRET: z.string().optional(),
+  SANITY_WEBHOOK_SECRET: z.string().optional(),
+  NEXT_PUBLIC_SITE_URL: z.string().optional(),
+  RESEND_API_KEY: z.string().optional(),
+  FORM_FROM_EMAIL: z.string().optional(),
+  FORM_TO_EMAIL: z.string().optional(),
 })
 
 export const env = envSchema.parse(process.env)

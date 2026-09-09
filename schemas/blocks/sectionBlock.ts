@@ -23,7 +23,8 @@ export default defineType({
         defineArrayMember({ type: 'accordionBlock' }),
         defineArrayMember({ type: 'marqueeBlock' }),
         defineArrayMember({ type: 'mediaTextBlock' }),
-        defineArrayMember({ type: 'postGridBlock' })
+        defineArrayMember({ type: 'postGridBlock' }),
+        defineArrayMember({ type: 'formBlock' })
       ]
     }),
     defineField({

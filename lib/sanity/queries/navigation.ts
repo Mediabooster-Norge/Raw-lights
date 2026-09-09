@@ -1,4 +1,5 @@
 import { groq } from 'next-sanity'
+import { LANGUAGE_FILTER } from './page'
 
 export const linkFields = groq`
   _type,
@@ -14,7 +15,8 @@ export const linkFields = groq`
 `
 
 export const navigationQuery = groq`
-  *[_type == "navigation"][0] {
+  *[_type == "navigation" && ${LANGUAGE_FILTER}][0] {
+    language,
     mainNav[] {
       label,
       link { ${linkFields} },

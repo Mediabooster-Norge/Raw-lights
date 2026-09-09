@@ -1,12 +1,12 @@
-import { draftMode } from 'next/headers'
-import { NextRequest, NextResponse } from 'next/server'
+import { defineEnableDraftMode } from 'next-sanity/draft-mode'
+import { getTokenClient } from '@/lib/sanity/client'
 
-export async function GET(request: NextRequest) {
-  const { searchParams, origin } = new URL(request.url)
-  const redirect = searchParams.get('redirect') || '/'
+export async function GET(request: Request) {
+  const client = getTokenClient()
+  if (!client) {
+    return new Response('Draft mode is not configured', { status: 500 })
+  }
 
-  const draft = await draftMode()
-  draft.enable()
-
-  return NextResponse.redirect(new URL(redirect, origin))
+  const handler = defineEnableDraftMode({ client })
+  return handler.GET(request)
 }

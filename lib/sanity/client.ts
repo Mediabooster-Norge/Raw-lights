@@ -39,3 +39,13 @@ export function getClient(): SanityClient | null {
     useCdn: true,
   })
 }
+
+export function getTokenClient(): SanityClient | null {
+  const client = getClient()
+  const token = process.env.SANITY_API_TOKEN
+  if (!client || !token) return null
+  return client.withConfig({
+    token,
+    useCdn: false,
+  })
+}

@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
-import Link from 'next/link'
+import { LocaleLink } from '@/lib/i18n'
 import { SanityImage } from '@/lib/components/ui/SanityImage'
 import { BlockContainer } from './BlockContainer'
 import { cleanStegaString } from '@/lib/utils/stegaClean'
@@ -106,12 +106,12 @@ export function PostGridBlock({ data }: PostGridBlockProps) {
               )}
             </div>
             {showAllLink && (
-              <Link
+              <LocaleLink
                 href={`/${data.postType.slug}`}
                 className="text-primary hover:underline font-medium whitespace-nowrap"
               >
                 {data.showAllText ?? 'Se alle'} →
-              </Link>
+              </LocaleLink>
             )}
           </div>
         </div>
@@ -188,12 +188,12 @@ export function PostGridBlock({ data }: PostGridBlockProps) {
       {/* Show all link at bottom (if no header) */}
       {showAllLink && !data.heading && !data.description && (
         <div className="mt-8 text-center">
-          <Link
+          <LocaleLink
             href={`/${data.postType.slug}`}
             className="inline-block px-6 py-3 bg-primary text-on-primary rounded-lg font-semibold hover:opacity-90 transition-opacity"
           >
             {data.showAllText ?? 'Se alle'} →
-          </Link>
+          </LocaleLink>
         </div>
       )}
     </BlockContainer>
@@ -258,9 +258,9 @@ function PostCard({
 
   if (hasSingleView) {
     return (
-      <Link href={`/${postTypeSlug}/${post.slug}`} className="block h-full">
+      <LocaleLink href={`/${postTypeSlug}/${post.slug}`} className="block h-full">
         {content}
-      </Link>
+      </LocaleLink>
     )
   }
 
@@ -325,9 +325,9 @@ function PostListItem({
 
   if (hasSingleView) {
     return (
-      <Link href={`/${postTypeSlug}/${post.slug}`} className="block">
+      <LocaleLink href={`/${postTypeSlug}/${post.slug}`} className="block">
         {content}
-      </Link>
+      </LocaleLink>
     )
   }
 
@@ -578,14 +578,14 @@ function FeaturedListItem({
 
   if (hasSingleView) {
     return (
-      <Link 
+      <LocaleLink 
         href={`/${postTypeSlug}/${post.slug}`} 
         className="block"
         onMouseEnter={onMouseEnter}
         onMouseLeave={onMouseLeave}
       >
         {content}
-      </Link>
+      </LocaleLink>
     )
   }
 

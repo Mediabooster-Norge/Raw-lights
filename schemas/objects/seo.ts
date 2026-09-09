@@ -62,10 +62,11 @@ export default defineType({
     }),
     defineField({
       name: 'jsonLd',
-      title: 'JSON-LD',
+      title: 'JSON-LD-overstyring',
       type: 'text',
       rows: 8,
-      description: 'Valgfri schema.org-markup. Lim inn et JSON-objekt eller en array. Lagres som tekst, ikke HTML.',
+      hidden: true,
+      description: 'Skjult overstyring. Brukes bare når den genererte markupen ikke holder.',
       group: 'schema',
       validation: (Rule) =>
         Rule.custom((value) => {

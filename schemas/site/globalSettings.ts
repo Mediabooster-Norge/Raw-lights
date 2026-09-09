@@ -86,6 +86,30 @@ export default defineType({
       ]
     }),
     defineField({
+      name: 'homePage',
+      title: 'Forside',
+      type: 'reference',
+      to: [{ type: 'page' }],
+      group: 'brand',
+      description: 'Siden som vises på /. Oversettelser av denne siden brukes på /en.',
+    }),
+    defineField({
+      name: 'notFoundPage',
+      title: '404-side',
+      type: 'reference',
+      to: [{ type: 'page' }],
+      group: 'brand',
+      description: 'Valgfri CMS-side for 404. Oversettelser brukes per språk.',
+    }),
+    defineField({
+      name: 'enableCookieConsent',
+      title: 'Cookie-samtykke',
+      type: 'boolean',
+      group: 'code',
+      initialValue: true,
+      description: 'Vis samtykke-banner før egendefinerte scripts lastes. Slå av for å laste scripts med en gang.',
+    }),
+    defineField({
       name: 'seo',
       title: 'Standard SEO',
       type: 'seo',

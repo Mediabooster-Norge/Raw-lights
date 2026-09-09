@@ -2,6 +2,7 @@ import {
   CogIcon,
   DocumentsIcon,
   DocumentIcon,
+  DocumentTextIcon,
   MenuIcon,
   TagsIcon,
   TransferIcon,
@@ -50,11 +51,7 @@ export const structure: StructureResolver = (S) => {
         .title('Navigasjon')
         .id('navigation')
         .icon(MenuIcon)
-        .child(
-          S.document()
-            .schemaType('navigation')
-            .documentId('navigation')
-        ),
+        .child(S.documentTypeList('navigation').title('Navigasjon')),
       S.divider(),
       S.listItem()
         .title('Sider')
@@ -63,6 +60,11 @@ export const structure: StructureResolver = (S) => {
         .child(S.documentTypeList('page').title('Sider')),
       postsListItem,
       postTypesListItem,
+      S.listItem()
+        .title('Skjemaer')
+        .id('forms')
+        .icon(DocumentTextIcon)
+        .child(S.documentTypeList('form').title('Skjemaer')),
       S.divider(),
       S.listItem()
         .title('Redirects')
