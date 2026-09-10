@@ -296,3 +296,11 @@ html.raw-home-intro-pending .raw-story-hero:not(.raw-story-hero--about) .raw-dis
   .raw-mobile-menu, .raw-menu-button span, .raw-menu-button span::before { transition: none; }
   .raw-finale::before, .raw-scene--3::before, .raw-loader i { animation: none !important; }
 }
+
+/* Keep editorial copy aligned with the story hero; only intentional catalogue and stat layouts bleed full width. */
+.raw-section > .raw-shell { width: min(100%, 100rem); max-width: none; margin-inline: auto; }
+.raw-fill-statement__sticky { padding-inline: 0; }
+.raw-reseller .raw-shell { width: min(100%, 100rem); max-width: none; margin-inline: auto; }
+@media (max-width: 800px) {
+  .raw-fill-statement__sticky { padding-inline: 0; }
+}
