@@ -92,7 +92,7 @@ html.raw-home-intro-pending .raw-story-hero:not(.raw-story-hero--about) .raw-dis
 .raw-header__end .raw-button { min-height: 2.25rem; padding: .55rem 1.05rem; border-color: rgba(243,239,228,.16); border-radius: 999px; background: var(--raw-ink); color: var(--raw-paper); font-family: var(--font-body), sans-serif; font-size: .78rem; font-weight: 500; letter-spacing: .06em; }
 .raw-header__end .raw-button:hover { border-color: var(--raw-lime); background: var(--raw-lime); color: var(--raw-ink); transform: none; }
 
-.raw-chapters { position: fixed; z-index: 40; top: 50%; right: var(--raw-pad); display: grid; gap: .85rem; transform: translateY(-50%); }
+.raw-chapters { position: fixed; z-index: 40; top: 50%; right: clamp(.75rem,1.25vw,1.5rem); display: grid; gap: .85rem; transform: translateY(-50%); }
 .raw-chapters a { display: flex; align-items: center; gap: .7rem; color: rgba(243,239,228,.38); font: .62rem var(--raw-mono); letter-spacing: .18em; }
 .raw-chapters a span { width: 1.4rem; }.raw-chapters a i { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }.raw-chapters a.is-active { color: var(--raw-lime); }
 
