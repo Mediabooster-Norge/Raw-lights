@@ -16,7 +16,7 @@ const { projectId: PROJECT_ID, dataset: DATASET } = getSanityConfig()
 const PREVIEW_URL = getSiteUrl()
 
 const SINGLETON_TYPES = new Set(['globalSettings'])
-const TRANSLATED_TYPES = ['page', 'post', 'postType', 'navigation', 'form']
+const TRANSLATED_TYPES = ['page', 'post', 'postType', 'product', 'navigation', 'form']
 
 export default defineConfig({
   name: 'default',

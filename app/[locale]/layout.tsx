@@ -1,13 +1,11 @@
 import { ReactNode } from 'react'
 import { Metadata } from 'next'
-import { Inter } from 'next/font/google'
 import { draftMode, headers } from 'next/headers'
 import { VisualEditing } from 'next-sanity/visual-editing'
 import { notFound } from 'next/navigation'
 import '../globals.css'
 import { getNavigation, getGlobalSettings, getHomePageSlug, getPrivacyPageSlug } from '@/lib/sanity/fetcher'
 import { mergeTheme } from '@/lib/theme/mergeTheme'
-import { googleFontsHref } from '@/lib/theme/loadFonts'
 import { Header } from '@/lib/components/layout/Header'
 import { Footer } from '@/lib/components/layout/Footer'
 import { SkipToContent } from '@/lib/components/ui/SkipToContent'
@@ -15,13 +13,12 @@ import { PreviewBanner } from '@/lib/components/ui/PreviewBanner'
 import { JsonLd } from '@/lib/components/seo/JsonLd'
 import { CookieConsent } from '@/lib/components/ui/CookieConsent'
 import { CustomCodeScripts } from '@/lib/components/ui/CustomCodeScripts'
+import { RawChrome } from '@/lib/components/layout/RawChrome'
 import { getSiteUrl } from '@/lib/utils/getSiteUrl'
 import { LocaleProvider, isLocale, localizedPath, locales, type Locale } from '@/lib/i18n'
 import { getAlternateUrls, languageMetadata } from '@/lib/i18n/alternates'
 import { buildOrganizationGraph } from '@/lib/seo/buildJsonLd'
 import { socialMetadata } from '@/lib/seo/socialMetadata'
-
-const inter = Inter({ subsets: ['latin'], variable: '--font-body' })
 
 type Props = {
   children: ReactNode
@@ -76,22 +73,14 @@ export default async function LocaleLayout({ children, params }: Props) {
 
   const draft = await draftMode()
   const isDraftMode = draft.isEnabled
-  const headerList = await headers()
-  const pathname = headerList.get('x-pathname') || localizedPath(locale, '/')
-
-  const [navigation, settings, alternates, homeSlug, privacySlug] = await Promise.all([
+  const [navigation, settings, homeSlug, privacySlug] = await Promise.all([
     getNavigation(locale),
     getGlobalSettings(),
-    getAlternateUrls(pathname),
     getHomePageSlug(locale),
     getPrivacyPageSlug(locale),
   ])
 
   const theme = mergeTheme(settings?.siteTheme)
-  const fontsHref = googleFontsHref([
-    theme.typography.fontFamily.heading,
-    theme.typography.fontFamily.body,
-  ])
   const homeHref = localizedPath(locale, '/')
   const cookieEnabled = settings?.enableCookieConsent !== false
   const privacyHref = privacySlug ? localizedPath(locale, `/${privacySlug}`) : null
@@ -132,11 +121,9 @@ export default async function LocaleLayout({ children, params }: Props) {
 
   return (
     <LocaleProvider locale={locale} homeSlug={homeSlug}>
-      <div className={`${inter.variable} min-h-screen bg-background text-text-primary font-body`} style={cssVariables}>
-        {fontsHref ? (
-          // eslint-disable-next-line @next/next/no-page-custom-font
-          <link rel="stylesheet" href={fontsHref} />
-        ) : null}
+      <div className="raw-site" style={cssVariables}>
+        <link rel="stylesheet" href="/fonts/google-fonts.css" />
+        <RawChrome />
         <JsonLd data={organizationGraph} />
         <CustomCodeScripts
           enabled={cookieEnabled}
@@ -151,7 +138,6 @@ export default async function LocaleLayout({ children, params }: Props) {
           mainNav={navigation?.mainNav}
           headerCta={navigation?.headerCta}
           homeHref={homeHref}
-          alternates={alternates}
         />
         <main id="main-content">
           {children}

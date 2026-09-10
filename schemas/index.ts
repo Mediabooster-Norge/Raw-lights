@@ -5,6 +5,7 @@ import postType from './site/postType'
 import post from './site/post'
 import redirect from './site/redirect'
 import form from './site/form'
+import product from './site/product'
 
 import link from './objects/link'
 import seo from './objects/seo'
@@ -22,6 +23,22 @@ import marqueeBlock from './blocks/marqueeBlock'
 import mediaTextBlock from './blocks/mediaTextBlock'
 import postGridBlock from './blocks/postGridBlock'
 import formBlock from './blocks/formBlock'
+import {
+  rawStoryHero,
+  rawFillStatement,
+  rawPinnedStories,
+  rawProductSpotlight,
+  rawStats,
+  rawProductFamilies,
+  rawRules,
+  rawTimeline,
+  rawBeamSection,
+  rawFinale,
+  rawContactInfo,
+  rawContactForm,
+  rawReseller,
+  productCatalogBlock,
+} from './blocks/rawBlocks'
 
 export const schemaTypes = [
   page,
@@ -31,6 +48,7 @@ export const schemaTypes = [
   post,
   redirect,
   form,
+  product,
   link,
   seo,
   richText,
@@ -46,4 +64,18 @@ export const schemaTypes = [
   mediaTextBlock,
   postGridBlock,
   formBlock,
+  rawStoryHero,
+  rawFillStatement,
+  rawPinnedStories,
+  rawProductSpotlight,
+  rawStats,
+  rawProductFamilies,
+  rawRules,
+  rawTimeline,
+  rawBeamSection,
+  rawFinale,
+  rawContactInfo,
+  rawContactForm,
+  rawReseller,
+  productCatalogBlock,
 ]

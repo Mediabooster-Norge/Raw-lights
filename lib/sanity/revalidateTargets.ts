@@ -57,6 +57,14 @@ export function revalidateSpec(body: RevalidateBody): RevalidateSpec {
       tags.add('post-types')
       if (slug) localePaths(`/${slug}`)
       break
+    case 'product':
+      tags.add('products')
+      localePaths('/products')
+      if (slug) {
+        tags.add(`product-${slug}`)
+        localePaths(`/products/${slug}`)
+      }
+      break
     case 'navigation':
       tags.add('navigation')
       break
@@ -73,6 +81,7 @@ export function revalidateSpec(body: RevalidateBody): RevalidateSpec {
       tags.add('pages')
       tags.add('posts')
       tags.add('post-types')
+      tags.add('products')
       tags.add('navigation')
       tags.add('global-settings')
       tags.add('redirects')

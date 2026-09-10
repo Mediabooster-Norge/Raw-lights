@@ -9,6 +9,22 @@ import { MarqueeBlock } from './MarqueeBlock'
 import { MediaTextBlock } from './MediaTextBlock'
 import { PostGridBlock } from './PostGridBlock'
 import { FormBlock } from './FormBlock'
+import {
+  ProductCatalog,
+  RawFillStatement,
+  RawBeamSection,
+  RawContactForm,
+  RawContactInfo,
+  RawFinale,
+  RawPinnedStories,
+  RawProductFamilies,
+  RawProductSpotlight,
+  RawRules,
+  RawReseller,
+  RawStats,
+  RawStoryHero,
+  RawTimeline,
+} from './RawBlocks'
 import { ComponentType } from 'react'
 
 type BlockComponent = ComponentType<{ data: any; renderChildren?: (children: any[]) => React.ReactNode }>
@@ -25,4 +41,18 @@ export const blockRegistry: Record<string, BlockComponent> = {
   mediaTextBlock: MediaTextBlock,
   postGridBlock: PostGridBlock,
   formBlock: FormBlock,
+  rawStoryHero: RawStoryHero,
+  rawFillStatement: RawFillStatement,
+  rawBeamSection: RawBeamSection,
+  rawFinale: RawFinale,
+  rawContactInfo: RawContactInfo,
+  rawContactForm: RawContactForm,
+  rawReseller: RawReseller,
+  rawPinnedStories: RawPinnedStories,
+  rawProductSpotlight: RawProductSpotlight,
+  rawStats: RawStats,
+  rawProductFamilies: RawProductFamilies,
+  rawRules: RawRules,
+  rawTimeline: RawTimeline,
+  productCatalogBlock: ProductCatalog,
 }

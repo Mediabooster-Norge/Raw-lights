@@ -74,10 +74,8 @@ export type Navigation = {
   mainNav?: NavItem[]
   headerCta?: {
     link: SanityLink
-    variant: 'primary' | 'secondary'
   }
   footerNav?: {
-    title: string
     links: SanityLink[]
   }[]
   socialLinks?: {

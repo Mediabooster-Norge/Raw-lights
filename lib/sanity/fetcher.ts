@@ -14,6 +14,7 @@ import {
   allPostTypeSlugsQuery
 } from './queries/posts'
 import { translationsQuery, formByIdQuery, sitemapQuery } from './queries/i18n'
+import { productBySlugQuery, productSlugsQuery, productsQuery } from './queries/products'
 import { defaultLocale, parseLocale, type Locale } from '@/lib/i18n/config'
 
 function isAuthError(error: unknown) {
@@ -34,11 +35,17 @@ export async function getPage(slug: string, locale: Locale) {
   const query = isPreview ? pagePreviewQuery : pageQuery
 
   try {
-    return await client.fetch(
+    const page = await client.fetch(
       query,
       { slug, locale },
       isPreview ? {} : { next: { tags: ['pages', `page-${slug}`] } }
     )
+    // The RAW launch is seeded in English. Until a Norwegian translation exists,
+    // render that source document on the default locale instead of a blank page.
+    if (!page && locale !== 'en') {
+      return client.fetch(query, { slug, locale: 'en' }, isPreview ? {} : { next: { tags: ['pages', `page-${slug}`] } })
+    }
+    return page
   } catch (error: unknown) {
     if (isAuthError(error)) {
       const fallbackClient = getClient()
@@ -57,6 +64,8 @@ export async function getPageById(id: string, locale: Locale) {
     return await client.fetch(
       pageByIdQuery,
       { id, locale },
+      // Home pages are addressed by Sanity id from global settings. Tagging them
+      // with `pages` keeps the normal page webhook invalidation effective too.
       isPreview ? {} : { next: { tags: ['pages', `page-${id}`] } }
     )
   } catch (error: unknown) {
@@ -78,8 +87,8 @@ export async function getNavigation(locale: Locale) {
     const nav = await client.fetch(navigationQuery, { locale }, {
       next: { tags: ['navigation'] }
     })
-    if (nav || locale === defaultLocale) return nav
-    return client.fetch(navigationQuery, { locale: defaultLocale }, {
+    if (nav || locale === 'en') return nav
+    return client.fetch(navigationQuery, { locale: 'en' }, {
       next: { tags: ['navigation'] }
     })
   } catch (error: unknown) {
@@ -282,4 +291,26 @@ export async function getSitemapEntries() {
   const client = getClient()
   if (!client) return { pages: [], postTypes: [], posts: [] }
   return client.fetch(sitemapQuery)
+}
+
+export async function getProducts(locale: Locale) {
+  const { isPreview, client } = await publishedOrPreview()
+  if (!client) return []
+  const products = await client.fetch(productsQuery, { locale }, isPreview ? {} : { next: { tags: ['products'] } })
+  if (!products.length && locale !== 'en') return client.fetch(productsQuery, { locale: 'en' }, isPreview ? {} : { next: { tags: ['products'] } })
+  return products
+}
+
+export async function getProductBySlug(slug: string, locale: Locale) {
+  const { isPreview, client } = await publishedOrPreview()
+  if (!client) return null
+  const product = await client.fetch(productBySlugQuery, { slug, locale }, isPreview ? {} : { next: { tags: ['products', `product-${slug}`] } })
+  if (!product && locale !== 'en') return client.fetch(productBySlugQuery, { slug, locale: 'en' }, isPreview ? {} : { next: { tags: ['products', `product-${slug}`] } })
+  return product
+}
+
+export async function getProductSlugs(locale: Locale): Promise<string[]> {
+  const client = getClient()
+  if (!client) return []
+  return client.fetch(productSlugsQuery, { locale }, { next: { tags: ['products'] } })
 }

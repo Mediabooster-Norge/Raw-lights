@@ -47,6 +47,10 @@ function buildInternalUrl(
     return `/${internalLink.postTypeSlug}/${slug}`
   }
 
+  if (internalLink._type === 'product') {
+    return `/products/${slug}`
+  }
+
   return `/${slug}`
 }
 

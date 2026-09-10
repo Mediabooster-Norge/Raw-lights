@@ -276,6 +276,31 @@ export function buildPostJsonLd(input: {
   }
 }
 
+export function buildProductJsonLd(input: {
+  title: string
+  description?: string
+  url: string
+  siteUrl: string
+  locale: string
+  imageUrl?: string
+  sku?: string
+  price?: string
+}) {
+  const product: GraphNode = {
+    '@type': 'Product',
+    '@id': `${input.url}#product`,
+    name: input.title,
+    url: input.url,
+    inLanguage: input.locale,
+    brand: organizationRef(input.siteUrl),
+  }
+  if (input.description) product.description = input.description
+  if (input.sku) product.sku = input.sku
+  if (input.imageUrl) product.image = [input.imageUrl]
+  if (input.price) product.offers = { '@type': 'Offer', price: input.price.replace(/[^0-9.,]/g, '').replace(',', '.'), priceCurrency: 'NOK', availability: 'https://schema.org/InStock', url: input.url }
+  return { '@context': 'https://schema.org', '@graph': [product, breadcrumbList(input.siteUrl, [{ name: 'Products', path: '/products' }, { name: input.title, path: new URL(input.url).pathname }])] }
+}
+
 export function buildCollectionJsonLd(input: {
   title: string
   description?: string

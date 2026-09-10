@@ -2,22 +2,7 @@ import { CogIcon } from '@sanity/icons'
 import { defineType, defineField } from 'sanity'
 import { brandGroup, codeGroup, seoGroup } from '../studio/groups'
 import { altField } from '../helpers/altField'
-
-const fontOptions = [
-  'Inter',
-  'Playfair Display',
-  'Montserrat',
-  'Poppins',
-  'Oswald',
-  'Merriweather',
-  'Raleway',
-  'Roboto',
-  'Open Sans',
-  'Lato',
-  'Source Sans Pro',
-  'Nunito',
-  'Work Sans'
-]
+import { fontOptions } from '@/lib/theme/fontOptions'
 
 export default defineType({
   name: 'globalSettings',
@@ -72,16 +57,16 @@ export default defineType({
               name: 'headingFont',
               title: 'Overskriftsfont',
               type: 'string',
-              options: { list: fontOptions }
+              options: { list: fontOptions, layout: 'dropdown' },
+              validation: (Rule) => Rule.required(),
             },
             {
               name: 'bodyFont',
               title: 'Brødtekstfont',
               type: 'string',
-              options: { list: fontOptions }
-            },
-            { name: 'customHeadingFont', title: 'Egendefinert overskriftsfont', type: 'string' },
-            { name: 'customBodyFont', title: 'Egendefinert brødtekstfont', type: 'string' }
+              options: { list: fontOptions, layout: 'dropdown' },
+              validation: (Rule) => Rule.required(),
+            }
           ]
         })
       ]
