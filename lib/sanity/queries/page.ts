@@ -108,6 +108,10 @@ export const pageFields = groq`
       primaryCta { ..., internalLink-> { _type, "slug": slug.current, "postTypeSlug": postType->slug.current } },
       secondaryCta { ..., internalLink-> { _type, "slug": slug.current, "postTypeSlug": postType->slug.current } }
     },
+    _type == "rawReseller" => {
+      ...,
+      cta { ..., internalLink-> { _type, "slug": slug.current, "postTypeSlug": postType->slug.current } }
+    },
     _type == "rawContactForm" => {
       ...,
       "form": form-> { _id, submitLabel, successMessage, fields[] }

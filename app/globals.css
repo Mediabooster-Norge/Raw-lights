@@ -167,6 +167,10 @@ html.raw-touch .raw-cursor { display: none; }
 .raw-fill-statement { min-height: 185vh; --raw-fill: 0; }
 .raw-fill-text b { animation: none; -webkit-mask-size: 100% calc(var(--raw-fill) * 100%); mask-size: 100% calc(var(--raw-fill) * 100%); }
 .raw-no-motion .raw-fill-text b { -webkit-mask-size: 100% 100%; mask-size: 100% 100%; }
+.raw-no-motion.raw-pinned-stories { height: auto; }
+.raw-no-motion .raw-pinned-stories__sticky { position: static; }
+.raw-no-motion .raw-pinned-stories__track { display: block; }
+.raw-no-motion .raw-scene { width: 100%; flex: none; }
 @media (prefers-reduced-motion: reduce) { .raw-fill-text b { -webkit-mask-size: 100% 100%; mask-size: 100% 100%; } }
 
 /* About: the reference is a separate origin story, not the home-page chapter hero. */

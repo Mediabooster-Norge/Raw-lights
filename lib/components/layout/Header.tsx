@@ -4,6 +4,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { useEffect, useState } from 'react'
+import { usePathname } from 'next/navigation'
 import { Logo } from '@/lib/components/ui/Logo'
 import { SanityLink } from '@/lib/components/ui/SanityLink'
 import { LocaleLink, t, useLocale } from '@/lib/i18n'
@@ -14,10 +15,12 @@ type HeaderProps = { logo?: any; mainNav?: NavItem[]; headerCta?: { link: any };
 export function Header({ logo, mainNav, headerCta, homeHref = '/' }: HeaderProps) {
   const [open, setOpen] = useState(false)
   const locale = useLocale()
+  const pathname = usePathname()
   useEffect(() => {
     const onScroll = () => document.documentElement.classList.toggle('raw-scrolled', scrollY > 24)
     onScroll(); addEventListener('scroll', onScroll, { passive: true }); return () => removeEventListener('scroll', onScroll)
   }, [])
+  useEffect(() => { setOpen(false) }, [pathname])
   useEffect(() => { document.body.classList.toggle('raw-nav-open', open); return () => document.body.classList.remove('raw-nav-open') }, [open])
   return <header className="raw-header">
     <LocaleLink href={homeHref} className="raw-header__logo" aria-label="RAW Lights home">{logo ? <Logo logo={logo} className="h-10 w-auto" /> : <span>RAW</span>}</LocaleLink>

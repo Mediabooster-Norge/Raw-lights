@@ -3,7 +3,9 @@ import { LANGUAGE_FILTER, PUBLISH_FILTER } from './page'
 
 export const productFields = groq`
   _id, _type, language, title, "slug": slug.current, category, sku, price, excerpt,
-  descriptionHeading, features, keyStats, specifications, primaryCta, secondaryCta,
+  descriptionHeading, features, keyStats, specifications,
+  primaryCta { ..., internalLink-> { _type, "slug": slug.current, "postTypeSlug": postType->slug.current } },
+  secondaryCta { ..., internalLink-> { _type, "slug": slug.current, "postTypeSlug": postType->slug.current } },
   heroImage { ..., asset-> { _id, url, metadata { dimensions { width, height, aspectRatio } } } },
   relatedProducts[]-> { _id, title, "slug": slug.current, sku, excerpt, category, heroImage { ..., asset-> { _id, url, metadata { dimensions { width, height, aspectRatio } } } } },
   seo, visibility, publishDate, order, _updatedAt

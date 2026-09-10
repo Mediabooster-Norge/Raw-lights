@@ -7,6 +7,7 @@ import { useEffect, useRef, useState } from 'react'
 import { SanityImage, IMAGE_SIZES } from '@/lib/components/ui/SanityImage'
 import { SanityLink } from '@/lib/components/ui/SanityLink'
 import { FormRenderer } from '@/lib/components/forms/FormRenderer'
+import { LocaleLink } from '@/lib/i18n'
 
 type Image = { alt?: string; asset?: { url?: string } }
 type Product = { title?: string; slug?: string; sku?: string; excerpt?: string; category?: string; heroImage?: Image; keyStats?: { value?: string; label?: string }[]; features?: { title?: string; text?: string }[] }
@@ -66,7 +67,12 @@ export function RawPinnedStories({ data }: { data: { slides?: { eyebrow?: string
   const root = useRef<HTMLElement>(null)
   const track = useRef<HTMLDivElement>(null)
   useEffect(() => {
-    if (data.animate === false || !root.current || !track.current || matchMedia('(prefers-reduced-motion: reduce)').matches) return
+    if (data.animate === false || !root.current || !track.current || matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      if (track.current) {
+        track.current.style.transform = 'none'
+      }
+      return
+    }
     let frame = 0
     const update = () => { frame = 0; const el = root.current; const content = track.current; if (!el || !content) return; const distance = Math.max(0, el.offsetHeight - innerHeight); const progress = distance ? Math.max(0, Math.min(1, -el.getBoundingClientRect().top / distance)) : 0; content.style.transform = `translate3d(${-progress * Math.max(0, content.scrollWidth - innerWidth)}px,0,0)` }
     const onScroll = () => { if (!frame) frame = requestAnimationFrame(update) }; addEventListener('scroll', onScroll, { passive: true }); addEventListener('resize', onScroll); update(); return () => { removeEventListener('scroll', onScroll); removeEventListener('resize', onScroll); if (frame) cancelAnimationFrame(frame) }
@@ -79,13 +85,20 @@ export function RawProductSpotlight({ data }: { data: { product?: Product; eyebr
   const [illuminated, setIlluminated] = useState(false)
   if (!product) return null
   const productName = data.heading || product.title?.replace(/["″]$/, '') || 'Product'
-  return <section id="carbon" className="raw-section raw-carbon"><div className="raw-shell raw-product-spotlight"><button className={`raw-lamp ${illuminated ? 'is-on' : ''}`} type="button" aria-label={`Illuminate ${productName}`} onPointerEnter={() => setIlluminated(true)} onPointerLeave={() => setIlluminated(false)} onClick={() => setIlluminated((value) => !value)}>{product.heroImage && <SanityImage image={product.heroImage} width={840} height={720} sizes="(min-width: 900px) 50vw, 100vw" />}<span>Hover to ignite</span></button><div><p className="raw-eyebrow">{data.eyebrow || 'The lamp'}</p><h2 className="raw-display">{productName}</h2><p className="raw-lede">{data.text || product.excerpt}</p><ul className="raw-feature-list">{product.features?.map((item) => <li key={item.title}><strong>{item.title}</strong><span>{item.text}</span></li>)}</ul><a className="raw-button" href={`/products/${product.slug}`}>View {productName}</a></div></div></section>
+  return <section id="carbon" className="raw-section raw-carbon"><div className="raw-shell raw-product-spotlight"><button className={`raw-lamp ${illuminated ? 'is-on' : ''}`} type="button" aria-label={`Illuminate ${productName}`} onPointerEnter={() => setIlluminated(true)} onPointerLeave={() => setIlluminated(false)} onClick={() => setIlluminated((value) => !value)}>{product.heroImage && <SanityImage image={product.heroImage} width={840} height={720} sizes="(min-width: 900px) 50vw, 100vw" />}<span>Hover to ignite</span></button><div><p className="raw-eyebrow">{data.eyebrow || 'The lamp'}</p><h2 className="raw-display">{productName}</h2><p className="raw-lede">{data.text || product.excerpt}</p><ul className="raw-feature-list">{product.features?.map((item) => <li key={item.title}><strong>{item.title}</strong><span>{item.text}</span></li>)}</ul><LocaleLink className="raw-button" href={`/products/${product.slug}`}>View {productName}</LocaleLink></div></div></section>
 }
 
 export function RawStats({ data }: { data: { stats?: { value?: string; label?: string }[]; animate?: boolean } }) {
   const root = useRef<HTMLElement>(null)
   useEffect(() => {
-    if (data.animate === false || !root.current || matchMedia('(prefers-reduced-motion: reduce)').matches) return
+    if (data.animate === false || !root.current || matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      if (root.current) {
+        root.current.querySelectorAll<HTMLElement>('.raw-stat').forEach((stat) => {
+          stat.style.setProperty('--raw-stat-fill', '1')
+        })
+      }
+      return
+    }
     const update = () => {
       const element = root.current; if (!element) return
       const progress = Math.max(0, Math.min(1, -element.getBoundingClientRect().top / Math.max(1, element.offsetHeight - innerHeight)))
@@ -150,5 +163,5 @@ export function ProductCatalog({ data }: { data: { products?: Product[]; fallbac
   const [filter, setFilter] = useState('all')
   const products = (data.products?.length ? data.products : data.fallbackProducts || []).filter((product) => filter === 'all' || product.category === filter)
   const excerpt = (value?: string) => value && (value.length > 115 ? `${value.slice(0, 112).trimEnd()}…` : value)
-  return <section className="raw-catalog-section">{data.showFilters !== false && <div className="raw-filters" role="group" aria-label="Filter products">{[['all', 'All'], ['driving', 'Driving'], ['work', 'Work'], ['warning', 'Warning']].map(([value, label]) => <button key={value} className={filter === value ? 'is-active' : ''} onClick={() => setFilter(value)}>{label}</button>)}</div>}<div className="raw-catalog">{products.map((product) => <a key={product.slug} className="raw-card" href={`/products/${product.slug}`}>{product.heroImage && <SanityImage image={product.heroImage} width={760} height={560} sizes="(min-width: 900px) 33vw, 100vw" />}<p className="raw-kicker">{product.sku}</p><h2>{product.title}</h2><p>{excerpt(product.excerpt)}</p></a>)}</div></section>
+  return <section className="raw-catalog-section">{data.showFilters !== false && <div className="raw-filters" role="group" aria-label="Filter products">{[['all', 'All'], ['driving', 'Driving'], ['work', 'Work'], ['warning', 'Warning']].map(([value, label]) => <button key={value} className={filter === value ? 'is-active' : ''} onClick={() => setFilter(value)}>{label}</button>)}</div>}<div className="raw-catalog">{products.map((product) => <LocaleLink key={product.slug} className="raw-card" href={`/products/${product.slug}`}>{product.heroImage && <SanityImage image={product.heroImage} width={760} height={560} sizes="(min-width: 900px) 33vw, 100vw" />}<p className="raw-kicker">{product.sku}</p><h2>{product.title}</h2><p>{excerpt(product.excerpt)}</p></LocaleLink>)}</div></section>
 }
