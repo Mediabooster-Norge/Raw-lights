@@ -127,11 +127,11 @@ export function mergeTheme(sanityTheme?: SanityTheme): Theme {
     typography: {
       ...baseTheme.typography,
       fontFamily: {
-        heading: sanityTheme.typography?.customHeadingFont
-          ?? sanityTheme.typography?.headingFont
+        heading: sanityTheme.typography?.headingFont
+          ?? sanityTheme.typography?.customHeadingFont
           ?? baseTheme.typography.fontFamily.heading,
-        body: sanityTheme.typography?.customBodyFont
-          ?? sanityTheme.typography?.bodyFont
+        body: sanityTheme.typography?.bodyFont
+          ?? sanityTheme.typography?.customBodyFont
           ?? baseTheme.typography.fontFamily.body
       }
     }

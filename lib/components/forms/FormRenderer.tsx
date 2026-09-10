@@ -70,14 +70,14 @@ export function FormRenderer({
 
   if (state.status === 'success') {
     return (
-      <div className="p-6 bg-green-50 border border-green-200 rounded-lg text-green-800">
+      <div className="raw-form-success">
         {state.message}
       </div>
     )
   }
 
   return (
-    <form onSubmit={handleSubmit} className="relative space-y-6">
+    <form onSubmit={handleSubmit} className="raw-form">
       <div className="absolute -left-[9999px] h-0 w-0 overflow-hidden" aria-hidden="true">
         <label htmlFor={HONEYPOT_FIELD}>Company website</label>
         <input
@@ -145,7 +145,7 @@ export function FormRenderer({
       })}
 
       {state.status === 'error' && (
-        <div className="p-4 bg-red-50 border border-red-200 rounded text-red-800 text-sm">
+        <div className="raw-form-error">
           {state.message}
         </div>
       )}
@@ -153,7 +153,7 @@ export function FormRenderer({
       <button
         type="submit"
         disabled={state.status === 'submitting'}
-        className="w-full px-6 py-3 bg-primary text-on-primary rounded-lg font-semibold hover:opacity-90 transition-opacity disabled:opacity-50"
+        className="raw-button"
       >
         {state.status === 'submitting' ? t(locale, 'formSending') : (submitButtonText ?? t(locale, 'formDefaultSubmit'))}
       </button>

@@ -1,4 +1,4 @@
 export * from './baseTheme'
+export * from './fontOptions'
 export * from './mergeTheme'
 export * from './resolveTextColor'
-export * from './loadFonts'

@@ -26,11 +26,9 @@ export const navigationQuery = groq`
       }
     },
     headerCta {
-      link { ${linkFields} },
-      variant
+      link { ${linkFields} }
     },
     footerNav[] {
-      title,
       links[] { ${linkFields} }
     },
     socialLinks[] {

@@ -39,4 +39,12 @@ describe('revalidateSpec', () => {
     assert.ok(spec.paths.some((item) => item.path === '/en/artister/ballinciaga'))
     assert.ok(spec.paths.some((item) => item.path === '/artister'))
   })
+
+  it('revalidates the product catalog and localized product route', () => {
+    const spec = revalidateSpec({ _type: 'product', slug: 'raw-carbon-9' })
+    assert.ok(spec.tags.includes('products'))
+    assert.ok(spec.tags.includes('product-raw-carbon-9'))
+    assert.ok(spec.paths.some((item) => item.path === '/products'))
+    assert.ok(spec.paths.some((item) => item.path === '/en/products/raw-carbon-9'))
+  })
 })

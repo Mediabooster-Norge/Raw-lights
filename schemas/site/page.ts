@@ -37,17 +37,21 @@ export default defineType({
       type: 'array',
       group: 'content',
       of: [
-        { type: 'heroBlock' },
-        { type: 'textBlock' },
-        { type: 'ctaBlock' },
-        { type: 'galleryBlock' },
         { type: 'marqueeBlock' },
-        { type: 'mediaTextBlock' },
-        { type: 'accordionBlock' },
-        { type: 'postGridBlock' },
-        { type: 'formBlock' },
-        { type: 'spacerBlock' },
-        { type: 'sectionBlock' }
+        { type: 'rawStoryHero' },
+        { type: 'rawFillStatement' },
+        { type: 'rawPinnedStories' },
+        { type: 'rawProductSpotlight' },
+        { type: 'rawStats' },
+        { type: 'rawProductFamilies' },
+        { type: 'rawRules' },
+        { type: 'rawTimeline' },
+        { type: 'rawBeamSection' },
+        { type: 'rawFinale' },
+        { type: 'rawContactInfo' },
+        { type: 'rawContactForm' },
+        { type: 'rawReseller' },
+        { type: 'productCatalogBlock' }
       ]
     }),
     defineField({

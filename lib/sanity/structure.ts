@@ -3,6 +3,7 @@ import {
   CogIcon,
   DocumentsIcon,
   DocumentIcon,
+  BulbOutlineIcon,
   DocumentTextIcon,
   MenuIcon,
   TagsIcon,
@@ -65,6 +66,11 @@ export const structure: StructureResolver = (S) => {
         .id('pages')
         .icon(DocumentsIcon)
         .child(S.documentTypeList('page').title('Sider')),
+      S.listItem()
+        .title('Products')
+        .id('products')
+        .icon(BulbOutlineIcon)
+        .child(S.documentTypeList('product').title('Products').defaultOrdering([{ field: 'order', direction: 'asc' }])),
       postsListItem,
       postTypesListItem,
       S.listItem()

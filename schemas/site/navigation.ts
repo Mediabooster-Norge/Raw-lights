@@ -61,13 +61,6 @@ export default defineType({
       options: { collapsible: true, collapsed: false },
       fields: [
         defineField({ name: 'link', title: 'Lenke', type: 'link' }),
-        defineField({
-          name: 'variant',
-          title: 'Variant',
-          type: 'string',
-          options: { list: ['primary', 'secondary'] },
-          initialValue: 'primary'
-        })
       ]
     }),
     defineField({
@@ -78,7 +71,6 @@ export default defineType({
       of: [{
         type: 'object',
         fields: [
-          defineField({ name: 'title', title: 'Tittel', type: 'string' }),
           defineField({
             name: 'links',
             title: 'Lenker',
@@ -87,13 +79,10 @@ export default defineType({
           })
         ],
         preview: {
-          select: { title: 'title', links: 'links' },
-          prepare({ title, links }) {
+          select: { links: 'links' },
+          prepare({ links }) {
             const count = Array.isArray(links) ? links.length : 0
-            return {
-              title: title || 'Kolonne',
-              subtitle: `${count} lenker`
-            }
+            return { title: `Footer-lenker (${count})` }
           }
         }
       }]
