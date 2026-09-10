@@ -51,6 +51,7 @@ export default defineType({
         { type: 'rawContactInfo' },
         { type: 'rawContactForm' },
         { type: 'rawReseller' },
+        { type: 'rawFaq' },
         { type: 'productCatalogBlock' }
       ]
     }),
@@ -65,7 +66,7 @@ export default defineType({
       },
       initialValue: 'WebPage',
       description:
-        'Schema.org-type for siden. FAQPage bygges automatisk fra accordion. BreadcrumbList legges alltid på. Bruk overstyring bare når den genererte grafen ikke holder.',
+        'Schema.org-type for siden. FAQPage bygges automatisk fra FAQ-moduler. BreadcrumbList legges alltid på. Bruk overstyring bare når den genererte grafen ikke holder.',
     }),
     defineField({
       name: 'jsonLdOverride',

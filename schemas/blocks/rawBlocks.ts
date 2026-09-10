@@ -1,4 +1,4 @@
-import { SparklesIcon } from '@sanity/icons'
+import { SparklesIcon, UlistIcon } from '@sanity/icons'
 import { defineField, defineType } from 'sanity'
 import { altField } from '../helpers/altField'
 
@@ -82,6 +82,27 @@ export const rawReseller = defineType({
   name: 'rawReseller', title: 'RAW reseller callout', type: 'object', icon: SparklesIcon,
   fields: [defineField({ name: 'eyebrow', title: 'Eyebrow', type: 'string' }), defineField({ name: 'heading', title: 'Heading', type: 'string' }), defineField({ name: 'text', title: 'Text', type: 'text', rows: 3 }), link('cta', 'CTA')],
   preview: { select: { title: 'heading' }, prepare: ({ title }) => ({ title: title || 'RAW reseller callout' }) },
+})
+
+export const rawFaq = defineType({
+  name: 'rawFaq', title: 'RAW FAQ', type: 'object', icon: UlistIcon,
+  fields: [
+    defineField({ name: 'eyebrow', title: 'Eyebrow', type: 'string' }),
+    defineField({ name: 'heading', title: 'Heading', type: 'string', validation: (Rule) => Rule.required() }),
+    defineField({ name: 'text', title: 'Intro', type: 'text', rows: 3 }),
+    defineField({
+      name: 'items', title: 'Questions', type: 'array', validation: (Rule) => Rule.required().min(1),
+      of: [{
+        type: 'object',
+        fields: [
+          defineField({ name: 'question', title: 'Question', type: 'string', validation: (Rule) => Rule.required() }),
+          defineField({ name: 'answer', title: 'Answer', type: 'richText', validation: (Rule) => Rule.required() }),
+        ],
+        preview: { select: { title: 'question' } },
+      }],
+    }),
+  ],
+  preview: { select: { title: 'heading', items: 'items' }, prepare: ({ title, items }) => ({ title: title || 'RAW FAQ', subtitle: `${items?.length || 0} questions` }) },
 })
 
 export const productCatalogBlock = defineType({

@@ -37,6 +37,7 @@ import {
   rawContactInfo,
   rawContactForm,
   rawReseller,
+  rawFaq,
   productCatalogBlock,
 } from './blocks/rawBlocks'
 
@@ -77,5 +78,6 @@ export const schemaTypes = [
   rawContactInfo,
   rawContactForm,
   rawReseller,
+  rawFaq,
   productCatalogBlock,
 ]

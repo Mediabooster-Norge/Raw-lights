@@ -6,6 +6,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { SanityImage, IMAGE_SIZES } from '@/lib/components/ui/SanityImage'
 import { SanityLink } from '@/lib/components/ui/SanityLink'
+import { PortableText } from '@/lib/components/ui/PortableText'
 import { FormRenderer } from '@/lib/components/forms/FormRenderer'
 import { LocaleLink } from '@/lib/i18n'
 
@@ -153,6 +154,11 @@ export function RawContactForm({ data }: { data: { heading?: string; form?: { _i
 
 export function RawReseller({ data }: { data: { eyebrow?: string; heading?: string; text?: string; cta?: any } }) {
   return <section id="resellers" className="raw-reseller"><div className="raw-shell"><p className="raw-eyebrow">{data.eyebrow}</p><h2 className="raw-display">{data.heading}</h2><p className="raw-lede">{data.text}</p>{data.cta && <SanityLink link={data.cta} className="raw-button" />}</div></section>
+}
+
+export function RawFaq({ data }: { data: { eyebrow?: string; heading?: string; text?: string; items?: { _key?: string; question?: string; answer?: any }[] } }) {
+  if (!data.items?.length) return null
+  return <section className="raw-faq"><div className="raw-shell raw-faq__layout"><header><p className="raw-eyebrow">{data.eyebrow}</p><h2 className="raw-display">{data.heading}</h2>{data.text && <p className="raw-lede">{data.text}</p>}</header><div className="raw-faq__list">{data.items.map((item, index) => <details className="raw-faq__item" key={item._key || item.question || index}><summary><span>{item.question}</span><i aria-hidden="true" /></summary><PortableText value={item.answer} className="raw-faq__answer" /></details>)}</div></div></section>
 }
 
 export function RawTimeline({ data }: { data: { items?: { index?: string; eyebrow?: string; title?: string; text?: string; image?: Image }[] } }) {

@@ -117,7 +117,7 @@ export function GalleryBlock({ data }: GalleryBlockProps) {
   }
 
   const onTouchEnd = () => {
-    if (!touchStart || !touchEnd) return
+    if (touchStart === null || touchEnd === null) return
     const distance = touchStart - touchEnd
     const isLeftSwipe = distance > minSwipeDistance
     const isRightSwipe = distance < -minSwipeDistance
@@ -241,6 +241,7 @@ export function GalleryBlock({ data }: GalleryBlockProps) {
         {/* Carousel Container */}
         <div 
           className="relative overflow-hidden rounded-lg"
+          style={{ touchAction: 'pan-y' }}
           onTouchStart={onTouchStart}
           onTouchMove={onTouchMove}
           onTouchEnd={onTouchEnd}
