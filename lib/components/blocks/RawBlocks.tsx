@@ -67,6 +67,9 @@ export function RawFillStatement({ data }: { data: { eyebrow?: string; heading?:
 export function RawPinnedStories({ data }: { data: { slides?: { eyebrow?: string; title?: string; text?: string; image?: Image }[]; animate?: boolean } }) {
   const root = useRef<HTMLElement>(null)
   const track = useRef<HTMLDivElement>(null)
+  const [activeSlide, setActiveSlide] = useState(0)
+  const [touchStart, setTouchStart] = useState<number | null>(null)
+  const [touchEnd, setTouchEnd] = useState<number | null>(null)
   useEffect(() => {
     if (data.animate === false || !root.current || !track.current || matchMedia('(prefers-reduced-motion: reduce)').matches) {
       if (track.current) {
@@ -75,10 +78,29 @@ export function RawPinnedStories({ data }: { data: { slides?: { eyebrow?: string
       return
     }
     let frame = 0
-    const update = () => { frame = 0; const el = root.current; const content = track.current; if (!el || !content) return; const distance = Math.max(0, el.offsetHeight - innerHeight); const progress = distance ? Math.max(0, Math.min(1, -el.getBoundingClientRect().top / distance)) : 0; content.style.transform = `translate3d(${-progress * Math.max(0, content.scrollWidth - innerWidth)}px,0,0)` }
+    const update = () => {
+      frame = 0
+      const el = root.current
+      const content = track.current
+      if (!el || !content) return
+      if (matchMedia('(max-width: 800px)').matches) {
+        content.style.setProperty('transform', `translate3d(-${activeSlide * 100}%,0,0)`, 'important')
+        return
+      }
+      const distance = Math.max(0, el.offsetHeight - innerHeight)
+      const progress = distance ? Math.max(0, Math.min(1, -el.getBoundingClientRect().top / distance)) : 0
+      content.style.setProperty('transform', `translate3d(${-progress * Math.max(0, content.scrollWidth - innerWidth)}px,0,0)`)
+    }
     const onScroll = () => { if (!frame) frame = requestAnimationFrame(update) }; addEventListener('scroll', onScroll, { passive: true }); addEventListener('resize', onScroll); update(); return () => { removeEventListener('scroll', onScroll); removeEventListener('resize', onScroll); if (frame) cancelAnimationFrame(frame) }
-  }, [data.animate])
-  return <section id="inspiration" ref={root} className={`raw-pinned-stories ${data.animate === false ? 'raw-no-motion' : ''}`}><div className="raw-pinned-stories__sticky"><div className="raw-pinned-stories__track" ref={track}>{data.slides?.map((slide, index) => <article key={`${slide.title}-${index}`} className={`raw-scene raw-scene--${index + 1}`}>{slide.image && <SanityImage image={slide.image} fill sizes="100vw" className="raw-scene__image" />}<div className="raw-scene__shade" /><div className="raw-shell raw-scene__copy"><p className="raw-eyebrow">{slide.eyebrow}</p><h2 className="raw-display">{slide.title}</h2><p className="raw-lede">{slide.text}</p></div></article>)}</div></div></section>
+  }, [activeSlide, data.animate])
+  const slides = data.slides || []
+  const endTouch = () => {
+    if (touchStart === null || touchEnd === null) return
+    const distance = touchStart - touchEnd
+    if (Math.abs(distance) < 45) return
+    setActiveSlide((current) => (distance > 0 ? Math.min(current + 1, slides.length - 1) : Math.max(current - 1, 0)))
+  }
+  return <section id="inspiration" ref={root} className={`raw-pinned-stories ${data.animate === false ? 'raw-no-motion' : ''}`}><div className="raw-pinned-stories__sticky"><div className="raw-pinned-stories__track" ref={track} style={{ touchAction: 'pan-y' }} onTouchStart={(event) => { setTouchEnd(null); setTouchStart(event.targetTouches[0].clientX) }} onTouchMove={(event) => setTouchEnd(event.targetTouches[0].clientX)} onTouchEnd={endTouch}>{slides.map((slide, index) => <article key={`${slide.title}-${index}`} className={`raw-scene raw-scene--${index + 1}`}>{slide.image && <SanityImage image={slide.image} fill sizes="100vw" className="raw-scene__image" />}<div className="raw-scene__shade" /><div className="raw-shell raw-scene__copy"><p className="raw-eyebrow">{slide.eyebrow}</p><h2 className="raw-display">{slide.title}</h2><p className="raw-lede">{slide.text}</p></div></article>)}</div><div className="raw-story-carousel-controls" aria-label="Inspiration slides">{slides.map((slide, index) => <button key={slide.title || index} type="button" onClick={() => setActiveSlide(index)} className={activeSlide === index ? 'is-active' : ''} aria-label={`Show ${slide.title || `slide ${index + 1}`}`} aria-current={activeSlide === index}>{String(index + 1).padStart(2, '0')}</button>)}</div></div></section>
 }
 
 export function RawProductSpotlight({ data }: { data: { product?: Product; eyebrow?: string; heading?: string; text?: string; animate?: boolean } }) {
@@ -102,9 +124,12 @@ export function RawStats({ data }: { data: { stats?: { value?: string; label?: s
     }
     const update = () => {
       const element = root.current; if (!element) return
-      const progress = Math.max(0, Math.min(1, -element.getBoundingClientRect().top / Math.max(1, element.offsetHeight - innerHeight)))
       element.querySelectorAll<HTMLElement>('.raw-stat').forEach((stat, index, all) => {
-        const value = Math.max(0, Math.min(1, (progress - index / all.length) * all.length))
+        const mobile = matchMedia('(max-width: 800px)').matches
+        const progress = mobile
+          ? Math.max(0, Math.min(1, (innerHeight * .78 - stat.getBoundingClientRect().top) / (innerHeight * .32)))
+          : Math.max(0, Math.min(1, -element.getBoundingClientRect().top / Math.max(1, element.offsetHeight - innerHeight)))
+        const value = mobile ? progress : Math.max(0, Math.min(1, (progress - index / all.length) * all.length))
         stat.style.setProperty('--raw-stat-fill', String(value * value * (3 - 2 * value)))
       })
     }

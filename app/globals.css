@@ -220,25 +220,34 @@ html.raw-home-intro-pending .raw-story-hero:not(.raw-story-hero--about) .raw-dis
   .raw-mobile-menu__cta { width: 100%; min-height: 3.4rem; color: var(--raw-ink); }
 
   .raw-section { padding: clamp(3.75rem, 16vw, 5rem) var(--raw-pad); }
-  .raw-display { font-size: clamp(2.25rem, 11.5vw, 4rem); line-height: .9; }
+  .raw-display { font-size: clamp(1.9rem, 9vw, 3.25rem); line-height: .9; }
   .raw-eyebrow { margin-bottom: .8rem; font-size: .62rem; letter-spacing: .24em; }
   .raw-lede { font-size: 1rem; line-height: 1.55; }
   .raw-story-hero { min-height: 100svh; }
   .raw-story-hero__content { padding-bottom: max(2rem, env(safe-area-inset-bottom)); }
-  .raw-story-hero .raw-display { font-size: clamp(3rem, 14vw, 4.7rem); }
+  .raw-story-hero .raw-display { font-size: clamp(2.2rem, 10.5vw, 3.5rem); }
   .raw-story-hero aside { margin-top: 1.75rem; font-size: .62rem; }
   .raw-scroll-cue { margin-top: 1.5rem; }
   .raw-fill-statement { min-height: 170svh; }
-  .raw-fill-statement .raw-display { font-size: clamp(2.35rem, 11vw, 4rem); }
-  .raw-scene { min-height: 70svh; padding: 5.5rem var(--raw-pad) 3rem; }
+  .raw-fill-statement .raw-display { font-size: clamp(2.05rem, 9.8vw, 3.45rem); }
+  .raw-pinned-stories { height: auto; }
+  .raw-pinned-stories__sticky { position: relative; height: auto; overflow: hidden; }
+  .raw-pinned-stories__track { display: flex !important; width: 100% !important; height: auto; transition: transform .45s var(--raw-ease); will-change: transform; }
+  .raw-scene { flex: 0 0 100%; width: 100%; min-height: 70svh; padding: 5.5rem var(--raw-pad) 5.75rem; }
   .raw-scene__copy { width: 100%; padding-bottom: 0; }
-  .raw-scene__copy .raw-display { font-size: clamp(2.7rem, 13vw, 4.4rem); }
+  .raw-scene__copy .raw-display { font-size: clamp(2.15rem, 10.5vw, 3.6rem); }
+  .raw-story-carousel-controls { position: absolute; z-index: 2; right: var(--raw-pad); bottom: 1.4rem; display: flex; gap: .55rem; }
+  .raw-story-carousel-controls button { width: 2.45rem; height: 2.45rem; border: 1px solid rgba(243,239,228,.36); border-radius: 50%; background: rgba(7,8,10,.48); color: var(--raw-paper); font: .62rem var(--raw-mono); letter-spacing: .08em; }
+  .raw-story-carousel-controls button.is-active { border-color: var(--raw-lime); background: var(--raw-lime); color: var(--raw-ink); }
   .raw-product-spotlight { gap: 2.5rem; }
   .raw-lamp { width: 100%; }
   .raw-lamp img { width: 100%; height: auto; }
   .raw-feature-list li { grid-template-columns: 1fr; gap: .55rem; padding: 1rem 0; }
-  .raw-pinned-stats__sticky > div, .raw-product-stats { grid-template-columns: repeat(2, 1fr); }
-  .raw-stat, .raw-product-stats article { padding: 1.5rem var(--raw-pad); }
+  .raw-pinned-stats__sticky > div { grid-template-columns: 1fr; }
+  .raw-pinned-stats__sticky .raw-stat { min-height: 8.75rem; padding: 2rem var(--raw-pad); border-right: 0; border-bottom: 1px solid var(--raw-line); }
+  .raw-pinned-stats__sticky .raw-stat:last-child { border-bottom: 0; }
+  .raw-product-stats { grid-template-columns: repeat(2, 1fr); }
+  .raw-product-stats article { padding: 1.5rem var(--raw-pad); }
   .raw-stat b, .raw-product-stats b { font-size: clamp(1.6rem, 9vw, 2.4rem); white-space: normal; overflow-wrap: anywhere; }
   .raw-stat > span, .raw-product-stats span { margin-top: .55rem; font-size: .62rem; letter-spacing: .13em; }
   .raw-beam { min-height: auto; gap: 2rem; }
