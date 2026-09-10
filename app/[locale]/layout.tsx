@@ -123,7 +123,7 @@ export default async function LocaleLayout({ children, params }: Props) {
     <LocaleProvider locale={locale} homeSlug={homeSlug}>
       <div className="raw-site" style={cssVariables}>
         <link rel="stylesheet" href="/fonts/google-fonts.css" />
-        <RawChrome />
+        <RawChrome logo={settings?.siteTheme?.logo} />
         <JsonLd data={organizationGraph} />
         <CustomCodeScripts
           enabled={cookieEnabled}

@@ -6,6 +6,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { SanityImage, IMAGE_SIZES } from '@/lib/components/ui/SanityImage'
 import { SanityLink } from '@/lib/components/ui/SanityLink'
+import { PortableText } from '@/lib/components/ui/PortableText'
 import { FormRenderer } from '@/lib/components/forms/FormRenderer'
 import { LocaleLink } from '@/lib/i18n'
 
@@ -74,7 +75,7 @@ export function RawPinnedStories({ data }: { data: { slides?: { eyebrow?: string
       return
     }
     let frame = 0
-    const update = () => { frame = 0; const el = root.current; const content = track.current; if (!el || !content) return; const distance = Math.max(0, el.offsetHeight - innerHeight); const progress = distance ? Math.max(0, Math.min(1, -el.getBoundingClientRect().top / distance)) : 0; content.style.transform = `translate3d(${-progress * Math.max(0, content.scrollWidth - innerWidth)}px,0,0)` }
+    const update = () => { frame = 0; const el = root.current; const content = track.current; if (!el || !content) return; const distance = Math.max(0, el.offsetHeight - innerHeight); const progress = distance ? Math.max(0, Math.min(1, -el.getBoundingClientRect().top / distance)) : 0; content.style.setProperty('transform', `translate3d(${-progress * Math.max(0, content.scrollWidth - innerWidth)}px,0,0)`, 'important') }
     const onScroll = () => { if (!frame) frame = requestAnimationFrame(update) }; addEventListener('scroll', onScroll, { passive: true }); addEventListener('resize', onScroll); update(); return () => { removeEventListener('scroll', onScroll); removeEventListener('resize', onScroll); if (frame) cancelAnimationFrame(frame) }
   }, [data.animate])
   return <section id="inspiration" ref={root} className={`raw-pinned-stories ${data.animate === false ? 'raw-no-motion' : ''}`}><div className="raw-pinned-stories__sticky"><div className="raw-pinned-stories__track" ref={track}>{data.slides?.map((slide, index) => <article key={`${slide.title}-${index}`} className={`raw-scene raw-scene--${index + 1}`}>{slide.image && <SanityImage image={slide.image} fill sizes="100vw" className="raw-scene__image" />}<div className="raw-scene__shade" /><div className="raw-shell raw-scene__copy"><p className="raw-eyebrow">{slide.eyebrow}</p><h2 className="raw-display">{slide.title}</h2><p className="raw-lede">{slide.text}</p></div></article>)}</div></div></section>
@@ -101,9 +102,12 @@ export function RawStats({ data }: { data: { stats?: { value?: string; label?: s
     }
     const update = () => {
       const element = root.current; if (!element) return
-      const progress = Math.max(0, Math.min(1, -element.getBoundingClientRect().top / Math.max(1, element.offsetHeight - innerHeight)))
       element.querySelectorAll<HTMLElement>('.raw-stat').forEach((stat, index, all) => {
-        const value = Math.max(0, Math.min(1, (progress - index / all.length) * all.length))
+        const mobile = matchMedia('(max-width: 800px)').matches
+        const progress = mobile
+          ? Math.max(0, Math.min(1, (innerHeight * .78 - stat.getBoundingClientRect().top) / (innerHeight * .32)))
+          : Math.max(0, Math.min(1, -element.getBoundingClientRect().top / Math.max(1, element.offsetHeight - innerHeight)))
+        const value = mobile ? progress : Math.max(0, Math.min(1, (progress - index / all.length) * all.length))
         stat.style.setProperty('--raw-stat-fill', String(value * value * (3 - 2 * value)))
       })
     }
@@ -153,6 +157,11 @@ export function RawContactForm({ data }: { data: { heading?: string; form?: { _i
 
 export function RawReseller({ data }: { data: { eyebrow?: string; heading?: string; text?: string; cta?: any } }) {
   return <section id="resellers" className="raw-reseller"><div className="raw-shell"><p className="raw-eyebrow">{data.eyebrow}</p><h2 className="raw-display">{data.heading}</h2><p className="raw-lede">{data.text}</p>{data.cta && <SanityLink link={data.cta} className="raw-button" />}</div></section>
+}
+
+export function RawFaq({ data }: { data: { eyebrow?: string; heading?: string; text?: string; items?: { _key?: string; question?: string; answer?: any }[] } }) {
+  if (!data.items?.length) return null
+  return <section className="raw-faq"><div className="raw-shell raw-faq__layout"><header><p className="raw-eyebrow">{data.eyebrow}</p><h2 className="raw-display">{data.heading}</h2>{data.text && <p className="raw-lede">{data.text}</p>}</header><div className="raw-faq__list">{data.items.map((item, index) => <details className="raw-faq__item" key={item._key || item.question || index}><summary><span>{item.question}</span><i aria-hidden="true" /></summary><PortableText value={item.answer} className="raw-faq__answer" /></details>)}</div></div></section>
 }
 
 export function RawTimeline({ data }: { data: { items?: { index?: string; eyebrow?: string; title?: string; text?: string; image?: Image }[] } }) {

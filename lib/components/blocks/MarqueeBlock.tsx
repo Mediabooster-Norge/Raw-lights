@@ -56,7 +56,7 @@ export function MarqueeBlock({ data }: MarqueeBlockProps) {
     const calculateDuration = () => {
       if (contentRef.current) {
         const totalWidth = contentRef.current.scrollWidth
-        const pixelsPerSecond = speedValues[speed]
+        const pixelsPerSecond = speedValues[speed] * (matchMedia('(max-width: 800px)').matches ? 5 : 1)
         // Animer over halvparten for seamless loop
         const duration = Math.max((totalWidth / 2) / pixelsPerSecond, 3)
         setAnimationDuration(`${duration}s`)
