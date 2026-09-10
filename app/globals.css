@@ -280,10 +280,15 @@ html.raw-home-intro-pending .raw-story-hero:not(.raw-story-hero--about) .raw-dis
   .raw-product-hero { padding: 6.7rem var(--raw-pad) 3rem; }
   .raw-pdp-copy h1 { font-size: clamp(2.55rem, 12vw, 4rem); }
   .raw-pdp-visual { min-height: min(50svh, 22rem); }
-  .raw-product-body .raw-display, .raw-specifications > .raw-display { font-size: clamp(2.35rem, 11.5vw, 4rem); }
-  .raw-spec-row, .raw-spec-row:nth-child(even) { grid-template-columns: minmax(0, 1fr) minmax(0, .9fr); padding: .9rem .2rem .9rem 0; }
-  .raw-spec-row span { font-size: .86rem; }
-  .raw-spec-row b { overflow-wrap: anywhere; font-size: .9rem; }
+  .raw-product-body, .raw-specifications, .raw-spec-table { width: 100%; min-width: 0; max-width: 100%; }
+  .raw-product-body { grid-template-columns: minmax(0, 1fr); gap: 2.25rem; }
+  .raw-product-body .raw-display, .raw-specifications > .raw-display { max-width: 100%; font-size: clamp(1.85rem, 8.5vw, 3.1rem); overflow-wrap: anywhere; }
+  .raw-product-body .raw-feature-list { min-width: 0; max-width: 100%; }
+  .raw-product-body .raw-feature-list li { min-width: 0; }
+  .raw-product-body .raw-feature-list span { min-width: 0; overflow-wrap: anywhere; }
+  .raw-spec-row, .raw-spec-row:nth-child(even) { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: .75rem; padding: .9rem 0; }
+  .raw-spec-row span { min-width: 0; font-size: .86rem; overflow-wrap: anywhere; }
+  .raw-spec-row b { min-width: 0; overflow-wrap: anywhere; font-size: .9rem; }
   .raw-footer { padding: 3rem var(--raw-pad) 2rem; }
   .raw-footer__brand p { font-size: 1.1rem; }
 }
