@@ -199,6 +199,7 @@ html.raw-home-intro-pending .raw-story-hero:not(.raw-story-hero--about) .raw-dis
 @media (max-width: 800px) {
   :root { --raw-pad: clamp(1.1rem, 5vw, 1.5rem); }
   body.raw-nav-open { overflow: hidden; }
+  .raw-shell { box-sizing: border-box; min-width: 0; max-width: 100%; }
   .raw-header { grid-template-columns: auto 1fr auto; width: calc(100% - 2 * var(--raw-pad)); min-height: 4.1rem; padding: .35rem .45rem .35rem .75rem; }
   .raw-header__logo { height: 3.1rem; padding-right: .75rem; }
   .raw-header__logo img { height: 2.55rem; }
@@ -220,25 +221,26 @@ html.raw-home-intro-pending .raw-story-hero:not(.raw-story-hero--about) .raw-dis
   .raw-mobile-menu__cta { width: 100%; min-height: 3.4rem; color: var(--raw-ink); }
 
   .raw-section { padding: clamp(3.75rem, 16vw, 5rem) var(--raw-pad); }
-  .raw-display { font-size: clamp(1.9rem, 9vw, 3.25rem); line-height: .9; }
+  .raw-display { max-width: 100%; font-size: clamp(1.65rem, 7.6vw, 3rem); line-height: .9; overflow-wrap: normal; }
   .raw-eyebrow { margin-bottom: .8rem; font-size: .62rem; letter-spacing: .24em; }
-  .raw-lede { font-size: 1rem; line-height: 1.55; }
+  .raw-lede { max-width: 100%; font-size: .98rem; line-height: 1.55; overflow-wrap: anywhere; }
   .raw-story-hero { min-height: 100svh; }
   .raw-story-hero__content { padding-bottom: max(2rem, env(safe-area-inset-bottom)); }
-  .raw-story-hero .raw-display { font-size: clamp(2.2rem, 10.5vw, 3.5rem); }
+  .raw-story-hero .raw-display { max-width: 100%; font-size: clamp(1.9rem, 9vw, 3.2rem); }
+  .raw-story-hero .raw-display span { max-width: 100%; white-space: normal; overflow-wrap: anywhere; }
   .raw-story-hero aside { margin-top: 1.75rem; font-size: .62rem; }
   .raw-scroll-cue { margin-top: 1.5rem; }
   .raw-fill-statement { min-height: 170svh; }
-  .raw-fill-statement .raw-display { font-size: clamp(2.05rem, 9.8vw, 3.45rem); }
-  .raw-pinned-stories { height: auto; }
-  .raw-pinned-stories__sticky { position: relative; height: auto; overflow: hidden; }
-  .raw-pinned-stories__track { display: flex !important; width: 100% !important; height: auto; transition: transform .45s var(--raw-ease); will-change: transform; }
-  .raw-scene { flex: 0 0 100%; width: 100%; min-height: 70svh; padding: 5.5rem var(--raw-pad) 5.75rem; }
+  .raw-fill-statement__sticky { box-sizing: border-box; width: 100%; max-width: 100%; padding-inline: var(--raw-pad); }
+  .raw-fill-statement .raw-display { max-width: 100%; font-size: clamp(1.75rem, 8.2vw, 3.2rem); }
+  .raw-fill-statement .raw-lede { max-width: 100%; font-size: 1rem; }
+  .raw-pinned-stories { height: 300svh; }
+  .raw-pinned-stories__sticky { position: sticky; top: 0; height: 100svh; overflow: hidden; }
+  .raw-pinned-stories__track { display: flex !important; width: max-content !important; height: 100%; transition: none; will-change: transform; }
+  .raw-scene { flex: 0 0 100vw; width: 100vw; height: 100%; min-height: 0; padding: 0 var(--raw-pad) 4.5rem; }
   .raw-scene__copy { width: 100%; padding-bottom: 0; }
-  .raw-scene__copy .raw-display { font-size: clamp(2.15rem, 10.5vw, 3.6rem); }
-  .raw-story-carousel-controls { position: absolute; z-index: 2; right: var(--raw-pad); bottom: 1.4rem; display: flex; gap: .55rem; }
-  .raw-story-carousel-controls button { width: 2.45rem; height: 2.45rem; border: 1px solid rgba(243,239,228,.36); border-radius: 50%; background: rgba(7,8,10,.48); color: var(--raw-paper); font: .62rem var(--raw-mono); letter-spacing: .08em; }
-  .raw-story-carousel-controls button.is-active { border-color: var(--raw-lime); background: var(--raw-lime); color: var(--raw-ink); }
+  .raw-scene__copy .raw-display { max-width: 100%; font-size: clamp(1.85rem, 8.6vw, 3.2rem); }
+  .raw-scene__copy .raw-lede { max-width: 100%; font-size: .98rem; }
   .raw-product-spotlight { gap: 2.5rem; }
   .raw-lamp { width: 100%; }
   .raw-lamp img { width: 100%; height: auto; }
@@ -256,7 +258,9 @@ html.raw-home-intro-pending .raw-story-hero:not(.raw-story-hero--about) .raw-dis
   .raw-rules__grid article { min-height: 20rem; padding: 1.5rem; }
   .raw-timeline article, .raw-timeline article:nth-child(even) { padding: 2.6rem var(--raw-pad); }
   .raw-finale { min-height: 80svh; padding: 4.5rem var(--raw-pad); }
-  .raw-finale .raw-display { font-size: clamp(2.55rem, 12vw, 4rem); }
+  .raw-finale > div { width: 100%; min-width: 0; }
+  .raw-finale .raw-display { max-width: 100%; font-size: clamp(1.9rem, 9.2vw, 3.3rem); overflow-wrap: anywhere; }
+  .raw-finale .raw-lede { max-width: 100%; }
   .raw-actions { gap: .75rem; }
   .raw-actions .raw-button { flex: 1 1 100%; width: 100%; margin: 0; }
   .raw-contact-info__details { gap: .75rem; }
