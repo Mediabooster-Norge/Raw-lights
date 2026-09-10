@@ -216,8 +216,8 @@ html.raw-home-intro-pending .raw-story-hero:not(.raw-story-hero--about) .raw-dis
   .raw-mobile-menu.is-open { opacity: 1; visibility: visible; pointer-events: auto; transform: none; }
   .raw-mobile-menu__links { display: grid; border-top: 1px solid var(--raw-line); }
   .raw-mobile-menu__links > div { display: grid; border-bottom: 1px solid var(--raw-line); }
-  .raw-mobile-menu__links a { display: block; padding: 1.15rem 0; color: var(--raw-paper); font: 800 clamp(2rem, 10vw, 3.25rem)/.9 var(--font-heading), sans-serif; letter-spacing: -.045em; text-transform: uppercase; }
-  .raw-mobile-menu__links a + a { padding-top: 0; font-size: clamp(1.15rem, 5.5vw, 1.7rem); color: var(--raw-mist); }
+  .raw-mobile-menu__links a { display: block; padding: 1rem 0; color: var(--raw-paper); font: 800 clamp(1.65rem, 7.8vw, 2.35rem)/.94 var(--font-heading), sans-serif; letter-spacing: -.04em; text-transform: uppercase; }
+  .raw-mobile-menu__links a + a { padding-top: 0; font-size: clamp(1rem, 4.8vw, 1.35rem); color: var(--raw-mist); }
   .raw-mobile-menu__cta { width: 100%; min-height: 3.4rem; color: var(--raw-ink); }
 
   .raw-section { padding: clamp(3.75rem, 16vw, 5rem) var(--raw-pad); }
