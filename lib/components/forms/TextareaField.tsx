@@ -14,8 +14,8 @@ export function TextareaField({
   rows = 4
 }: TextareaFieldProps) {
   return (
-    <div className="space-y-2">
-      <label htmlFor={name} className="block text-sm font-medium text-text-primary">
+    <div className="raw-field">
+      <label htmlFor={name}>
         {label}
         {required && <span className="text-red-500 ml-1">*</span>}
       </label>
@@ -25,7 +25,7 @@ export function TextareaField({
         placeholder={placeholder}
         required={required}
         rows={rows}
-        className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent resize-y"
+        className="raw-field__input"
       />
     </div>
   )

@@ -26,13 +26,14 @@ export function collectFaqItems(blocks: unknown): { question: string; answer: st
   for (const block of blocks) {
     if (!block || typeof block !== 'object') continue
     const node = block as AccordionLike
-    if (node._type === 'accordionBlock' && Array.isArray(node.items)) {
+    if ((node._type === 'accordionBlock' || node._type === 'rawFaq') && Array.isArray(node.items)) {
       for (const item of node.items) {
         const question = item.question?.trim()
-        if (!question) continue
+        const answer = portableTextToPlain(item.answer).trim()
+        if (!question || !answer) continue
         items.push({
           question,
-          answer: portableTextToPlain(item.answer).trim(),
+          answer,
         })
       }
     }

@@ -74,6 +74,7 @@ export default async function HomePage({ params }: Props) {
           url,
           siteUrl: siteUrl,
           locale,
+          slug: page.slug,
           blocks: page.blocks,
         })}
       />

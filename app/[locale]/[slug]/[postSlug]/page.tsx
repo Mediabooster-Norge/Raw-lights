@@ -94,7 +94,7 @@ export default async function PostPage({ params }: Props) {
       <JsonLd
         data={buildPostJsonLd({
           type: resolvePostJsonLdType(post.postType?.jsonLdType, post.jsonLdType),
-          override: parseJsonLdOverride(post.seo?.jsonLd),
+          override: parseJsonLdOverride(post.jsonLdOverride ?? post.seo?.jsonLd),
           title: post.title,
           description: post.seo?.metaDescription ?? post.excerpt,
           url,
@@ -103,7 +103,6 @@ export default async function PostPage({ params }: Props) {
           imageUrl: imageAssetUrl(post.seo?.metaImage) || imageAssetUrl(post.featuredImage),
           datePublished: post.publishDate,
           dateModified: post._updatedAt,
-          sameAs: post.externalUrl,
           breadcrumbs: [
             { name: post.postType?.title ?? postTypeSlug, path: localizedPath(locale, `/${postTypeSlug}`) },
             { name: post.title, path: localizedPath(locale, `/${postTypeSlug}/${postSlug}`) },

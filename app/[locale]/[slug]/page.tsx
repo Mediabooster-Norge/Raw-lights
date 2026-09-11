@@ -161,6 +161,7 @@ export default async function Page({ params, searchParams }: Props) {
           url,
           siteUrl,
           locale,
+          slug,
           blocks: page.blocks,
           breadcrumbs: [{ name: page.title, path: localizedPath(locale, `/${slug}`) }],
         })}

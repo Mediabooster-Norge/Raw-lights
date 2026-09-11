@@ -30,6 +30,16 @@ npm run dev
 
 Studio is at `/studio`. The public site uses one URL (`NEXT_PUBLIC_SITE_URL`) and one dataset.
 
+### RAW Lights import
+
+The RAW frontend uses dedicated page-builder modules and a `product` document type. To seed the English reference content, images and nine products from the sibling `Raw` checkout, provide a Sanity write token and run:
+
+```bash
+SANITY_API_TOKEN=... npx tsx scripts/import-raw.ts
+```
+
+Set `RAW_SOURCE_DIR` if the static `Raw` checkout is not located next to this repository. The importer uses stable document IDs and reuses media by filename, so it can be run again safely.
+
 Open **Oppstart** in Studio for a first-run checklist (homepage, 404, privacy page, navigation per language, JSON-LD types).
 
 ### Environment variables
@@ -106,7 +116,7 @@ The route revalidates `/` and `/en` layouts, plus slug paths in both locales.
 - Page builder (hero, text, CTA, gallery, marquee, accordion, form, …)
 - Posts with archive and single views
 - Global settings: logo, three colors, fonts, homepage, 404 and privacy page
-- JSON-LD generated in code (Organization/WebSite, post type inheritance, FAQ from accordion)
+- JSON-LD generated in code from visible content (Organization/WebSite, page recommendations, FAQ, catalog ItemLists and product data)
 - Draft mode via `/api/draft` and Presentation
 - CMS redirects in `proxy.ts`
 - Forms sent with Resend

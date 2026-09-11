@@ -52,6 +52,11 @@ export const sitemapQuery = groq`
     "postTypeSlug": postType->slug.current,
     language,
     _updatedAt
+  },
+  "products": *[_type == "product" && (visibility == "public" || !defined(visibility)) && defined(slug.current)] {
+    "slug": slug.current,
+    language,
+    _updatedAt
   }
 }
 `

@@ -100,6 +100,7 @@ const singlePostFields = groq`
     publishDate,
     _updatedAt,
     jsonLdType,
+    jsonLdOverride,
     seo {
       metaTitle,
       metaDescription,

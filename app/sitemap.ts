@@ -5,7 +5,7 @@ import { localizedPath, parseLocale } from '@/lib/i18n/config'
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = getSiteUrl()
-  const [{ pages = [], postTypes = [], posts = [] }, homeSlugs] = await Promise.all([
+  const [{ pages = [], postTypes = [], posts = [], products = [] }, homeSlugs] = await Promise.all([
     getSitemapEntries(),
     getHomePageSlugs(),
   ])
@@ -42,5 +42,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }
   })
 
-  return [...pageEntries, ...archiveEntries, ...postEntries]
+  const productEntries = products.map((product: { slug: string; language?: string; _updatedAt: string }) => {
+    const locale = parseLocale(product.language)
+    return {
+      url: `${baseUrl}${localizedPath(locale, `/products/${product.slug}`)}`,
+      lastModified: new Date(product._updatedAt),
+      changeFrequency: 'weekly' as const,
+      priority: 0.7,
+    }
+  })
+
+  return [...pageEntries, ...archiveEntries, ...postEntries, ...productEntries]
 }

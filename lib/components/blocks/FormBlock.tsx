@@ -29,8 +29,9 @@ export function FormBlock({ data }: FormBlockProps) {
 
   return (
     <BlockContainer background={data.background} spacing={data.spacing}>
+      <div className="raw-shell raw-form-block">
       {data.heading && (
-        <h2 className="text-2xl font-bold mb-6">{data.heading}</h2>
+        <h2 className="raw-display">{data.heading}</h2>
       )}
       <FormRenderer
         formId={data.form._id}
@@ -38,6 +39,7 @@ export function FormBlock({ data }: FormBlockProps) {
         submitButtonText={data.form.submitLabel}
         successMessage={data.form.successMessage}
       />
+      </div>
     </BlockContainer>
   )
 }

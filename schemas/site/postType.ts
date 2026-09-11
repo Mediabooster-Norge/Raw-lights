@@ -144,7 +144,7 @@ export default defineType({
       },
       initialValue: 'None',
       description:
-        'Schema.org-type alle enkeltinnlegg arver. Koden fyller tittel, URL, bilde, utdrag og dato. Velg typen som matcher innholdet (Person for artister, NewsArticle for nyheter). Ikke lim JSON.',
+        'Alle enkeltinnlegg arver denne typen. Velg Article, NewsArticle eller BlogPosting kun når det faktisk matcher innholdet. Vanlige innlegg får alltid WebPage og breadcrumbs automatisk.',
     }),
     defineField({
       name: 'seo',

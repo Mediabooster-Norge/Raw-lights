@@ -2,22 +2,7 @@ import { CogIcon } from '@sanity/icons'
 import { defineType, defineField } from 'sanity'
 import { brandGroup, codeGroup, seoGroup } from '../studio/groups'
 import { altField } from '../helpers/altField'
-
-const fontOptions = [
-  'Inter',
-  'Playfair Display',
-  'Montserrat',
-  'Poppins',
-  'Oswald',
-  'Merriweather',
-  'Raleway',
-  'Roboto',
-  'Open Sans',
-  'Lato',
-  'Source Sans Pro',
-  'Nunito',
-  'Work Sans'
-]
+import { fontOptions } from '@/lib/theme/fontOptions'
 
 export default defineType({
   name: 'globalSettings',
@@ -72,16 +57,16 @@ export default defineType({
               name: 'headingFont',
               title: 'Overskriftsfont',
               type: 'string',
-              options: { list: fontOptions }
+              options: { list: fontOptions, layout: 'dropdown' },
+              validation: (Rule) => Rule.required(),
             },
             {
               name: 'bodyFont',
               title: 'Brødtekstfont',
               type: 'string',
-              options: { list: fontOptions }
-            },
-            { name: 'customHeadingFont', title: 'Egendefinert overskriftsfont', type: 'string' },
-            { name: 'customBodyFont', title: 'Egendefinert brødtekstfont', type: 'string' }
+              options: { list: fontOptions, layout: 'dropdown' },
+              validation: (Rule) => Rule.required(),
+            }
           ]
         })
       ]
@@ -124,6 +109,27 @@ export default defineType({
       title: 'Standard SEO',
       type: 'seo',
       group: 'seo'
+    }),
+    defineField({
+      name: 'schemaOrganization',
+      title: 'Virksomhetsdata i schema',
+      type: 'object',
+      group: 'seo',
+      description: 'Valgfrie, faktiske kontaktopplysninger som publiseres på alle sider i Organization-schema.',
+      fields: [
+        defineField({ name: 'legalName', title: 'Juridisk navn', type: 'string' }),
+        defineField({ name: 'email', title: 'E-post', type: 'string', validation: (Rule) => Rule.email().warning('Skriv en gyldig e-postadresse') }),
+        defineField({ name: 'telephone', title: 'Telefon', type: 'string' }),
+        defineField({
+          name: 'address', title: 'Adresse', type: 'object',
+          fields: [
+            defineField({ name: 'streetAddress', title: 'Gateadresse', type: 'string' }),
+            defineField({ name: 'postalCode', title: 'Postnummer', type: 'string' }),
+            defineField({ name: 'addressLocality', title: 'Poststed', type: 'string' }),
+            defineField({ name: 'addressCountry', title: 'Landkode', type: 'string', initialValue: 'NO', validation: (Rule) => Rule.length(2).warning('Bruk ISO-landkode, f.eks. NO') }),
+          ]
+        }),
+      ]
     }),
     defineField({
       name: 'customCode',

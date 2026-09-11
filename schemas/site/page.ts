@@ -4,6 +4,7 @@ import { contentGroup, seoGroup, visibilityGroup } from '../studio/groups'
 import { languageField } from '../helpers/languageField'
 import { uniqueLocalizedSlug } from '../helpers/uniqueSlug'
 import { jsonLdPageTypes } from '../../lib/seo/types'
+import { SchemaRecommendationInput } from '../studio/SchemaRecommendationInput'
 
 export default defineType({
   name: 'page',
@@ -37,39 +38,52 @@ export default defineType({
       type: 'array',
       group: 'content',
       of: [
-        { type: 'heroBlock' },
-        { type: 'textBlock' },
-        { type: 'ctaBlock' },
-        { type: 'galleryBlock' },
         { type: 'marqueeBlock' },
-        { type: 'mediaTextBlock' },
-        { type: 'accordionBlock' },
-        { type: 'postGridBlock' },
-        { type: 'formBlock' },
-        { type: 'spacerBlock' },
-        { type: 'sectionBlock' }
+        { type: 'rawStoryHero' },
+        { type: 'rawFillStatement' },
+        { type: 'rawPinnedStories' },
+        { type: 'rawProductSpotlight' },
+        { type: 'rawStats' },
+        { type: 'rawProductFamilies' },
+        { type: 'rawRules' },
+        { type: 'rawTimeline' },
+        { type: 'rawBeamSection' },
+        { type: 'rawFinale' },
+        { type: 'rawContactInfo' },
+        { type: 'rawContactForm' },
+        { type: 'rawReseller' },
+        { type: 'rawFaq' },
+        { type: 'productCatalogBlock' }
       ]
     }),
     defineField({
+      name: 'schemaRecommendation',
+      title: 'Schema-forslag',
+      type: 'string',
+      group: 'seo',
+      readOnly: true,
+      components: { input: SchemaRecommendationInput },
+    }),
+    defineField({
       name: 'jsonLdType',
-      title: 'JSON-LD-type',
+      title: 'Schema for side',
       type: 'string',
       group: 'seo',
       options: {
         list: [...jsonLdPageTypes],
         layout: 'dropdown',
       },
-      initialValue: 'WebPage',
+      initialValue: 'auto',
       description:
-        'Schema.org-type for siden. FAQPage bygges automatisk fra accordion. BreadcrumbList legges alltid på. Bruk overstyring bare når den genererte grafen ikke holder.',
+        'Automatisk anbefales. Studio foreslår sidetypen fra URL og innhold. FAQPage og ItemList blir lagt til automatisk når synlige moduler krever det.',
     }),
     defineField({
       name: 'jsonLdOverride',
-      title: 'JSON-LD-overstyring',
+      title: 'Avansert JSON-LD-overstyring',
       type: 'text',
       rows: 8,
       group: 'seo',
-      description: 'Valgfri rå JSON som erstatter den genererte markupen for denne siden.',
+      description: 'Kun for SEO-eksperter. Rå JSON erstatter hele den automatiske grafen, inkludert breadcrumbs. Bruk bare når automatisk schema ikke dekker et dokumentert behov.',
       validation: (Rule) =>
         Rule.custom((value) => {
           if (!value || typeof value !== 'string' || !value.trim()) return true

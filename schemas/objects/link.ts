@@ -33,6 +33,7 @@ export default defineType({
         { type: 'page' },
         { type: 'postType' },
         { type: 'post' }
+        ,{ type: 'product' }
       ],
       hidden: ({ parent }) => parent?.type !== 'internal'
     }),

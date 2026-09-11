@@ -4,6 +4,7 @@
 
 `mergeTheme` derives secondary, surface, contrast text and CTA colors.
 
-Fonts from Studio are loaded with a Google Fonts stylesheet (`lib/theme/loadFonts.ts`). Inter is the Next font fallback.
+Fonts exposed in Studio are downloaded as local WOFF2 assets in `public/fonts/`.
+Run `node scripts/download-google-fonts.mjs` after changing `lib/theme/fontOptions.ts`.
 
 CSS variables are set on the locale layout wrapper.

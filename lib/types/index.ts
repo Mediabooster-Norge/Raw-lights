@@ -74,10 +74,8 @@ export type Navigation = {
   mainNav?: NavItem[]
   headerCta?: {
     link: SanityLink
-    variant: 'primary' | 'secondary'
   }
   footerNav?: {
-    title: string
     links: SanityLink[]
   }[]
   socialLinks?: {
@@ -121,6 +119,7 @@ export type Post = {
   publishDate?: string
   _updatedAt?: string
   jsonLdType?: string
+  jsonLdOverride?: string
   visibility: 'public' | 'hidden'
   order?: number
   seo?: SEO

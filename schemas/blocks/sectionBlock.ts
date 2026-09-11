@@ -25,6 +25,9 @@ export default defineType({
         defineArrayMember({ type: 'mediaTextBlock' }),
         defineArrayMember({ type: 'postGridBlock' }),
         defineArrayMember({ type: 'formBlock' })
+        ,defineArrayMember({ type: 'rawFillStatement' })
+        ,defineArrayMember({ type: 'rawProductFamilies' })
+        ,defineArrayMember({ type: 'rawRules' })
       ]
     }),
     defineField({

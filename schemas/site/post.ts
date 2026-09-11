@@ -98,7 +98,7 @@ export default defineType({
     }),
     defineField({
       name: 'jsonLdType',
-      title: 'JSON-LD-type',
+      title: 'Schema for innlegget',
       type: 'string',
       group: 'seo',
       options: {
@@ -107,7 +107,25 @@ export default defineType({
       },
       initialValue: 'inherit',
       description:
-        'Arver schema.org-type fra posttypen. Overstyr bare når dette innlegget er en annen type enn resten i gruppen.',
+        'Arver fra posttypen. Velg bare Article, NewsArticle eller BlogPosting når innholdet faktisk er en artikkel.',
+    }),
+    defineField({
+      name: 'jsonLdOverride',
+      title: 'Avansert JSON-LD-overstyring',
+      type: 'text',
+      rows: 8,
+      group: 'seo',
+      description: 'Kun for SEO-eksperter. Rå JSON erstatter hele den automatiske grafen for dette innlegget.',
+      validation: (Rule) =>
+        Rule.custom((value) => {
+          if (!value || typeof value !== 'string' || !value.trim()) return true
+          try {
+            const parsed = JSON.parse(value)
+            return parsed !== null && typeof parsed === 'object' ? true : 'JSON-LD må være et objekt eller en array'
+          } catch {
+            return 'Ugyldig JSON'
+          }
+        }),
     }),
     defineField({
       name: 'seo',

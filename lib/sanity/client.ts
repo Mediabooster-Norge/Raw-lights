@@ -26,6 +26,9 @@ export function getSanityConfig() {
 
 export function getClient(): SanityClient | null {
   const { dataset, projectId, apiVersion } = getSanityConfig()
+  // Keep this server-only token private. It is needed when the Sanity dataset is
+  // private, while NEXT_PUBLIC_* values alone remain sufficient for the Studio.
+  const token = process.env.SANITY_API_TOKEN
 
   if (!projectId) {
     console.warn('[Sanity] Missing Sanity project ID (set NEXT_PUBLIC_SANITY_PROJECT_ID)')
@@ -36,16 +39,18 @@ export function getClient(): SanityClient | null {
     projectId,
     dataset,
     apiVersion,
-    useCdn: true,
+    token,
+    // Next.js owns caching for server-rendered content through the tags supplied
+    // by the fetchers. Going through Sanity's CDN as well can keep a stale query
+    // result alive after an editor publishes or the import script runs.
+    useCdn: false,
   })
 }
 
 export function getTokenClient(): SanityClient | null {
   const client = getClient()
-  const token = process.env.SANITY_API_TOKEN
-  if (!client || !token) return null
+  if (!client || !process.env.SANITY_API_TOKEN) return null
   return client.withConfig({
-    token,
     useCdn: false,
   })
 }

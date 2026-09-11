@@ -14,8 +14,8 @@ export function InputField({
   required
 }: InputFieldProps) {
   return (
-    <div className="space-y-2">
-      <label htmlFor={name} className="block text-sm font-medium text-text-primary">
+    <div className="raw-field">
+      <label htmlFor={name}>
         {label}
         {required && <span className="text-red-500 ml-1">*</span>}
       </label>
@@ -25,7 +25,7 @@ export function InputField({
         name={name}
         placeholder={placeholder}
         required={required}
-        className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+        className="raw-field__input"
       />
     </div>
   )

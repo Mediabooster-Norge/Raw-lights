@@ -56,7 +56,7 @@ export function MarqueeBlock({ data }: MarqueeBlockProps) {
     const calculateDuration = () => {
       if (contentRef.current) {
         const totalWidth = contentRef.current.scrollWidth
-        const pixelsPerSecond = speedValues[speed]
+        const pixelsPerSecond = speedValues[speed] * (matchMedia('(max-width: 800px)').matches ? 5 : 1)
         // Animer over halvparten for seamless loop
         const duration = Math.max((totalWidth / 2) / pixelsPerSecond, 3)
         setAnimationDuration(`${duration}s`)
@@ -150,7 +150,7 @@ export function MarqueeBlock({ data }: MarqueeBlockProps) {
         className={`${textSizeClasses[size]} ${textColorClasses[textColor]} font-bold flex-shrink-0 flex items-center ${gapClasses[size]}`}
       >
         <span>{item.text}</span>
-        <span className="opacity-40">{separator}</span>
+        <b className="raw-marquee__separator" aria-hidden="true">{separator}</b>
       </span>
     ))
   }
@@ -163,6 +163,7 @@ export function MarqueeBlock({ data }: MarqueeBlockProps) {
       background={data.background}
       spacing={data.spacing}
       fullBleed
+      className="raw-marquee"
     >
       <div className="overflow-hidden">
         <div
