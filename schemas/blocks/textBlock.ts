@@ -4,7 +4,7 @@ import { appearanceGroup, contentGroup } from '../studio/groups'
 
 export default defineType({
   name: 'textBlock',
-  title: 'Tekst',
+  title: 'Tekstblokk (WYSIWYG)',
   type: 'object',
   icon: TextIcon,
   groups: [contentGroup, appearanceGroup],
