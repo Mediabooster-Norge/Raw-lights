@@ -38,6 +38,7 @@ export default defineType({
       type: 'array',
       group: 'content',
       of: [
+        { type: 'textBlock' },
         { type: 'marqueeBlock' },
         { type: 'rawStoryHero' },
         { type: 'rawFillStatement' },
