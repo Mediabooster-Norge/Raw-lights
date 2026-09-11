@@ -11,7 +11,7 @@
     "start": "next start",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
-    "test": "tsx --test lib/sanity/revalidateTargets.test.ts lib/forms/honeypot.test.ts lib/posts/pagination.test.ts",
+    "test": "tsx --test lib/sanity/revalidateTargets.test.ts lib/forms/honeypot.test.ts lib/posts/pagination.test.ts lib/seo/buildJsonLd.test.ts",
     "typegen": "sanity schema extract && sanity typegen generate"
   },
   "dependencies": {

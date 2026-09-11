@@ -116,7 +116,7 @@ The route revalidates `/` and `/en` layouts, plus slug paths in both locales.
 - Page builder (hero, text, CTA, gallery, marquee, accordion, form, …)
 - Posts with archive and single views
 - Global settings: logo, three colors, fonts, homepage, 404 and privacy page
-- JSON-LD generated in code (Organization/WebSite, post type inheritance, FAQ from accordion)
+- JSON-LD generated in code from visible content (Organization/WebSite, page recommendations, FAQ, catalog ItemLists and product data)
 - Draft mode via `/api/draft` and Presentation
 - CMS redirects in `proxy.ts`
 - Forms sent with Resend

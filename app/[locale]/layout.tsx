@@ -116,6 +116,7 @@ export default async function LocaleLayout({ children, params }: Props) {
       logoUrl: settings?.siteTheme?.logo?.asset?.url,
       locale,
       sameAs,
+      contact: settings?.schemaOrganization,
     }),
   }
 

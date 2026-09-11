@@ -8,9 +8,10 @@ Canonical URLs and `alternates.languages` (`nb`, `en`, `x-default`) are built in
 
 Graphs are built in `lib/seo/buildJsonLd.ts`, not pasted per document.
 
-- **Global**: `Organization` + `WebSite` from site name, logo, site URL and footer social `sameAs`
-- **Posts**: `jsonLdType` on `postType` (Google-relevant schema.org types). Every single inherits it. An innlegg can override the type. Hidden `seo.jsonLd` remains as a last-resort override. Graphs are filled from title, URL, image, excerpt, dates and external URL — required rich-result fields we do not have (price, location, ingredients) are not invented.
+- **Global**: `Organization` + `WebSite` from site name, logo, site URL, footer social `sameAs`, and optional verified contact data in Global settings.
+- **Posts**: Every post gets `WebPage` + breadcrumbs. `jsonLdType` on `postType` optionally adds the supported article subtype (`Article`, `NewsArticle` or `BlogPosting`). An innlegg can override the type. The expert-only document-level JSON override remains a last resort.
 - **Archives**: `CollectionPage` + `ItemList`
-- **Pages**: `jsonLdType` (`WebPage`, `AboutPage`, `ContactPage`, `FAQPage`, …) or a JSON override. Accordion blocks can produce `FAQPage` automatically. Breadcrumbs are always included.
+- **Pages**: `jsonLdType` defaults to automatic. Studio suggests `WebPage`, `AboutPage`, `ContactPage` or `CollectionPage` from URL and visible blocks. FAQ modules add `FAQPage` only when complete questions and answers exist; product catalog modules add a live `ItemList`. Breadcrumbs are always included.
+- **Products**: Every product gets `WebPage`, `Product`, and breadcrumbs. An `Offer` is only emitted from the structured price, currency and availability fields; display-price text is never parsed or used as inventory data.
 
 Sitemap is `app/sitemap.ts` and lists both locales.

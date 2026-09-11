@@ -7,7 +7,7 @@ type ChecklistState = {
   notFoundPage?: { _ref?: string } | null
   privacyPage?: { _ref?: string } | null
   navLanguages: string[]
-  unsetJsonLdTypes: { title?: string; language?: string }[]
+  legacyJsonLdTypes: { title?: string; language?: string; jsonLdType?: string }[]
 }
 
 type Row = {
@@ -35,9 +35,9 @@ export function SetupChecklist() {
         privacyPage
       }`),
       client.fetch(`*[_type == "navigation"]{ language }`),
-      client.fetch(`*[_type == "postType" && (!defined(jsonLdType) || jsonLdType == "None")]{ title, language }`),
+      client.fetch(`*[_type == "postType" && defined(jsonLdType) && !(jsonLdType in ["None", "Article", "NewsArticle", "BlogPosting"])]{ title, language, jsonLdType }`),
     ])
-      .then(([settings, navs, unsetJsonLdTypes]) => {
+      .then(([settings, navs, legacyJsonLdTypes]) => {
         if (cancelled) return
         setState({
           siteName: settings?.siteName,
@@ -45,7 +45,7 @@ export function SetupChecklist() {
           notFoundPage: settings?.notFoundPage,
           privacyPage: settings?.privacyPage,
           navLanguages: (navs ?? []).map((nav: { language?: string }) => languageLabel(nav.language)),
-          unsetJsonLdTypes: unsetJsonLdTypes ?? [],
+          legacyJsonLdTypes: legacyJsonLdTypes ?? [],
         })
       })
       .catch((err: unknown) => {
@@ -102,13 +102,13 @@ export function SetupChecklist() {
       label: 'Navigasjon for engelsk',
     },
     {
-      ok: state.unsetJsonLdTypes.length === 0,
-      label: 'JSON-LD-type på alle posttyper',
+      ok: state.legacyJsonLdTypes.length === 0,
+      label: 'Støttede schema-typer på posttyper',
       hint:
-        state.unsetJsonLdTypes.length === 0
+        state.legacyJsonLdTypes.length === 0
           ? undefined
-          : state.unsetJsonLdTypes
-              .map((item) => `${item.title ?? 'Uten tittel'} (${languageLabel(item.language)})`)
+          : state.legacyJsonLdTypes
+              .map((item) => `${item.title ?? 'Uten tittel'}: ${item.jsonLdType} (${languageLabel(item.language)})`)
               .join(', '),
     },
   ]

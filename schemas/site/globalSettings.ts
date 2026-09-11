@@ -111,6 +111,27 @@ export default defineType({
       group: 'seo'
     }),
     defineField({
+      name: 'schemaOrganization',
+      title: 'Virksomhetsdata i schema',
+      type: 'object',
+      group: 'seo',
+      description: 'Valgfrie, faktiske kontaktopplysninger som publiseres på alle sider i Organization-schema.',
+      fields: [
+        defineField({ name: 'legalName', title: 'Juridisk navn', type: 'string' }),
+        defineField({ name: 'email', title: 'E-post', type: 'string', validation: (Rule) => Rule.email().warning('Skriv en gyldig e-postadresse') }),
+        defineField({ name: 'telephone', title: 'Telefon', type: 'string' }),
+        defineField({
+          name: 'address', title: 'Adresse', type: 'object',
+          fields: [
+            defineField({ name: 'streetAddress', title: 'Gateadresse', type: 'string' }),
+            defineField({ name: 'postalCode', title: 'Postnummer', type: 'string' }),
+            defineField({ name: 'addressLocality', title: 'Poststed', type: 'string' }),
+            defineField({ name: 'addressCountry', title: 'Landkode', type: 'string', initialValue: 'NO', validation: (Rule) => Rule.length(2).warning('Bruk ISO-landkode, f.eks. NO') }),
+          ]
+        }),
+      ]
+    }),
+    defineField({
       name: 'customCode',
       title: 'Egendefinert kode',
       type: 'customCode',

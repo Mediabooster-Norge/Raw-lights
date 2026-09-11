@@ -33,7 +33,7 @@ export default async function ProductRoute({ params }: Props) {
   if (!product) notFound()
   const url = publicUrl(getSiteUrl(), localeParam as Locale, `/products/${productSlug}`)
   return <>
-    <JsonLd data={buildProductJsonLd({ title: product.title, description: product.seo?.metaDescription ?? product.excerpt, url, siteUrl: getSiteUrl(), locale: localeParam, imageUrl: product.heroImage?.asset?.url, sku: product.sku, price: product.price })} />
+    <JsonLd data={buildProductJsonLd({ title: product.title, description: product.seo?.metaDescription ?? product.excerpt, url, siteUrl: getSiteUrl(), locale: localeParam, imageUrl: product.heroImage?.asset?.url, sku: product.sku, mpn: product.mpn, gtin: product.gtin, offer: product.schemaOffer })} />
     <ProductPage product={product} />
   </>
 }

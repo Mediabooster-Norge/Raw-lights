@@ -2,7 +2,7 @@ import { groq } from 'next-sanity'
 import { LANGUAGE_FILTER, PUBLISH_FILTER } from './page'
 
 export const productFields = groq`
-  _id, _type, language, title, "slug": slug.current, category, sku, price, excerpt,
+  _id, _type, language, title, "slug": slug.current, category, sku, mpn, gtin, price, schemaOffer, excerpt,
   descriptionHeading, features, keyStats, specifications,
   primaryCta { ..., internalLink-> { _type, "slug": slug.current, "postTypeSlug": postType->slug.current } },
   secondaryCta { ..., internalLink-> { _type, "slug": slug.current, "postTypeSlug": postType->slug.current } },

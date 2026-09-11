@@ -23,7 +23,20 @@ export default defineType({
     defineField({ name: 'slug', title: 'URL', type: 'slug', group: 'content', options: { source: 'title', maxLength: 96 }, validation: (Rule) => Rule.required().custom(uniqueLocalizedSlug) }),
     defineField({ name: 'category', title: 'Category', type: 'string', group: 'content', options: { list: productCategories, layout: 'radio' }, validation: (Rule) => Rule.required() }),
     defineField({ name: 'sku', title: 'SKU', type: 'string', group: 'content' }),
-    defineField({ name: 'price', title: 'Price', type: 'string', group: 'content', description: 'Display value, for example “kr 3 744,00”.' }),
+    defineField({ name: 'mpn', title: 'MPN', type: 'string', group: 'content', description: 'Produsentens delenummer. Valgfritt, men anbefalt når det finnes.' }),
+    defineField({ name: 'gtin', title: 'GTIN / EAN', type: 'string', group: 'content', validation: (Rule) => Rule.regex(/^\d{8,14}$/).warning('Bruk 8–14 sifre uten mellomrom') }),
+    defineField({ name: 'price', title: 'Price display', type: 'string', group: 'content', description: 'Kun visning i designet. Dette brukes ikke i schema.' }),
+    defineField({
+      name: 'schemaOffer', title: 'Tilbud i schema', type: 'object', group: 'content',
+      description: 'Fyll ut bare når produktet faktisk kan kjøpes på denne siden. Alle felter må være korrekte og synlige for brukeren.',
+      fields: [
+        defineField({ name: 'price', title: 'Pris', type: 'number', validation: (Rule) => Rule.required().positive() }),
+        defineField({ name: 'currency', title: 'Valuta', type: 'string', initialValue: 'NOK', options: { list: ['NOK', 'SEK', 'DKK', 'EUR', 'USD'] }, validation: (Rule) => Rule.required() }),
+        defineField({ name: 'availability', title: 'Tilgjengelighet', type: 'string', options: { list: [{ title: 'På lager', value: 'InStock' }, { title: 'Utsolgt', value: 'OutOfStock' }, { title: 'Forhåndsbestilling', value: 'PreOrder' }, { title: 'Utgått', value: 'Discontinued' }] }, validation: (Rule) => Rule.required() }),
+        defineField({ name: 'validThrough', title: 'Pris gyldig til', type: 'date', description: 'Valgfritt. Bare for tidsavgrensede priser.' }),
+        defineField({ name: 'itemCondition', title: 'Varetilstand', type: 'string', initialValue: 'NewCondition', options: { list: [{ title: 'Ny', value: 'NewCondition' }, { title: 'Brukt', value: 'UsedCondition' }, { title: 'Reparert', value: 'RefurbishedCondition' }] } }),
+      ]
+    }),
     defineField({ name: 'excerpt', title: 'Catalog description', type: 'text', rows: 3, group: 'content', validation: (Rule) => Rule.required() }),
     defineField({ name: 'descriptionHeading', title: 'Description heading', type: 'string', group: 'content', initialValue: 'Built for Nordic conditions.' }),
     defineField({

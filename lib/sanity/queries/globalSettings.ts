@@ -31,6 +31,17 @@ export const globalSettingsQuery = groq`
       canonicalUrl,
       robots
     },
+    schemaOrganization {
+      legalName,
+      email,
+      telephone,
+      address {
+        streetAddress,
+        postalCode,
+        addressLocality,
+        addressCountry
+      }
+    },
     customCode {
       headScripts,
       bodyStartScripts,

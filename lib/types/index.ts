@@ -119,6 +119,7 @@ export type Post = {
   publishDate?: string
   _updatedAt?: string
   jsonLdType?: string
+  jsonLdOverride?: string
   visibility: 'public' | 'hidden'
   order?: number
   seo?: SEO
