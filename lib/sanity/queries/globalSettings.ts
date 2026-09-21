@@ -31,6 +31,17 @@ export const globalSettingsQuery = groq`
       canonicalUrl,
       robots
     },
+    localizedSeo[] {
+      language,
+      seo {
+        metaTitle,
+        metaDescription,
+        metaImage { asset-> },
+        canonicalUrl,
+        robots
+      }
+    },
+    localizedUiCopy[] { language, copy },
     schemaOrganization {
       legalName,
       email,

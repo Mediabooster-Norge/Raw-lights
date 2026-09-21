@@ -1,6 +1,8 @@
 import { collectFaqItems } from './plainText'
 import { recommendPageSchema, supportedPageSchemaType } from './schemaRecommendation'
 import type { JsonLdPageType, JsonLdPostType } from './types'
+import { parseLocale } from '@/lib/i18n/config'
+import { productPath, productsPath } from '@/lib/i18n/routes'
 
 type GraphNode = Record<string, unknown>
 
@@ -105,7 +107,7 @@ function catalogItems(blocks: unknown, siteUrl: string, locale: string) {
         const products = node.products?.length ? node.products : node.fallbackProducts
         for (const product of products ?? []) {
           if (!product.title || !product.slug) continue
-          const path = `${locale === 'en' ? '/en' : ''}/products/${product.slug}`
+          const path = productPath(parseLocale(locale), product.slug)
           items.set(product.slug, { name: product.title, url: new URL(path, siteUrl).toString() })
         }
       }
@@ -306,7 +308,7 @@ export function buildProductJsonLd(input: {
       page,
       product,
       breadcrumbList(input.siteUrl, input.locale, [
-        { name: localLabel(input.locale, 'Products', 'Produkter'), path: `${input.locale === 'en' ? '/en' : ''}/products` },
+        { name: localLabel(input.locale, 'Products', 'Produkter'), path: productsPath(parseLocale(input.locale)) },
         { name: input.title, path: new URL(input.url).pathname },
       ]),
     ],

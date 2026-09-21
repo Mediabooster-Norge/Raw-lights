@@ -3,6 +3,7 @@
 import { useEffect, useLayoutEffect, useState } from 'react'
 import { usePathname } from 'next/navigation'
 import { SanityImage } from '@/lib/components/ui/SanityImage'
+import { useSiteCopy } from '@/lib/i18n'
 
 type RawChromeProps = {
   logo?: { asset?: unknown; alt?: string }
@@ -13,6 +14,7 @@ const LOADER_EXIT_MS = 1150
 const HERO_REVEAL_DELAY_MS = 120
 
 export function RawChrome({ logo }: RawChromeProps) {
+  const copy = useSiteCopy()
   const pathname = usePathname()
   const isHome = pathname === '/' || pathname === '/en' || pathname === '/nb'
   const [loaded, setLoaded] = useState(!isHome)
@@ -67,7 +69,7 @@ export function RawChrome({ logo }: RawChromeProps) {
     <div className={`raw-loader ${loaded ? 'is-done' : ''}`} aria-hidden="true">
       <div>
         {logo ? <SanityImage image={logo} alt="" width={220} height={156} priority className="raw-loader__logo" /> : <strong>RAW</strong>}
-        <p>Born in Norway</p>
+        <p>{copy.loaderLabel}</p>
         <i />
       </div>
     </div>

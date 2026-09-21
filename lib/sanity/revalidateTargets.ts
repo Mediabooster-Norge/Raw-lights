@@ -1,4 +1,5 @@
 import { localizedPath, locales } from '../i18n/config'
+import { productPath, productsPath } from '../i18n/routes'
 
 export type RevalidateBody = {
   _type?: string
@@ -59,10 +60,10 @@ export function revalidateSpec(body: RevalidateBody): RevalidateSpec {
       break
     case 'product':
       tags.add('products')
-      localePaths('/products')
+      for (const locale of locales) paths.push({ path: productsPath(locale) })
       if (slug) {
         tags.add(`product-${slug}`)
-        localePaths(`/products/${slug}`)
+        for (const locale of locales) paths.push({ path: productPath(locale, slug) })
       }
       break
     case 'navigation':

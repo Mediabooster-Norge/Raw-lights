@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getRedirects } from '@/lib/sanity/redirects'
 import { getHomePageSlugs } from '@/lib/sanity/home'
 import { defaultLocale, localizedPath, parseLocale, stripLocalePrefix } from '@/lib/i18n/config'
+import { internalPathForLocale } from '@/lib/i18n/routes'
 
 const PUBLIC_FILE = /\.[^/]+$/
 
@@ -35,6 +36,25 @@ export async function proxy(request: NextRequest) {
   if (shouldSkip(pathname)) {
     return NextResponse.next()
   }
+
+  const host = request.headers.get('host')?.toLowerCase().split(':')[0]
+  if (host === 'www.rawlights.no' || host === 'raw-lights.vercel.app') {
+    const url = request.nextUrl.clone()
+    url.protocol = 'https:'
+    url.host = 'rawlights.no'
+    return NextResponse.redirect(url, 308)
+  }
+
+  const legacyDestination = (() => {
+    if (pathname === '/about') return '/om-oss'
+    if (pathname === '/contact') return '/kontakt'
+    if (pathname === '/privacy') return '/personvern'
+    if (pathname === '/products') return '/produkter'
+    if (pathname.startsWith('/products/')) return `/produkter/${pathname.slice('/products/'.length)}`
+    if (pathname === '/en/home') return '/en'
+    return null
+  })()
+  if (legacyDestination) return NextResponse.redirect(new URL(legacyDestination, request.url), 308)
 
   const { locale: pathLocale, path } = stripLocalePrefix(pathname)
 
@@ -77,7 +97,8 @@ export async function proxy(request: NextRequest) {
 
   requestHeaders.set('x-locale', defaultLocale)
   const url = request.nextUrl.clone()
-  url.pathname = pathname === '/' ? `/${defaultLocale}` : `/${defaultLocale}${pathname}`
+  const internalPath = internalPathForLocale(defaultLocale, pathname)
+  url.pathname = internalPath === '/' ? `/${defaultLocale}` : `/${defaultLocale}${internalPath}`
   return NextResponse.rewrite(url, { request: { headers: requestHeaders } })
 }
 

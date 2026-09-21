@@ -1,5 +1,6 @@
-import { getHomePage, getPage, getPostTypeBySlug, getSinglePost, getTranslations } from '@/lib/sanity/fetcher'
+import { getHomePage, getPage, getPostTypeBySlug, getProductBySlug, getSinglePost, getTranslations } from '@/lib/sanity/fetcher'
 import { defaultLocale, localizedPath, locales, parseLocale, stripLocalePrefix, type Locale } from './config'
+import { productPath, routeSegments } from './routes'
 
 export type AlternateMap = Record<Locale, string>
 
@@ -53,6 +54,19 @@ export async function getAlternateUrls(pathname: string): Promise<AlternateMap> 
   }
 
   const [typeSlug, postSlug] = segments
+  if (typeSlug === routeSegments[locale].products && postSlug) {
+    const product = await getProductBySlug(postSlug, locale)
+    if (product?._id) {
+      const translations = await getTranslations(product._id)
+      for (const doc of translations) {
+        const docLocale = parseLocale(doc.language)
+        if (doc.slug) result[docLocale] = productPath(docLocale, doc.slug)
+      }
+      result[locale] = productPath(locale, postSlug)
+    }
+    return result
+  }
+
   const post = await getSinglePost(typeSlug, postSlug, locale)
   if (post?._id) {
     const translations = await getTranslations(post._id)

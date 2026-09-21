@@ -8,7 +8,7 @@ import { SanityImage, IMAGE_SIZES } from '@/lib/components/ui/SanityImage'
 import { SanityLink } from '@/lib/components/ui/SanityLink'
 import { PortableText } from '@/lib/components/ui/PortableText'
 import { FormRenderer } from '@/lib/components/forms/FormRenderer'
-import { LocaleLink } from '@/lib/i18n'
+import { LocaleLink, productPath, useLocale, useSiteCopy } from '@/lib/i18n'
 
 type Image = { alt?: string; asset?: { url?: string } }
 type Product = { title?: string; slug?: string; sku?: string; excerpt?: string; category?: string; heroImage?: Image; keyStats?: { value?: string; label?: string }[]; features?: { title?: string; text?: string }[] }
@@ -36,12 +36,13 @@ function RawChapters() {
 
 export function RawStoryHero({ data }: { data: { eyebrow?: string; headingLines?: string[]; layout?: 'story' | 'about'; chapter?: string; chapterTitle?: string; aside?: string; showChapters?: boolean; image?: Image; animate?: boolean } }) {
   const isAbout = data.layout === 'about'
+  const copy = useSiteCopy()
   return <><section className={`raw-story-hero ${isAbout ? 'raw-story-hero--about' : ''} ${data.animate === false ? 'raw-no-motion' : ''}`} id="origin">
     {data.image && <SanityImage image={data.image} fill priority sizes={IMAGE_SIZES.hero} className="raw-story-hero__image" />}
     <div className="raw-story-hero__shade" />
     {!isAbout && <div className="raw-story-hero__mark" aria-hidden="true"><svg viewBox="0 0 240 120"><path d="M8 112 L72 8 L118 86 L156 28 L232 112 Z" /></svg></div>}
     <div className="raw-shell raw-story-hero__content">
-      <div><p className="raw-eyebrow">{data.eyebrow}</p><h1 className="raw-display">{data.headingLines?.map((line) => <span key={line}>{line}</span>)}</h1><p className="raw-scroll-cue"><i />Scroll the {isAbout ? 'origin' : 'story'}</p></div>
+      <div><p className="raw-eyebrow">{data.eyebrow}</p><h1 className="raw-display">{data.headingLines?.map((line) => <span key={line}>{line}</span>)}</h1><p className="raw-scroll-cue"><i />{isAbout ? copy.scrollOrigin : copy.scrollStory}</p></div>
       {!isAbout && <aside>{data.chapter}<strong>{data.chapterTitle}</strong>{data.aside}</aside>}
     </div>
   </section>{data.showChapters && <RawChapters />}</>
@@ -84,9 +85,11 @@ export function RawPinnedStories({ data }: { data: { slides?: { eyebrow?: string
 export function RawProductSpotlight({ data }: { data: { product?: Product; eyebrow?: string; heading?: string; text?: string; animate?: boolean } }) {
   const product = data.product
   const [illuminated, setIlluminated] = useState(false)
+  const locale = useLocale()
+  const copy = useSiteCopy()
   if (!product) return null
-  const productName = data.heading || product.title?.replace(/["″]$/, '') || 'Product'
-  return <section id="carbon" className="raw-section raw-carbon"><div className="raw-shell raw-product-spotlight"><button className={`raw-lamp ${illuminated ? 'is-on' : ''}`} type="button" aria-label={`Illuminate ${productName}`} onPointerEnter={() => setIlluminated(true)} onPointerLeave={() => setIlluminated(false)} onClick={() => setIlluminated((value) => !value)}>{product.heroImage && <SanityImage image={product.heroImage} width={840} height={720} sizes="(min-width: 900px) 50vw, 100vw" />}<span>Hover to ignite</span></button><div><p className="raw-eyebrow">{data.eyebrow || 'The lamp'}</p><h2 className="raw-display">{productName}</h2><p className="raw-lede">{data.text || product.excerpt}</p><ul className="raw-feature-list">{product.features?.map((item) => <li key={item.title}><strong>{item.title}</strong><span>{item.text}</span></li>)}</ul><LocaleLink className="raw-button" href={`/products/${product.slug}`}>View {productName}</LocaleLink></div></div></section>
+  const productName = data.heading || product.title?.replace(/["″]$/, '') || copy.productLabel
+  return <section id="carbon" className="raw-section raw-carbon"><div className="raw-shell raw-product-spotlight"><button className={`raw-lamp ${illuminated ? 'is-on' : ''}`} type="button" aria-label={`${copy.productViewLabel} ${productName}`} onPointerEnter={() => setIlluminated(true)} onPointerLeave={() => setIlluminated(false)} onClick={() => setIlluminated((value) => !value)}>{product.heroImage && <SanityImage image={product.heroImage} width={840} height={720} sizes="(min-width: 900px) 50vw, 100vw" />}<span>{copy.productHoverLabel}</span></button><div><p className="raw-eyebrow">{data.eyebrow || copy.productLampFallback}</p><h2 className="raw-display">{productName}</h2><p className="raw-lede">{data.text || product.excerpt}</p><ul className="raw-feature-list">{product.features?.map((item) => <li key={item.title}><strong>{item.title}</strong><span>{item.text}</span></li>)}</ul><LocaleLink className="raw-button" href={productPath(locale, product.slug || '')}>{copy.productViewLabel} {productName}</LocaleLink></div></div></section>
 }
 
 export function RawStats({ data }: { data: { stats?: { value?: string; label?: string }[]; animate?: boolean } }) {
@@ -151,8 +154,9 @@ export function RawContactInfo({ data }: { data: { eyebrow?: string; heading?: s
 }
 
 export function RawContactForm({ data }: { data: { heading?: string; form?: { _id?: string; submitLabel?: string; successMessage?: string; fields?: any[] } } }) {
+  const copy = useSiteCopy()
   if (!data.form?._id) return null
-  return <section className="raw-section raw-contact-form"><div className="raw-shell"><p className="raw-eyebrow">Contact</p><h2 className="raw-display">{data.heading}</h2><FormRenderer formId={data.form._id} fields={data.form.fields || []} submitButtonText={data.form.submitLabel} successMessage={data.form.successMessage} /></div></section>
+  return <section className="raw-section raw-contact-form"><div className="raw-shell"><p className="raw-eyebrow">{copy.contactEyebrow}</p><h2 className="raw-display">{data.heading}</h2><FormRenderer formId={data.form._id} fields={data.form.fields || []} submitButtonText={data.form.submitLabel} successMessage={data.form.successMessage} /></div></section>
 }
 
 export function RawReseller({ data }: { data: { eyebrow?: string; heading?: string; text?: string; cta?: any } }) {
@@ -170,7 +174,9 @@ export function RawTimeline({ data }: { data: { items?: { index?: string; eyebro
 
 export function ProductCatalog({ data }: { data: { products?: Product[]; fallbackProducts?: Product[]; showFilters?: boolean } }) {
   const [filter, setFilter] = useState('all')
+  const locale = useLocale()
+  const copy = useSiteCopy()
   const products = (data.products?.length ? data.products : data.fallbackProducts || []).filter((product) => filter === 'all' || product.category === filter)
   const excerpt = (value?: string) => value && (value.length > 115 ? `${value.slice(0, 112).trimEnd()}…` : value)
-  return <section className="raw-catalog-section">{data.showFilters !== false && <div className="raw-filters" role="group" aria-label="Filter products">{[['all', 'All'], ['driving', 'Driving'], ['work', 'Work'], ['warning', 'Warning']].map(([value, label]) => <button key={value} className={filter === value ? 'is-active' : ''} onClick={() => setFilter(value)}>{label}</button>)}</div>}<div className="raw-catalog">{products.map((product) => <LocaleLink key={product.slug} className="raw-card" href={`/products/${product.slug}`}>{product.heroImage && <SanityImage image={product.heroImage} width={760} height={560} sizes="(min-width: 900px) 33vw, 100vw" />}<p className="raw-kicker">{product.sku}</p><h2>{product.title}</h2><p>{excerpt(product.excerpt)}</p></LocaleLink>)}</div></section>
+  return <section className="raw-catalog-section">{data.showFilters !== false && <div className="raw-filters" role="group" aria-label={copy.catalogFilterLabel}>{[['all', copy.catalogAll], ['driving', copy.catalogDriving], ['work', copy.catalogWork], ['warning', copy.catalogWarning]].map(([value, label]) => <button key={value} className={filter === value ? 'is-active' : ''} onClick={() => setFilter(value)}>{label}</button>)}</div>}<div className="raw-catalog">{products.map((product) => <LocaleLink key={product.slug} className="raw-card" href={productPath(locale, product.slug || '')}>{product.heroImage && <SanityImage image={product.heroImage} width={760} height={560} sizes="(min-width: 900px) 33vw, 100vw" />}<p className="raw-kicker">{product.sku}</p><h2>{product.title}</h2><p>{excerpt(product.excerpt)}</p></LocaleLink>)}</div></section>
 }

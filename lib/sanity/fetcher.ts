@@ -40,11 +40,6 @@ export async function getPage(slug: string, locale: Locale) {
       { slug, locale },
       isPreview ? {} : { next: { tags: ['pages', `page-${slug}`] } }
     )
-    // The RAW launch is seeded in English. Until a Norwegian translation exists,
-    // render that source document on the default locale instead of a blank page.
-    if (!page && locale !== 'en') {
-      return client.fetch(query, { slug, locale: 'en' }, isPreview ? {} : { next: { tags: ['pages', `page-${slug}`] } })
-    }
     return page
   } catch (error: unknown) {
     if (isAuthError(error)) {
@@ -87,10 +82,7 @@ export async function getNavigation(locale: Locale) {
     const nav = await client.fetch(navigationQuery, { locale }, {
       next: { tags: ['navigation'] }
     })
-    if (nav || locale === 'en') return nav
-    return client.fetch(navigationQuery, { locale: 'en' }, {
-      next: { tags: ['navigation'] }
-    })
+    return nav
   } catch (error: unknown) {
     if (isAuthError(error)) return null
     throw error
@@ -122,7 +114,10 @@ export async function getHomePage(locale: Locale) {
   const homeId = settings?.homePageId as string | undefined
 
   if (homeId) {
-    const translatedId = locale === defaultLocale ? homeId : (await getTranslatedId(homeId, locale)) ?? homeId
+    const translatedId = locale === defaultLocale ? homeId : await getTranslatedId(homeId, locale)
+    // Never render the Norwegian document on an English URL. A missing
+    // translation must be visible as missing rather than silently misleading.
+    if (!translatedId) return null
     const page = await getPageById(translatedId, locale)
     if (page) return page
   }
@@ -134,7 +129,8 @@ export async function getNotFoundPage(locale: Locale) {
   const settings = await getGlobalSettings()
   const notFoundId = settings?.notFoundPageId as string | undefined
   if (!notFoundId) return null
-  const translatedId = locale === defaultLocale ? notFoundId : (await getTranslatedId(notFoundId, locale)) ?? notFoundId
+  const translatedId = locale === defaultLocale ? notFoundId : await getTranslatedId(notFoundId, locale)
+  if (!translatedId) return null
   return getPageById(translatedId, locale)
 }
 

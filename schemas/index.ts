@@ -6,6 +6,7 @@ import post from './site/post'
 import redirect from './site/redirect'
 import form from './site/form'
 import product from './site/product'
+import translationJob from './site/translationJob'
 
 import link from './objects/link'
 import seo from './objects/seo'
@@ -50,6 +51,7 @@ export const schemaTypes = [
   redirect,
   form,
   product,
+  translationJob,
   link,
   seo,
   richText,

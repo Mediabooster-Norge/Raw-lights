@@ -1,7 +1,7 @@
 import { MetadataRoute } from 'next'
 import { getHomePageSlugs, getSitemapEntries } from '@/lib/sanity/fetcher'
 import { getSiteUrl } from '@/lib/utils/getSiteUrl'
-import { localizedPath, parseLocale } from '@/lib/i18n/config'
+import { localizedPath, parseLocale, productPath } from '@/lib/i18n'
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = getSiteUrl()
@@ -45,7 +45,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const productEntries = products.map((product: { slug: string; language?: string; _updatedAt: string }) => {
     const locale = parseLocale(product.language)
     return {
-      url: `${baseUrl}${localizedPath(locale, `/products/${product.slug}`)}`,
+      url: `${baseUrl}${productPath(locale, product.slug)}`,
       lastModified: new Date(product._updatedAt),
       changeFrequency: 'weekly' as const,
       priority: 0.7,

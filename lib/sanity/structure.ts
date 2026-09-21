@@ -8,35 +8,70 @@ import {
   MenuIcon,
   TagsIcon,
   TransferIcon,
+  TranslateIcon,
 } from '@sanity/icons'
 import type { StructureResolver } from 'sanity/structure'
 import { SetupChecklist } from './SetupChecklist'
 
 export const structure: StructureResolver = (S) => {
-  const postsListItem = S.listItem()
-    .title('Innlegg')
-    .id('posts')
-    .icon(DocumentIcon)
-    .child(
-      S.documentTypeList('postType')
-        .title('Velg posttype')
-        .child((postTypeId: string) =>
-          S.documentList()
-            .title('Innlegg')
-            .filter('_type == "post" && postType._ref == $postTypeId')
-            .params({ postTypeId })
-            .defaultOrdering([
-              { field: 'order', direction: 'asc' },
-              { field: 'publishDate', direction: 'desc' },
-            ])
-        )
-    )
+  const localizedContent = (language: 'nb' | 'en', label: string) => {
+    const postsListItem = S.listItem()
+      .title('Innlegg')
+      .id(`posts-${language}`)
+      .icon(DocumentIcon)
+      .child(
+        S.documentList()
+          .title('Velg posttype')
+          .filter('_type == "postType" && language == $language')
+          .params({ language })
+          .child((postTypeId: string) =>
+            S.documentList()
+              .title('Innlegg')
+              .filter('_type == "post" && language == $language && postType._ref == $postTypeId')
+              .params({ language, postTypeId })
+              .defaultOrdering([
+                { field: 'order', direction: 'asc' },
+                { field: 'publishDate', direction: 'desc' },
+              ])
+          )
+      )
 
-  const postTypesListItem = S.listItem()
-    .title('Posttyper')
-    .id('postTypes')
-    .icon(TagsIcon)
-    .child(S.documentTypeList('postType').title('Posttyper'))
+    return S.listItem()
+      .title(label)
+      .id(`content-${language}`)
+      .child(
+        S.list()
+          .title(label)
+          .items([
+            S.listItem()
+              .title('Sider')
+              .id(`pages-${language}`)
+              .icon(DocumentsIcon)
+              .child(S.documentList().title('Sider').filter('_type == "page" && language == $language').params({ language })),
+            S.listItem()
+              .title('Produkter')
+              .id(`products-${language}`)
+              .icon(BulbOutlineIcon)
+              .child(S.documentList().title('Produkter').filter('_type == "product" && language == $language').params({ language }).defaultOrdering([{ field: 'order', direction: 'asc' }])),
+            S.listItem()
+              .title('Navigasjon')
+              .id(`navigation-${language}`)
+              .icon(MenuIcon)
+              .child(S.documentList().title('Navigasjon').filter('_type == "navigation" && language == $language').params({ language })),
+            S.listItem()
+              .title('Skjemaer')
+              .id(`forms-${language}`)
+              .icon(DocumentTextIcon)
+              .child(S.documentList().title('Skjemaer').filter('_type == "form" && language == $language').params({ language })),
+            postsListItem,
+            S.listItem()
+              .title('Posttyper')
+              .id(`post-types-${language}`)
+              .icon(TagsIcon)
+              .child(S.documentList().title('Posttyper').filter('_type == "postType" && language == $language').params({ language })),
+          ])
+      )
+  }
 
   return S.list()
     .title('Innhold')
@@ -55,29 +90,15 @@ export const structure: StructureResolver = (S) => {
             .schemaType('globalSettings')
             .documentId('globalSettings')
         ),
-      S.listItem()
-        .title('Navigasjon')
-        .id('navigation')
-        .icon(MenuIcon)
-        .child(S.documentTypeList('navigation').title('Navigasjon')),
+      S.divider(),
+      localizedContent('nb', 'Norsk innhold'),
+      localizedContent('en', 'English content'),
       S.divider(),
       S.listItem()
-        .title('Sider')
-        .id('pages')
-        .icon(DocumentsIcon)
-        .child(S.documentTypeList('page').title('Sider')),
-      S.listItem()
-        .title('Products')
-        .id('products')
-        .icon(BulbOutlineIcon)
-        .child(S.documentTypeList('product').title('Products').defaultOrdering([{ field: 'order', direction: 'asc' }])),
-      postsListItem,
-      postTypesListItem,
-      S.listItem()
-        .title('Skjemaer')
-        .id('forms')
-        .icon(DocumentTextIcon)
-        .child(S.documentTypeList('form').title('Skjemaer')),
+        .title('Oversettelsesjobber')
+        .id('translation-jobs')
+        .icon(TranslateIcon)
+        .child(S.documentTypeList('translationJob').title('Oversettelsesjobber').defaultOrdering([{ field: 'requestedAt', direction: 'desc' }])),
       S.divider(),
       S.listItem()
         .title('Redirects')

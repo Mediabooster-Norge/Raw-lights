@@ -1,6 +1,7 @@
 import { DocumentTextIcon } from '@sanity/icons'
 import { defineType, defineField } from 'sanity'
 import { contentGroup } from '../studio/groups'
+import { languageField } from '../helpers/languageField'
 
 const fieldTypeList = [
   { title: 'Tekst', value: 'text' },
@@ -18,6 +19,7 @@ export default defineType({
   icon: DocumentTextIcon,
   groups: [contentGroup],
   fields: [
+    languageField,
     defineField({
       name: 'title',
       title: 'Navn',

@@ -11,6 +11,7 @@ import { getSiteUrl } from './lib/utils/getSiteUrl'
 import { schemaTypes } from './schemas'
 import { resolve } from './lib/sanity/presentation'
 import { structure } from './lib/sanity/structure'
+import { CreateEnglishDraftAction } from './lib/sanity/CreateEnglishDraftAction'
 
 const { projectId: PROJECT_ID, dataset: DATASET } = getSanityConfig()
 const PREVIEW_URL = getSiteUrl()
@@ -65,7 +66,7 @@ export default defineConfig({
           return !name || !['delete', 'duplicate', 'unpublish'].includes(name)
         })
       }
-      return prev
+      return [...prev, CreateEnglishDraftAction]
     },
   },
 })

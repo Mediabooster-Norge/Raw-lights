@@ -15,10 +15,11 @@ import { CookieConsent } from '@/lib/components/ui/CookieConsent'
 import { CustomCodeScripts } from '@/lib/components/ui/CustomCodeScripts'
 import { RawChrome } from '@/lib/components/layout/RawChrome'
 import { getSiteUrl } from '@/lib/utils/getSiteUrl'
-import { LocaleProvider, isLocale, localizedPath, locales, type Locale } from '@/lib/i18n'
+import { LocaleProvider, isLocale, localizedPath, locales, siteCopy, type Locale } from '@/lib/i18n'
 import { getAlternateUrls, languageMetadata } from '@/lib/i18n/alternates'
 import { buildOrganizationGraph } from '@/lib/seo/buildJsonLd'
 import { socialMetadata } from '@/lib/seo/socialMetadata'
+import { localizedSeo } from '@/lib/seo/localizedSeo'
 
 type Props = {
   children: ReactNode
@@ -38,10 +39,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const pathname = headerList.get('x-pathname') || localizedPath(localeParam, '/')
   const alternates = await getAlternateUrls(pathname)
   const baseUrl = getSiteUrl()
-  const siteName = settings?.siteName ?? settings?.seo?.metaTitle ?? 'Nettsted'
-  const title = settings?.seo?.metaTitle ?? siteName
-  const description = settings?.seo?.metaDescription ?? ''
-  const imageUrl = settings?.seo?.metaImage?.asset?.url
+  const seo = localizedSeo(settings, localeParam)
+  const siteName = settings?.siteName ?? seo?.metaTitle ?? 'Nettsted'
+  const title = seo?.metaTitle ?? siteName
+  const description = seo?.metaDescription ?? ''
+  const imageUrl = seo?.metaImage?.asset?.url
 
   return {
     metadataBase: new URL(baseUrl),
@@ -79,6 +81,9 @@ export default async function LocaleLayout({ children, params }: Props) {
     getHomePageSlug(locale),
     getPrivacyPageSlug(locale),
   ])
+  const requestHeaders = await headers()
+  const languageUrls = await getAlternateUrls(requestHeaders.get('x-pathname') || localizedPath(locale, '/'))
+  const uiCopy = siteCopy(locale, settings)
 
   const theme = mergeTheme(settings?.siteTheme)
   const homeHref = localizedPath(locale, '/')
@@ -121,7 +126,7 @@ export default async function LocaleLayout({ children, params }: Props) {
   }
 
   return (
-    <LocaleProvider locale={locale} homeSlug={homeSlug}>
+    <LocaleProvider locale={locale} homeSlug={homeSlug} siteCopy={uiCopy}>
       <div className="raw-site" style={cssVariables}>
         <link rel="stylesheet" href="/fonts/google-fonts.css" />
         <RawChrome logo={settings?.siteTheme?.logo} />
@@ -139,6 +144,7 @@ export default async function LocaleLayout({ children, params }: Props) {
           mainNav={navigation?.mainNav}
           headerCta={navigation?.headerCta}
           homeHref={homeHref}
+          languageUrls={languageUrls}
         />
         <main id="main-content">
           {children}

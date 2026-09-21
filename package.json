@@ -11,6 +11,9 @@
     "start": "next start",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
+    "migration:report": "tsx --env-file=.env.local scripts/migrate-raw-to-norwegian.ts",
+    "migration:apply": "tsx --env-file=.env.local scripts/migrate-raw-to-norwegian.ts --apply",
+    "translations:publish-english": "tsx --env-file=.env.local scripts/publish-english-drafts.ts",
     "test": "tsx --test lib/sanity/revalidateTargets.test.ts lib/forms/honeypot.test.ts lib/posts/pagination.test.ts lib/seo/buildJsonLd.test.ts",
     "typegen": "sanity schema extract && sanity typegen generate"
   },
