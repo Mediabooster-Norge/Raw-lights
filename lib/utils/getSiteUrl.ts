@@ -32,6 +32,5 @@ export function getSiteUrl(): string {
   const explicit = process.env.NEXT_PUBLIC_SITE_URL?.trim()
   if (explicit && isHttpUrl(explicit)) return stripTrailingSlash(explicit)
 
-  if (process.env.VERCEL_ENV === 'production') return 'https://rawlights.no'
   return vercelDeploymentUrl() ?? DEFAULT_URL
 }

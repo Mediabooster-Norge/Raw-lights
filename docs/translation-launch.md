@@ -4,7 +4,7 @@
 
 Kjør `npm run migration:report`. Kommandoen er skrivebeskyttet og gir listen over dokumenter, foreslåtte norske URL-er og kjente avvik. Eksporter en URL-liste fra den tidligere WordPress-siden og opprett ett Sanity-redirect per gammel URL før DNS byttes.
 
-## Vercel
+## Vercel ved lansering
 
 I Production Environment Variables:
 
@@ -13,7 +13,7 @@ I Production Environment Variables:
 - `OPENAI_TRANSLATION_MODEL=gpt-5-mini`
 - `SANITY_TRANSLATION_WEBHOOK_SECRET` (hemmelig, tilfeldig verdi)
 
-Koble både `rawlights.no` og `www.rawlights.no` til Vercel. Sett `rawlights.no` som primær domene. `www` og den tidligere Vercel-produksjonsadressen videresendes permanent i appen.
+Koble både `rawlights.no` og `www.rawlights.no` til Vercel. Sett `rawlights.no` som primær domene først når DNS er byttet. Fram til da brukes Vercel-adressen uten domeneforcing.
 
 ## Sanity webhook for oversettelsesjobber
 

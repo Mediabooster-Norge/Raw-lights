@@ -37,14 +37,6 @@ export async function proxy(request: NextRequest) {
     return NextResponse.next()
   }
 
-  const host = request.headers.get('host')?.toLowerCase().split(':')[0]
-  if (host === 'www.rawlights.no' || host === 'raw-lights.vercel.app') {
-    const url = request.nextUrl.clone()
-    url.protocol = 'https:'
-    url.host = 'rawlights.no'
-    return NextResponse.redirect(url, 308)
-  }
-
   const legacyDestination = (() => {
     if (pathname === '/about') return '/om-oss'
     if (pathname === '/contact') return '/kontakt'
