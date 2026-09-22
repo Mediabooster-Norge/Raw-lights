@@ -41,6 +41,7 @@ export async function POST(request: NextRequest) {
 
   const sourceId = job.sourceDocument._ref.replace(/^drafts\./, '')
   const targetId = englishDraftId(sourceId)
+  const targetDraftId = `drafts.${targetId}`
   try {
     await client.patch(jobId).set({ status: 'processing', error: undefined }).commit()
     const [source, existingTarget, metadata] = await Promise.all([
@@ -50,7 +51,7 @@ export async function POST(request: NextRequest) {
     ])
     if (!source) throw new Error('Kildedokumentet ble ikke funnet.')
     if (existingTarget) {
-      await client.patch(jobId).set({ status: 'existing_translation', targetDocument: { _type: 'reference', _ref: targetId }, completedAt: new Date().toISOString() }).commit()
+      await client.patch(jobId).set({ status: 'existing_translation', targetDocument: { _type: 'reference', _ref: String(existingTarget._id) }, completedAt: new Date().toISOString() }).commit()
       return NextResponse.json({ status: 'existing_translation', targetId })
     }
     if (source.language !== 'nb') throw new Error('Bare norske hoveddokumenter kan oversettes til engelsk.')
@@ -70,15 +71,17 @@ export async function POST(request: NextRequest) {
       ],
     }
 
+    // A draft has a different document id from its eventual published version.
+    // Create it first so the job's strong reference always resolves.
+    await client.create(target as never)
     await client.transaction()
-      .create(target as never)
       .createOrReplace(translationMetadata as never)
-      .patch(jobId, { set: { status: 'completed', targetDocument: { _type: 'reference', _ref: targetId }, completedAt: new Date().toISOString() } })
+      .patch(jobId, { set: { status: 'completed', targetDocument: { _type: 'reference', _ref: targetDraftId }, completedAt: new Date().toISOString() } })
       .commit()
     return NextResponse.json({ status: 'completed', targetId })
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Ukjent oversettelsesfeil.'
-    await client.patch(jobId).set({ status: 'failed', error: message }).commit().catch(() => undefined)
+    await client.patch(jobId).unset(['targetDocument']).set({ status: 'failed', error: message }).commit().catch(() => undefined)
     return NextResponse.json({ error: message }, { status: 500 })
   }
 }
