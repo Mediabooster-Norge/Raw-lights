@@ -5,6 +5,7 @@ export type PageSchemaType =
   | 'AboutPage'
   | 'ContactPage'
   | 'CollectionPage'
+  | 'FAQPage'
 
 type PageLike = {
   slug?: string | null
@@ -66,6 +67,21 @@ export function recommendPageSchema(page: PageLike): SchemaRecommendation {
     }
   }
 
+  const isDedicatedFaq =
+    ['faq', 'faqs', 'ofte-stilte-sporsmal', 'ofte-stilte-spørsmål', 'questions-and-answers'].includes(slug) ||
+    title === 'faq' ||
+    title.includes('ofte stilte spørsmål') ||
+    title.includes('frequently asked questions')
+
+  if (isDedicatedFaq && hasFaq) {
+    return {
+      type: 'FAQPage',
+      label: 'FAQPage',
+      reasons: ['Siden er en dedikert FAQ-side med synlige spørsmål og svar.'],
+      hasFaq,
+    }
+  }
+
   return {
     type: 'WebPage',
     label: 'WebPage',
@@ -75,7 +91,7 @@ export function recommendPageSchema(page: PageLike): SchemaRecommendation {
 }
 
 export function supportedPageSchemaType(value?: string | null): PageSchemaType | null {
-  if (value === 'WebPage' || value === 'AboutPage' || value === 'ContactPage' || value === 'CollectionPage') {
+  if (value === 'WebPage' || value === 'AboutPage' || value === 'ContactPage' || value === 'CollectionPage' || value === 'FAQPage') {
     return value
   }
   return null

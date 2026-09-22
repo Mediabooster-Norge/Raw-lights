@@ -16,6 +16,7 @@ export const jsonLdPageTypes = [
   { title: 'AboutPage', value: 'AboutPage' },
   { title: 'ContactPage', value: 'ContactPage' },
   { title: 'CollectionPage', value: 'CollectionPage' },
+  { title: 'FAQPage', value: 'FAQPage' },
 ] as const
 
 export type JsonLdPostType = (typeof jsonLdPostTypes)[number]['value']

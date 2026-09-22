@@ -1,4 +1,4 @@
-import { collectFaqItems } from './plainText'
+import { collectFaqSections, type FaqItem } from './plainText'
 import { recommendPageSchema, supportedPageSchemaType } from './schemaRecommendation'
 import type { JsonLdPageType, JsonLdPostType } from './types'
 import { localizedPath, parseLocale } from '@/lib/i18n/config'
@@ -37,9 +37,9 @@ function imageUrl(image?: ImageLike | null): string | undefined {
   return image?.asset?.url
 }
 
-function imageObject(url?: string): GraphNode | undefined {
+function imageObject(url?: string, id?: string): GraphNode | undefined {
   if (!url) return undefined
-  return { '@type': 'ImageObject', url }
+  return { '@type': 'ImageObject', ...(id ? { '@id': id } : {}), url, contentUrl: url }
 }
 
 function localLabel(locale: string, english: string, norwegian: string) {
@@ -47,7 +47,9 @@ function localLabel(locale: string, english: string, norwegian: string) {
 }
 
 function schemaId(url: string, fragment: string) {
-  return `${url.replace(/\/+$/, '')}/#${fragment}`
+  const parsed = new URL(url)
+  const pathname = parsed.pathname === '/' ? '/' : parsed.pathname.replace(/\/+$/, '')
+  return `${parsed.origin}${pathname}${parsed.search}#${fragment}`
 }
 
 function publicUrl(baseUrl: string, path: string) {
@@ -176,17 +178,35 @@ function catalogItems(blocks: unknown, siteUrl: string, locale: string) {
   return [...items.values()]
 }
 
-function itemList(items: { name: string; url: string }[]): GraphNode {
+function itemList(items: { name: string; url: string }[], id: string): GraphNode {
   return {
     '@type': 'ItemList',
+    '@id': id,
     numberOfItems: items.length,
     itemListElement: items.map((item, index) => ({
       '@type': 'ListItem',
       position: index + 1,
-      url: item.url,
-      name: item.name,
+      item: {
+        '@type': 'Product',
+        '@id': schemaId(item.url, 'product'),
+        url: item.url,
+        name: item.name,
+      },
     })),
   }
+}
+
+function faqQuestions(items: FaqItem[], pageUrl: string, fragment: string): GraphNode[] {
+  return items.map((item, index) => ({
+    '@type': 'Question',
+    '@id': schemaId(pageUrl, `${fragment}-question-${index + 1}`),
+    name: item.question,
+    acceptedAnswer: {
+      '@type': 'Answer',
+      '@id': schemaId(pageUrl, `${fragment}-answer-${index + 1}`),
+      text: item.answer,
+    },
+  }))
 }
 
 export function buildOrganizationGraph(input: {
@@ -200,24 +220,33 @@ export function buildOrganizationGraph(input: {
   const organization: GraphNode = {
     '@type': 'Organization',
     '@id': schemaId(input.siteUrl, 'organization'),
-    name: input.contact?.legalName || input.siteName || 'Website',
+    name: input.siteName?.trim() || input.contact?.legalName?.trim() || 'Website',
     url: input.siteUrl,
   }
-  if (input.logoUrl) organization.logo = imageObject(input.logoUrl)
-  if (input.sameAs?.length) organization.sameAs = input.sameAs
-  if (input.contact?.email) organization.email = input.contact.email
-  if (input.contact?.telephone) organization.telephone = input.contact.telephone
+  if (input.contact?.legalName?.trim()) organization.legalName = input.contact.legalName.trim()
+  if (input.logoUrl) organization.logo = imageObject(input.logoUrl, schemaId(input.siteUrl, 'logo'))
+  const sameAs = input.sameAs?.map((url) => url.trim()).filter(Boolean)
+  if (sameAs?.length) organization.sameAs = sameAs
+  if (input.contact?.email?.trim()) organization.email = input.contact.email.trim()
+  if (input.contact?.telephone?.trim()) organization.telephone = input.contact.telephone.trim()
 
   const address = input.contact?.address
   if (address && Object.values(address).some(Boolean)) {
-    organization.address = { '@type': 'PostalAddress', ...address }
+    organization.address = {
+      '@type': 'PostalAddress',
+      ...Object.fromEntries(
+        Object.entries(address)
+          .map(([key, value]) => [key, value?.trim()])
+          .filter((entry): entry is [string, string] => Boolean(entry[1]))
+      ),
+    }
   }
 
   if (input.contact?.email || input.contact?.telephone) {
     organization.contactPoint = {
       '@type': 'ContactPoint',
-      ...(input.contact.email ? { email: input.contact.email } : {}),
-      ...(input.contact.telephone ? { telephone: input.contact.telephone } : {}),
+      ...(input.contact.email?.trim() ? { email: input.contact.email.trim() } : {}),
+      ...(input.contact.telephone?.trim() ? { telephone: input.contact.telephone.trim() } : {}),
       contactType: 'customer support',
       availableLanguage: ['nb', 'en'],
     }
@@ -249,29 +278,41 @@ export function buildPageJsonLd(input: {
 }): GraphNode {
   const recommendation = recommendPageSchema({ title: input.title, slug: input.slug, blocks: input.blocks })
   const items = catalogItems(input.blocks, input.siteUrl, input.locale)
+  const faqSections = collectFaqSections(input.blocks)
+  const faqItems = faqSections.flatMap((section) => section.items)
   const requestedType = supportedPageSchemaType(input.type)
-  const type = requestedType === 'CollectionPage' && !items.length
-    ? recommendation.type
-    : requestedType ?? recommendation.type
+  const type =
+    (requestedType === 'CollectionPage' && !items.length) ||
+    (requestedType === 'FAQPage' && (!faqItems.length || items.length > 0))
+      ? recommendation.type
+      : requestedType ?? recommendation.type
   const page = pageNode({ ...input, type })
-  const faqItems = collectFaqItems(input.blocks)
-
-  if (items.length) page.mainEntity = itemList(items)
-
   const graph: GraphNode[] = [page]
-  if (faqItems.length) {
-    graph.push({
-      '@type': 'FAQPage',
-      '@id': schemaId(input.url, 'faq'),
-      url: input.url,
-      inLanguage: input.locale,
-      mainEntityOfPage: { '@id': schemaId(input.url, 'webpage') },
-      mainEntity: faqItems.map((item) => ({
-        '@type': 'Question',
-        name: item.question,
-        acceptedAnswer: { '@type': 'Answer', text: item.answer },
-      })),
+
+  if (items.length) {
+    const listId = schemaId(input.url, 'itemlist')
+    page.mainEntity = { '@id': listId }
+    graph.push(itemList(items, listId))
+  }
+
+  if (type === 'FAQPage' && faqItems.length) {
+    page.mainEntity = faqQuestions(faqItems, input.url, 'faq')
+  } else if (faqSections.length) {
+    const sectionRefs: GraphNode[] = []
+    faqSections.forEach((section, index) => {
+      const fragment = index === 0 ? 'faq' : `faq-${index + 1}`
+      const sectionId = schemaId(input.url, fragment)
+      sectionRefs.push({ '@id': sectionId })
+      graph.push({
+        '@type': 'WebPageElement',
+        '@id': sectionId,
+        name: section.heading || localLabel(input.locale, 'Frequently asked questions', 'Ofte stilte spørsmål'),
+        inLanguage: input.locale,
+        isPartOf: { '@id': schemaId(input.url, 'webpage') },
+        hasPart: faqQuestions(section.items, input.url, fragment),
+      })
     })
+    page.hasPart = sectionRefs
   }
   if (input.breadcrumbs?.length) {
     page.breadcrumb = { '@id': schemaId(input.url, 'breadcrumb') }
@@ -298,9 +339,11 @@ export function buildPostJsonLd(input: {
   const graph: GraphNode[] = [page]
 
   if (input.type && ARTICLE_TYPES.has(input.type)) {
+    const articleId = schemaId(input.url, 'article')
     const article: GraphNode = {
       '@type': input.type,
-      '@id': schemaId(input.url, 'article'),
+      '@id': articleId,
+      url: input.url,
       headline: input.title,
       mainEntityOfPage: { '@id': schemaId(input.url, 'webpage') },
       publisher: organizationRef(input.siteUrl),
@@ -311,6 +354,7 @@ export function buildPostJsonLd(input: {
     if (input.imageUrl) article.image = imageObject(input.imageUrl)
     if (input.datePublished) article.datePublished = input.datePublished
     if (input.dateModified) article.dateModified = input.dateModified
+    page.mainEntity = { '@id': articleId }
     graph.push(article)
   }
 
@@ -333,10 +377,11 @@ export function buildProductJsonLd(input: {
   gtin?: string
   offer?: ProductOffer
 }) {
-  const page = pageNode({ ...input, type: 'WebPage' })
+  const page = pageNode({ ...input, type: 'ItemPage' })
+  const productId = schemaId(input.url, 'product')
   const product: GraphNode = {
     '@type': 'Product',
-    '@id': schemaId(input.url, 'product'),
+    '@id': productId,
     name: input.title,
     url: input.url,
     inLanguage: input.locale,
@@ -356,11 +401,13 @@ export function buildProductJsonLd(input: {
       price: input.offer.price,
       priceCurrency: input.offer.currency,
       availability: `https://schema.org/${input.offer.availability}`,
+      seller: organizationRef(input.siteUrl),
       ...(input.offer.validThrough ? { priceValidUntil: input.offer.validThrough } : {}),
       ...(input.offer.itemCondition ? { itemCondition: `https://schema.org/${input.offer.itemCondition}` } : {}),
     }
   }
 
+  page.mainEntity = { '@id': productId }
   page.breadcrumb = { '@id': schemaId(input.url, 'breadcrumb') }
 
   return {
@@ -385,14 +432,15 @@ export function buildCollectionJsonLd(input: {
   items: { name: string; url: string }[]
 }): GraphNode {
   const collection = pageNode({ ...input, type: 'CollectionPage' })
-  collection['@id'] = schemaId(input.url, 'collection')
-  collection.mainEntity = itemList(input.items)
+  const listId = schemaId(input.url, 'itemlist')
+  collection.mainEntity = { '@id': listId }
   collection.breadcrumb = { '@id': schemaId(input.url, 'breadcrumb') }
 
   return {
     '@context': 'https://schema.org',
     '@graph': [
       collection,
+      itemList(input.items, listId),
       breadcrumbList(input.siteUrl, input.url, input.locale, [{ name: input.title, path: new URL(input.url).pathname }]),
     ],
   }

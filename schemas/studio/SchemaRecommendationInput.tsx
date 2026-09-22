@@ -23,12 +23,12 @@ export function SchemaRecommendationInput() {
         <Text size={1}>
           {usesAutomaticMode ? 'Forslag som publiseres:' : 'Automatisk forslag:'}{' '}
           <Badge tone="primary">{recommendation.label}</Badge>
-          {recommendation.hasFaq ? ' + FAQPage' : ''}
+          {recommendation.hasFaq && recommendation.type !== 'FAQPage' ? ' + FAQ-seksjon' : ''}
         </Text>
         <Text size={1} muted>
           {recommendation.reasons.join(' ')}
-          {recommendation.hasFaq
-            ? ' FAQPage blir bare lagt til når spørsmål og synlige svar finnes i sidebyggeren.'
+          {recommendation.hasFaq && recommendation.type !== 'FAQPage'
+            ? ' Synlige spørsmål og svar beskrives som en FAQ-seksjon under siden, ikke som hele siden.'
             : ''}
         </Text>
       </div>

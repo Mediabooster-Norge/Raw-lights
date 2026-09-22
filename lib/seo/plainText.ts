@@ -14,19 +14,24 @@ export function portableTextToPlain(value: unknown): string {
 
 type AccordionLike = {
   _type?: string
+  heading?: string
   items?: { question?: string; answer?: unknown }[]
   children?: unknown[]
 }
 
-export function collectFaqItems(blocks: unknown): { question: string; answer: string }[] {
+export type FaqItem = { question: string; answer: string }
+export type FaqSection = { heading?: string; items: FaqItem[] }
+
+export function collectFaqSections(blocks: unknown): FaqSection[] {
   if (!Array.isArray(blocks)) return []
 
-  const items: { question: string; answer: string }[] = []
+  const sections: FaqSection[] = []
 
   for (const block of blocks) {
     if (!block || typeof block !== 'object') continue
     const node = block as AccordionLike
-    if ((node._type === 'accordionBlock' || node._type === 'rawFaq') && Array.isArray(node.items)) {
+    if (node._type === 'rawFaq' && Array.isArray(node.items)) {
+      const items: FaqItem[] = []
       for (const item of node.items) {
         const question = item.question?.trim()
         const answer = portableTextToPlain(item.answer).trim()
@@ -36,11 +41,18 @@ export function collectFaqItems(blocks: unknown): { question: string; answer: st
           answer,
         })
       }
+      if (items.length) {
+        sections.push({ heading: node.heading?.trim() || undefined, items })
+      }
     }
     if (Array.isArray(node.children)) {
-      items.push(...collectFaqItems(node.children))
+      sections.push(...collectFaqSections(node.children))
     }
   }
 
-  return items
+  return sections
+}
+
+export function collectFaqItems(blocks: unknown): FaqItem[] {
+  return collectFaqSections(blocks).flatMap((section) => section.items)
 }

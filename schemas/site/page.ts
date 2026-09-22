@@ -76,7 +76,7 @@ export default defineType({
       },
       initialValue: 'auto',
       description:
-        'Automatisk anbefales. Studio foreslår sidetypen fra URL og innhold. FAQPage og ItemList blir lagt til automatisk når synlige moduler krever det.',
+        'Automatisk anbefales. Studio foreslår sidetypen fra URL og innhold. Produktlister og FAQ-seksjoner beskrives automatisk ut fra synlige moduler. Bare en dedikert FAQ-side bruker FAQPage.',
     }),
     defineField({
       name: 'jsonLdOverride',
