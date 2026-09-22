@@ -71,8 +71,8 @@ export function RawChrome({ logo, logoLight }: RawChromeProps) {
     <div className={`raw-loader ${loaded ? 'is-done' : ''}`} aria-hidden="true">
       <div>
         {logo ? <>{/* Both logos render so client-side theme changes are immediate. */}
-          <SanityImage image={logo} alt="" width={220} height={156} priority className="raw-loader__logo raw-logo raw-logo--dark" />
-          {logoLight && <SanityImage image={logoLight} alt="" width={220} height={156} priority className="raw-loader__logo raw-logo raw-logo--light" />}
+          <SanityImage image={logo} alt="" width={220} height={150} priority className="raw-loader__logo raw-logo raw-logo--dark" style={{ width: 'min(42vw, 220px)', height: 'auto' }} />
+          {logoLight && <SanityImage image={logoLight} alt="" width={220} height={150} priority className="raw-loader__logo raw-logo raw-logo--light" style={{ width: 'min(42vw, 220px)', height: 'auto' }} />}
         </> : <strong>RAW</strong>}
         <p>{copy.loaderLabel}</p>
         <i />

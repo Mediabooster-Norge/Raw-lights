@@ -31,6 +31,79 @@ test('page markup infers catalog and FAQ markup from visible blocks', () => {
   assert.equal(nodes.some((node) => node['@type'] === 'FAQPage'), true)
 })
 
+test('home page keeps WebPage and FAQPage but omits an invalid one-item breadcrumb', () => {
+  const data = buildPageJsonLd({
+    title: 'Raw Lights',
+    description: 'Premium lights for Nordic conditions.',
+    url: 'https://example.com',
+    siteUrl: 'https://example.com',
+    locale: 'nb',
+    slug: 'forside',
+    blocks: [
+      {
+        _type: 'rawFaq',
+        items: [{ question: 'Er lyset vanntett?', answer: 'Ja.' }],
+      },
+    ],
+  }) as { '@graph': Record<string, unknown>[] }
+
+  const nodes = graph(data)
+  const page = nodes.find((node) => node['@type'] === 'WebPage')
+  assert.equal(page?.['@id'], 'https://example.com/#webpage')
+  assert.equal(page?.description, 'Premium lights for Nordic conditions.')
+  assert.equal(nodes.some((node) => node['@type'] === 'FAQPage'), true)
+  assert.equal(nodes.some((node) => node['@type'] === 'BreadcrumbList'), false)
+})
+
+test('English breadcrumbs start at the localized home page and connect to WebPage', () => {
+  const url = 'https://example.com/en/about'
+  const data = buildPageJsonLd({
+    title: 'About',
+    url,
+    siteUrl: 'https://example.com',
+    locale: 'en',
+    slug: 'about',
+    breadcrumbs: [{ name: 'About', path: '/en/about' }],
+  }) as { '@graph': Record<string, unknown>[] }
+
+  const nodes = graph(data)
+  const page = nodes.find((node) => node['@type'] === 'AboutPage')
+  const breadcrumbs = nodes.find((node) => node['@type'] === 'BreadcrumbList')
+  const items = breadcrumbs?.itemListElement as { position: number; name: string; item: string }[]
+
+  assert.deepEqual(page?.breadcrumb, { '@id': `${url}/#breadcrumb` })
+  assert.equal(breadcrumbs?.['@id'], `${url}/#breadcrumb`)
+  assert.deepEqual(items, [
+    { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://example.com/en' },
+    { '@type': 'ListItem', position: 2, name: 'About', item: url },
+  ])
+})
+
+test('advanced overrides extend automatic schema instead of removing required nodes', () => {
+  const data = buildPageJsonLd({
+    title: 'Contact',
+    url: 'https://example.com/contact',
+    siteUrl: 'https://example.com',
+    locale: 'en',
+    slug: 'contact',
+    breadcrumbs: [{ name: 'Contact', path: '/contact' }],
+    blocks: [{ _type: 'rawFaq', items: [{ question: 'When?', answer: 'Today.' }] }],
+    override: {
+      '@context': 'https://schema.org',
+      '@graph': [
+        { '@type': 'ContactPage', description: 'Expert description' },
+        { '@type': 'LocalBusiness', '@id': 'https://example.com/#local-business', name: 'RAW Lights' },
+      ],
+    },
+  }) as { '@graph': Record<string, unknown>[] }
+
+  const nodes = graph(data)
+  assert.equal(nodes.find((node) => node['@type'] === 'ContactPage')?.description, 'Expert description')
+  assert.equal(nodes.some((node) => node['@type'] === 'FAQPage'), true)
+  assert.equal(nodes.some((node) => node['@type'] === 'BreadcrumbList'), true)
+  assert.equal(nodes.some((node) => node['@type'] === 'LocalBusiness'), true)
+})
+
 test('posts always retain WebPage and BreadcrumbList when no article type is selected', () => {
   const data = buildPostJsonLd({
     type: 'None',
@@ -38,6 +111,10 @@ test('posts always retain WebPage and BreadcrumbList when no article type is sel
     url: 'https://example.com/updates/example',
     siteUrl: 'https://example.com',
     locale: 'en',
+    breadcrumbs: [
+      { name: 'Updates', path: '/updates' },
+      { name: 'A regular update', path: '/updates/example' },
+    ],
   }) as { '@graph': Record<string, unknown>[] }
 
   assert.equal(graph(data)[0]['@type'], 'WebPage')

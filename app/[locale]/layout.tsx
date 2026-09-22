@@ -1,6 +1,5 @@
 import { ReactNode } from 'react'
 import { Metadata } from 'next'
-import Script from 'next/script'
 import { draftMode, headers } from 'next/headers'
 import { VisualEditing } from 'next-sanity/visual-editing'
 import { notFound } from 'next/navigation'
@@ -131,21 +130,6 @@ export default async function LocaleLayout({ children, params }: Props) {
   return (
     <LocaleProvider locale={locale} homeSlug={homeSlug} siteCopy={uiCopy}>
       <div className="raw-site" style={cssVariables}>
-        <Script id="raw-theme-bootstrap" strategy="beforeInteractive">{`
-          try {
-            var rawLightModeEnabled = ${lightModeEnabled ? 'true' : 'false'};
-            document.documentElement.dataset.lightMode = rawLightModeEnabled ? 'enabled' : 'disabled';
-            if (!rawLightModeEnabled) {
-              localStorage.removeItem('raw-theme');
-              document.documentElement.dataset.theme = 'dark';
-            } else {
-              var rawTheme = localStorage.getItem('raw-theme');
-              document.documentElement.dataset.theme = rawTheme === 'light' ? 'light' : 'dark';
-            }
-          } catch (_) {
-            document.documentElement.dataset.theme = 'dark';
-          }
-        `}</Script>
         <link rel="stylesheet" href="/fonts/google-fonts.css" />
         <RawChrome logo={settings?.siteTheme?.logo} logoLight={settings?.siteTheme?.logoLight} />
         <JsonLd data={organizationGraph} />

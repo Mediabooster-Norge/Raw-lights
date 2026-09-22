@@ -1,7 +1,7 @@
 import { collectFaqItems } from './plainText'
 import { recommendPageSchema, supportedPageSchemaType } from './schemaRecommendation'
 import type { JsonLdPageType, JsonLdPostType } from './types'
-import { parseLocale } from '@/lib/i18n/config'
+import { localizedPath, parseLocale } from '@/lib/i18n/config'
 import { productPath, productsPath } from '@/lib/i18n/routes'
 
 type GraphNode = Record<string, unknown>
@@ -46,28 +46,45 @@ function localLabel(locale: string, english: string, norwegian: string) {
   return locale === 'nb' ? norwegian : english
 }
 
-function breadcrumbList(baseUrl: string, locale: string, segments: { name: string; path: string }[]): GraphNode {
+function schemaId(url: string, fragment: string) {
+  return `${url.replace(/\/+$/, '')}/#${fragment}`
+}
+
+function publicUrl(baseUrl: string, path: string) {
+  const url = new URL(path, `${baseUrl.replace(/\/+$/, '')}/`).toString()
+  return url.replace(/\/$/, '')
+}
+
+function breadcrumbList(
+  baseUrl: string,
+  pageUrl: string,
+  locale: string,
+  segments: { name: string; path: string }[]
+): GraphNode {
+  const homePath = localizedPath(parseLocale(locale), '/')
+
   return {
     '@type': 'BreadcrumbList',
+    '@id': schemaId(pageUrl, 'breadcrumb'),
     itemListElement: [
       {
         '@type': 'ListItem',
         position: 1,
         name: localLabel(locale, 'Home', 'Hjem'),
-        item: baseUrl,
+        item: publicUrl(baseUrl, homePath),
       },
       ...segments.map((segment, index) => ({
         '@type': 'ListItem',
         position: index + 2,
         name: segment.name,
-        item: `${baseUrl}${segment.path === '/' ? '' : segment.path}`,
+        item: publicUrl(baseUrl, segment.path),
       })),
     ],
   }
 }
 
 function organizationRef(siteUrl: string) {
-  return { '@id': `${siteUrl}/#organization` }
+  return { '@id': schemaId(siteUrl, 'organization') }
 }
 
 function pageNode(input: {
@@ -80,14 +97,54 @@ function pageNode(input: {
 }): GraphNode {
   const node: GraphNode = {
     '@type': input.type,
-    '@id': `${input.url}#webpage`,
+    '@id': schemaId(input.url, 'webpage'),
     url: input.url,
     name: input.title,
     inLanguage: input.locale,
-    isPartOf: { '@id': `${input.siteUrl}/#website` },
+    isPartOf: { '@id': schemaId(input.siteUrl, 'website') },
   }
   if (input.description) node.description = input.description
   return node
+}
+
+function overrideNodes(override: unknown): GraphNode[] {
+  if (Array.isArray(override)) {
+    return override.filter((node): node is GraphNode => Boolean(node) && typeof node === 'object' && !Array.isArray(node))
+  }
+  if (!override || typeof override !== 'object') return []
+
+  const document = override as GraphNode
+  if (Array.isArray(document['@graph'])) {
+    return overrideNodes(document['@graph'])
+  }
+  return [document]
+}
+
+function mergeJsonLdOverride(graph: GraphNode[], override: unknown): GraphNode[] {
+  const merged = [...graph]
+
+  for (const node of overrideNodes(override)) {
+    const id = typeof node['@id'] === 'string' ? node['@id'] : null
+    const type = typeof node['@type'] === 'string' ? node['@type'] : null
+    const index = merged.findIndex((candidate) =>
+      (id && candidate['@id'] === id) || (type && candidate['@type'] === type)
+    )
+
+    if (index >= 0) {
+      const generatedType = merged[index]['@type']
+      const generatedId = merged[index]['@id']
+      merged[index] = {
+        ...merged[index],
+        ...node,
+        ...(generatedType ? { '@type': generatedType } : {}),
+        ...(generatedId ? { '@id': generatedId } : {}),
+      }
+    } else {
+      merged.push(node)
+    }
+  }
+
+  return merged
 }
 
 function catalogItems(blocks: unknown, siteUrl: string, locale: string) {
@@ -142,7 +199,7 @@ export function buildOrganizationGraph(input: {
 }): GraphNode[] {
   const organization: GraphNode = {
     '@type': 'Organization',
-    '@id': `${input.siteUrl}/#organization`,
+    '@id': schemaId(input.siteUrl, 'organization'),
     name: input.contact?.legalName || input.siteName || 'Website',
     url: input.siteUrl,
   }
@@ -168,7 +225,7 @@ export function buildOrganizationGraph(input: {
 
   const website: GraphNode = {
     '@type': 'WebSite',
-    '@id': `${input.siteUrl}/#website`,
+    '@id': schemaId(input.siteUrl, 'website'),
     url: input.siteUrl,
     name: input.siteName || 'Website',
     publisher: organizationRef(input.siteUrl),
@@ -190,8 +247,6 @@ export function buildPageJsonLd(input: {
   blocks?: unknown
   breadcrumbs?: { name: string; path: string }[]
 }): GraphNode {
-  if (input.override && typeof input.override === 'object') return input.override as GraphNode
-
   const recommendation = recommendPageSchema({ title: input.title, slug: input.slug, blocks: input.blocks })
   const items = catalogItems(input.blocks, input.siteUrl, input.locale)
   const requestedType = supportedPageSchemaType(input.type)
@@ -207,10 +262,10 @@ export function buildPageJsonLd(input: {
   if (faqItems.length) {
     graph.push({
       '@type': 'FAQPage',
-      '@id': `${input.url}#faq`,
+      '@id': schemaId(input.url, 'faq'),
       url: input.url,
       inLanguage: input.locale,
-      mainEntityOfPage: { '@id': `${input.url}#webpage` },
+      mainEntityOfPage: { '@id': schemaId(input.url, 'webpage') },
       mainEntity: faqItems.map((item) => ({
         '@type': 'Question',
         name: item.question,
@@ -218,9 +273,12 @@ export function buildPageJsonLd(input: {
       })),
     })
   }
-  graph.push(breadcrumbList(input.siteUrl, input.locale, input.breadcrumbs ?? []))
+  if (input.breadcrumbs?.length) {
+    page.breadcrumb = { '@id': schemaId(input.url, 'breadcrumb') }
+    graph.push(breadcrumbList(input.siteUrl, input.url, input.locale, input.breadcrumbs))
+  }
 
-  return { '@context': 'https://schema.org', '@graph': graph }
+  return { '@context': 'https://schema.org', '@graph': mergeJsonLdOverride(graph, input.override) }
 }
 
 export function buildPostJsonLd(input: {
@@ -236,17 +294,15 @@ export function buildPostJsonLd(input: {
   dateModified?: string
   breadcrumbs?: { name: string; path: string }[]
 }): GraphNode {
-  if (input.override && typeof input.override === 'object') return input.override as GraphNode
-
   const page = pageNode({ ...input, type: 'WebPage' })
   const graph: GraphNode[] = [page]
 
   if (input.type && ARTICLE_TYPES.has(input.type)) {
     const article: GraphNode = {
       '@type': input.type,
-      '@id': `${input.url}#article`,
+      '@id': schemaId(input.url, 'article'),
       headline: input.title,
-      mainEntityOfPage: { '@id': `${input.url}#webpage` },
+      mainEntityOfPage: { '@id': schemaId(input.url, 'webpage') },
       publisher: organizationRef(input.siteUrl),
       author: organizationRef(input.siteUrl),
       inLanguage: input.locale,
@@ -258,8 +314,11 @@ export function buildPostJsonLd(input: {
     graph.push(article)
   }
 
-  graph.push(breadcrumbList(input.siteUrl, input.locale, input.breadcrumbs ?? []))
-  return { '@context': 'https://schema.org', '@graph': graph }
+  if (input.breadcrumbs?.length) {
+    page.breadcrumb = { '@id': schemaId(input.url, 'breadcrumb') }
+    graph.push(breadcrumbList(input.siteUrl, input.url, input.locale, input.breadcrumbs))
+  }
+  return { '@context': 'https://schema.org', '@graph': mergeJsonLdOverride(graph, input.override) }
 }
 
 export function buildProductJsonLd(input: {
@@ -277,11 +336,11 @@ export function buildProductJsonLd(input: {
   const page = pageNode({ ...input, type: 'WebPage' })
   const product: GraphNode = {
     '@type': 'Product',
-    '@id': `${input.url}#product`,
+    '@id': schemaId(input.url, 'product'),
     name: input.title,
     url: input.url,
     inLanguage: input.locale,
-    mainEntityOfPage: { '@id': `${input.url}#webpage` },
+    mainEntityOfPage: { '@id': schemaId(input.url, 'webpage') },
     brand: organizationRef(input.siteUrl),
   }
   if (input.description) product.description = input.description
@@ -302,12 +361,14 @@ export function buildProductJsonLd(input: {
     }
   }
 
+  page.breadcrumb = { '@id': schemaId(input.url, 'breadcrumb') }
+
   return {
     '@context': 'https://schema.org',
     '@graph': [
       page,
       product,
-      breadcrumbList(input.siteUrl, input.locale, [
+      breadcrumbList(input.siteUrl, input.url, input.locale, [
         { name: localLabel(input.locale, 'Products', 'Produkter'), path: productsPath(parseLocale(input.locale)) },
         { name: input.title, path: new URL(input.url).pathname },
       ]),
@@ -324,14 +385,15 @@ export function buildCollectionJsonLd(input: {
   items: { name: string; url: string }[]
 }): GraphNode {
   const collection = pageNode({ ...input, type: 'CollectionPage' })
-  collection['@id'] = `${input.url}#collection`
+  collection['@id'] = schemaId(input.url, 'collection')
   collection.mainEntity = itemList(input.items)
+  collection.breadcrumb = { '@id': schemaId(input.url, 'breadcrumb') }
 
   return {
     '@context': 'https://schema.org',
     '@graph': [
       collection,
-      breadcrumbList(input.siteUrl, input.locale, [{ name: input.title, path: new URL(input.url).pathname }]),
+      breadcrumbList(input.siteUrl, input.url, input.locale, [{ name: input.title, path: new URL(input.url).pathname }]),
     ],
   }
 }

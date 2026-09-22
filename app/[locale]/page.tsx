@@ -1,12 +1,13 @@
 import { Metadata } from 'next'
 import { notFound } from 'next/navigation'
-import { getHomePage } from '@/lib/sanity/fetcher'
+import { getGlobalSettings, getHomePage } from '@/lib/sanity/fetcher'
 import { PageRenderer } from '@/lib/components/blocks/PageRenderer'
 import { JsonLd } from '@/lib/components/seo/JsonLd'
 import { getSiteUrl } from '@/lib/utils/getSiteUrl'
 import { isLocale, localizedPath, t, type Locale } from '@/lib/i18n'
 import { metadataAlternates } from '@/lib/i18n/alternates'
 import { buildPageJsonLd, parseJsonLdOverride } from '@/lib/seo/buildJsonLd'
+import { localizedSeo } from '@/lib/seo/localizedSeo'
 import { socialMetadata } from '@/lib/seo/socialMetadata'
 
 type Props = {
@@ -16,14 +17,18 @@ type Props = {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale: localeParam } = await params
   if (!isLocale(localeParam)) return {}
-  const page = await getHomePage(localeParam)
+  const [page, settings] = await Promise.all([
+    getHomePage(localeParam),
+    getGlobalSettings(),
+  ])
   if (!page) return {}
 
   const baseUrl = getSiteUrl()
   const url = localizedPath(localeParam, '/')
-  const title = page.seo?.metaTitle ?? page.title
-  const description = page.seo?.metaDescription
-  const canonical = page.seo?.canonicalUrl ?? `${baseUrl}${url === '/' ? '' : url}`
+  const fallbackSeo = localizedSeo(settings, localeParam)
+  const title = page.seo?.metaTitle || fallbackSeo?.metaTitle || page.title
+  const description = page.seo?.metaDescription || fallbackSeo?.metaDescription
+  const canonical = page.seo?.canonicalUrl || fallbackSeo?.canonicalUrl || `${baseUrl}${url === '/' ? '' : url}`
 
   return {
     title,
@@ -31,7 +36,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     ...socialMetadata({
       title,
       description,
-      imageUrl: page.seo?.metaImage?.asset?.url,
+      imageUrl: page.seo?.metaImage?.asset?.url || fallbackSeo?.metaImage?.asset?.url,
       locale: localeParam,
       url: canonical,
     }),
@@ -47,7 +52,10 @@ export default async function HomePage({ params }: Props) {
   const { locale: localeParam } = await params
   if (!isLocale(localeParam)) notFound()
   const locale: Locale = localeParam
-  const page = await getHomePage(locale)
+  const [page, settings] = await Promise.all([
+    getHomePage(locale),
+    getGlobalSettings(),
+  ])
 
   if (!page) {
     return (
@@ -62,6 +70,7 @@ export default async function HomePage({ params }: Props) {
 
   const siteUrl = getSiteUrl()
   const url = `${siteUrl}${localizedPath(locale, '/') === '/' ? '' : localizedPath(locale, '/')}`
+  const fallbackSeo = localizedSeo(settings, locale)
 
   return (
     <>
@@ -69,8 +78,8 @@ export default async function HomePage({ params }: Props) {
         data={buildPageJsonLd({
           type: page.jsonLdType,
           override: parseJsonLdOverride(page.jsonLdOverride),
-          title: page.seo?.metaTitle ?? page.title,
-          description: page.seo?.metaDescription,
+          title: page.seo?.metaTitle || fallbackSeo?.metaTitle || page.title,
+          description: page.seo?.metaDescription || fallbackSeo?.metaDescription,
           url,
           siteUrl: siteUrl,
           locale,

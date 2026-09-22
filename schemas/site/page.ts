@@ -84,7 +84,7 @@ export default defineType({
       type: 'text',
       rows: 8,
       group: 'seo',
-      description: 'Kun for SEO-eksperter. Rå JSON erstatter hele den automatiske grafen, inkludert breadcrumbs. Bruk bare når automatisk schema ikke dekker et dokumentert behov.',
+      description: 'Kun for SEO-eksperter. Rå JSON flettes inn i den automatiske grafen. Noder med samme @id eller @type oppdateres; automatiske basetyper beholdes.',
       validation: (Rule) =>
         Rule.custom((value) => {
           if (!value || typeof value !== 'string' || !value.trim()) return true

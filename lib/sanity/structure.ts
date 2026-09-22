@@ -13,6 +13,8 @@ import {
 import type { StructureResolver } from 'sanity/structure'
 import { SetupChecklist } from './SetupChecklist'
 
+const SANITY_API_VERSION = '2024-01-01'
+
 export const structure: StructureResolver = (S) => {
   const localizedContent = (language: 'nb' | 'en', label: string) => {
     const postsListItem = S.listItem()
@@ -22,11 +24,13 @@ export const structure: StructureResolver = (S) => {
       .child(
         S.documentList()
           .title('Velg posttype')
+          .apiVersion(SANITY_API_VERSION)
           .filter('_type == "postType" && language == $language')
           .params({ language })
           .child((postTypeId: string) =>
             S.documentList()
               .title('Innlegg')
+              .apiVersion(SANITY_API_VERSION)
               .filter('_type == "post" && language == $language && postType._ref == $postTypeId')
               .params({ language, postTypeId })
               .defaultOrdering([
@@ -47,28 +51,28 @@ export const structure: StructureResolver = (S) => {
               .title('Sider')
               .id(`pages-${language}`)
               .icon(DocumentsIcon)
-              .child(S.documentList().title('Sider').filter('_type == "page" && language == $language').params({ language })),
+              .child(S.documentList().title('Sider').apiVersion(SANITY_API_VERSION).filter('_type == "page" && language == $language').params({ language })),
             S.listItem()
               .title('Produkter')
               .id(`products-${language}`)
               .icon(BulbOutlineIcon)
-              .child(S.documentList().title('Produkter').filter('_type == "product" && language == $language').params({ language }).defaultOrdering([{ field: 'order', direction: 'asc' }])),
+              .child(S.documentList().title('Produkter').apiVersion(SANITY_API_VERSION).filter('_type == "product" && language == $language').params({ language }).defaultOrdering([{ field: 'order', direction: 'asc' }])),
             S.listItem()
               .title('Navigasjon')
               .id(`navigation-${language}`)
               .icon(MenuIcon)
-              .child(S.documentList().title('Navigasjon').filter('_type == "navigation" && language == $language').params({ language })),
+              .child(S.documentList().title('Navigasjon').apiVersion(SANITY_API_VERSION).filter('_type == "navigation" && language == $language').params({ language })),
             S.listItem()
               .title('Skjemaer')
               .id(`forms-${language}`)
               .icon(DocumentTextIcon)
-              .child(S.documentList().title('Skjemaer').filter('_type == "form" && language == $language').params({ language })),
+              .child(S.documentList().title('Skjemaer').apiVersion(SANITY_API_VERSION).filter('_type == "form" && language == $language').params({ language })),
             postsListItem,
             S.listItem()
               .title('Posttyper')
               .id(`post-types-${language}`)
               .icon(TagsIcon)
-              .child(S.documentList().title('Posttyper').filter('_type == "postType" && language == $language').params({ language })),
+              .child(S.documentList().title('Posttyper').apiVersion(SANITY_API_VERSION).filter('_type == "postType" && language == $language').params({ language })),
           ])
       )
   }
