@@ -1,14 +1,14 @@
 export const baseTheme = {
   palette: {
-    primary: '#2563eb',
-    secondary: '#7c3aed',
-    tertiary: '#06b6d4',
-    background: '#ffffff',
-    surface: '#f8fafc',
-    textPrimary: '#0f172a',
-    textSecondary: '#64748b',
-    onPrimary: '#ffffff',
-    onSecondary: '#ffffff'
+    primary: '#c6e000',
+    secondary: '#d3e440',
+    tertiary: '#7a8a04',
+    background: '#07080a',
+    surface: '#151617',
+    textPrimary: '#f3efe4',
+    textSecondary: '#908e87',
+    onPrimary: '#0f172a',
+    onSecondary: '#0f172a'
   },
   typography: {
     fontFamily: {
@@ -60,28 +60,28 @@ export const baseTheme = {
   },
   components: {
     header: {
-      background: '#ffffff',
-      text: '#0f172a'
+      background: '#07080a',
+      text: '#f3efe4'
     },
     footer: {
-      background: '#0f172a',
-      text: '#f8fafc'
+      background: '#07080a',
+      text: '#f3efe4'
     },
     cta: {
       primary: {
-        background: '#2563eb',
-        text: '#ffffff',
-        border: '#2563eb'
+        background: '#c6e000',
+        text: '#0f172a',
+        border: '#c6e000'
       },
       secondary: {
-        background: '#7c3aed',
-        text: '#ffffff',
-        border: '#7c3aed'
+        background: '#d3e440',
+        text: '#0f172a',
+        border: '#d3e440'
       }
     },
     section: {
-      defaultBackground: '#ffffff',
-      altBackground: '#f8fafc'
+      defaultBackground: '#07080a',
+      altBackground: '#151617'
     }
   }
 }

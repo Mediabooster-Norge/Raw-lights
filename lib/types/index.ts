@@ -128,11 +128,6 @@ export type Post = {
 export type SiteTheme = {
   logo?: SanityImage
   favicon?: SanityImage
-  colors?: {
-    primary?: { hex: string; alpha?: number }
-    background?: { hex: string; alpha?: number }
-    textPrimary?: { hex: string; alpha?: number }
-  }
   typography?: {
     headingFont?: string
     bodyFont?: string
@@ -151,6 +146,8 @@ export type GlobalSettings = {
   privacyPageSlug?: string
   siteTheme?: SiteTheme
   seo?: SEO
+  seoNb?: SEO
+  seoEn?: SEO
   customCode?: {
     consentScript?: { enabled?: boolean; scriptUrl?: string; inlineScript?: string }
     headScripts?: string

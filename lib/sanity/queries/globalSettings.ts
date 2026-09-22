@@ -12,11 +12,6 @@ export const globalSettingsQuery = groq`
     siteTheme {
       logo { asset->, alt },
       favicon { asset-> },
-      colors {
-        primary { hex, alpha },
-        background { hex, alpha },
-        textPrimary { hex, alpha }
-      },
       typography {
         headingFont,
         bodyFont,
@@ -25,6 +20,20 @@ export const globalSettingsQuery = groq`
       }
     },
     seo {
+      metaTitle,
+      metaDescription,
+      metaImage { asset-> },
+      canonicalUrl,
+      robots
+    },
+    seoNb {
+      metaTitle,
+      metaDescription,
+      metaImage { asset-> },
+      canonicalUrl,
+      robots
+    },
+    seoEn {
       metaTitle,
       metaDescription,
       metaImage { asset-> },

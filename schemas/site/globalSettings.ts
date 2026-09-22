@@ -52,17 +52,6 @@ export default defineType({
           type: 'image'
         }),
         defineField({
-          name: 'colors',
-          title: 'Farger',
-          type: 'object',
-          options: { collapsible: true, collapsed: false },
-          fields: [
-            { name: 'primary', title: 'Primær', type: 'color' },
-            { name: 'background', title: 'Bakgrunn', type: 'color' },
-            { name: 'textPrimary', title: 'Tekst', type: 'color' }
-          ]
-        }),
-        defineField({
           name: 'typography',
           title: 'Typografi',
           type: 'object',
@@ -124,22 +113,33 @@ export default defineType({
       title: 'Standard SEO (eldre fallback)',
       type: 'seo',
       group: 'seo',
+      hidden: true,
       description: 'Beholdes som fallback. Bruk språkspesifikk standard-SEO under for nytt innhold.',
     }),
     defineField({
+      name: 'seoNb',
+      title: 'Norsk SEO',
+      type: 'seo',
+      group: 'seo',
+      description: 'Standard metadata for den norske versjonen av nettstedet.',
+    }),
+    defineField({
+      name: 'seoEn',
+      title: 'English SEO',
+      type: 'seo',
+      group: 'seo',
+      description: 'Default metadata for the English version of the website.',
+    }),
+    defineField({
       name: 'localizedSeo',
-      title: 'Språkspesifikk standard-SEO',
+      title: 'Språkspesifikk standard-SEO (eldre fallback)',
       type: 'array',
       group: 'seo',
-      validation: (Rule) => Rule.max(2),
-      of: [{
-        type: 'object',
-        fields: [
-          defineField({ name: 'language', title: 'Språk', type: 'string', options: { list: [{ title: 'Norsk', value: 'nb' }, { title: 'English', value: 'en' }] }, validation: (Rule) => Rule.required() }),
-          defineField({ name: 'seo', title: 'Standard SEO', type: 'seo', validation: (Rule) => Rule.required() }),
-        ],
-        preview: { select: { title: 'language', subtitle: 'seo.metaTitle' }, prepare: ({ title, subtitle }) => ({ title: title === 'nb' ? 'Norsk' : 'English', subtitle }) },
-      }],
+      hidden: true,
+      of: [{ type: 'object', fields: [
+        defineField({ name: 'language', type: 'string' }),
+        defineField({ name: 'seo', type: 'seo' }),
+      ] }],
     }),
     defineField({
       name: 'schemaOrganization',
