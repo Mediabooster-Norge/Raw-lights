@@ -2,18 +2,14 @@
 
 import Script from 'next/script'
 import { useEffect, useState } from 'react'
+import { CONSENT_EVENT, installConsentBridge, readConsent } from '@/lib/utils/consent'
 
 type Props = {
   enabled: boolean
   headScripts?: string
   bodyStartScripts?: string
   footerScripts?: string
-}
-
-function readConsent() {
-  if (typeof document === 'undefined') return null
-  const match = document.cookie.split('; ').find((row) => row.startsWith('cookie-consent='))
-  return match?.split('=')[1] ?? null
+  consentScript?: { enabled?: boolean; scriptUrl?: string; inlineScript?: string }
 }
 
 export function CustomCodeScripts({
@@ -21,21 +17,27 @@ export function CustomCodeScripts({
   headScripts,
   bodyStartScripts,
   footerScripts,
+  consentScript,
 }: Props) {
   const [allowed, setAllowed] = useState(!enabled)
 
   useEffect(() => {
+    installConsentBridge()
+    const refresh = () => setAllowed(!enabled || readConsent() === 'all')
     if (!enabled) {
-      setAllowed(true)
-      return
+      refresh()
+    } else {
+      refresh()
     }
-    setAllowed(readConsent() === 'all')
+    addEventListener(CONSENT_EVENT, refresh)
+    return () => removeEventListener(CONSENT_EVENT, refresh)
   }, [enabled])
-
-  if (!allowed) return null
 
   return (
     <>
+      {consentScript?.enabled && consentScript.scriptUrl && <Script id="custom-consent-provider" src={consentScript.scriptUrl} strategy="afterInteractive" />}
+      {consentScript?.enabled && consentScript.inlineScript && <Script id="custom-consent-provider-inline" strategy="afterInteractive">{consentScript.inlineScript}</Script>}
+      {allowed && <>
       {headScripts && (
         <Script id="head-scripts" strategy="afterInteractive">
           {headScripts}
@@ -51,6 +53,7 @@ export function CustomCodeScripts({
           {footerScripts}
         </Script>
       )}
+      </>}
     </>
   )
 }

@@ -33,6 +33,18 @@ export default defineType({
   ],
   fields: [
     defineField({
+      name: 'consentScript',
+      title: 'Eget cookie consent-script',
+      type: 'object',
+      description: 'Lastes alltid som nødvendig funksjonalitet. Når dette er aktivt, skjules det innebygde banneret. Scriptet skal kalle window.RAWCookieConsent.accept() ved godta og window.RAWCookieConsent.reject() ved avslag.',
+      fields: [
+        defineField({ name: 'enabled', title: 'Bruk eget consent-script', type: 'boolean', initialValue: false }),
+        defineField({ name: 'scriptUrl', title: 'Script-URL', type: 'url', description: 'HTTPS-URL til leverandørens consent-script.' }),
+        defineField({ name: 'inlineScript', title: 'Inline JavaScript', type: 'text', rows: 6, description: 'Valgfritt. Lim inn kun JavaScript, ikke <script>-tagger.', validation: (Rule) => Rule.custom(validateScript) }),
+      ],
+      group: 'head',
+    }),
+    defineField({
       name: 'headScripts',
       title: 'Head scripts',
       type: 'text',

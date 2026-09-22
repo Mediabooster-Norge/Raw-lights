@@ -11,7 +11,8 @@ type RawChromeProps = {
 
 const LOADER_DELAY_MS = 420
 const LOADER_EXIT_MS = 1150
-const HERO_REVEAL_DELAY_MS = 120
+// Keep a subtle beat after the loader clears, but start the hero immediately.
+const HERO_REVEAL_DELAY_MS = 24
 
 export function RawChrome({ logo }: RawChromeProps) {
   const copy = useSiteCopy()

@@ -54,6 +54,7 @@ export const globalSettingsQuery = groq`
       }
     },
     customCode {
+      consentScript { enabled, scriptUrl, inlineScript },
       headScripts,
       bodyStartScripts,
       footerScripts

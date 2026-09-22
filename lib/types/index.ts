@@ -152,6 +152,7 @@ export type GlobalSettings = {
   siteTheme?: SiteTheme
   seo?: SEO
   customCode?: {
+    consentScript?: { enabled?: boolean; scriptUrl?: string; inlineScript?: string }
     headScripts?: string
     bodyStartScripts?: string
     footerScripts?: string

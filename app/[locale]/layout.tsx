@@ -88,6 +88,7 @@ export default async function LocaleLayout({ children, params }: Props) {
   const theme = mergeTheme(settings?.siteTheme)
   const homeHref = localizedPath(locale, '/')
   const cookieEnabled = settings?.enableCookieConsent !== false
+  const customConsentEnabled = Boolean(settings?.customCode?.consentScript?.enabled)
   const privacyHref = privacySlug ? localizedPath(locale, `/${privacySlug}`) : null
   const sameAs = (navigation?.socialLinks ?? [])
     .map((link: { url?: string }) => link.url)
@@ -136,6 +137,7 @@ export default async function LocaleLayout({ children, params }: Props) {
           headScripts={settings?.customCode?.headScripts}
           bodyStartScripts={settings?.customCode?.bodyStartScripts}
           footerScripts={settings?.customCode?.footerScripts}
+          consentScript={settings?.customCode?.consentScript}
         />
         <SkipToContent />
         <PreviewBanner locale={locale} />
@@ -155,7 +157,7 @@ export default async function LocaleLayout({ children, params }: Props) {
           socialLinks={navigation?.socialLinks}
           homeHref={homeHref}
         />
-        <CookieConsent locale={locale} enabled={cookieEnabled} privacyHref={privacyHref} />
+        <CookieConsent locale={locale} enabled={cookieEnabled} privacyHref={privacyHref} externalProvider={customConsentEnabled} />
         {isDraftMode && <VisualEditing />}
       </div>
     </LocaleProvider>
