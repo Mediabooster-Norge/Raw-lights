@@ -127,6 +127,7 @@ export type Post = {
 
 export type SiteTheme = {
   logo?: SanityImage
+  logoLight?: SanityImage
   favicon?: SanityImage
   typography?: {
     headingFont?: string
@@ -139,6 +140,7 @@ export type SiteTheme = {
 export type GlobalSettings = {
   siteName?: string
   enableCookieConsent?: boolean
+  enableLightMode?: boolean
   homePageId?: string
   homePageSlug?: string
   notFoundPageId?: string

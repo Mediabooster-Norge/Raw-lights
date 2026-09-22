@@ -2,24 +2,22 @@ import { SanityImage } from './SanityImage'
 
 type LogoProps = {
   logo: any
-  logoDark?: any
+  logoLight?: any
   variant?: 'light' | 'dark' | 'auto'
   className?: string
 }
 
-export function Logo({ logo, logoDark, variant = 'auto', className }: LogoProps) {
-  if (variant === 'dark' && logoDark) {
-    return <SanityImage image={logoDark} alt="Logo" className={className} />
+export function Logo({ logo, logoLight, variant = 'auto', className }: LogoProps) {
+  if (variant === 'light' && logoLight) {
+    return <SanityImage image={logoLight} alt={logoLight?.alt ?? 'RAW Lights'} className={className} />
   }
-  
-  if (variant === 'auto' && logoDark) {
-    return (
-      <>
-        <SanityImage image={logo} alt="Logo" className={`${className} dark:hidden`} />
-        <SanityImage image={logoDark} alt="Logo" className={`${className} hidden dark:block`} />
-      </>
-    )
+
+  if (variant === 'auto' && logoLight) {
+    return <>
+      <SanityImage image={logo} alt={logo?.alt ?? 'RAW Lights'} className={`${className} raw-logo raw-logo--dark`} />
+      <SanityImage image={logoLight} alt="" className={`${className} raw-logo raw-logo--light`} />
+    </>
   }
-  
-  return <SanityImage image={logo} alt={logo?.alt ?? 'Logo'} className={className} />
+
+  return <SanityImage image={logo} alt={logo?.alt ?? 'RAW Lights'} className={className} />
 }

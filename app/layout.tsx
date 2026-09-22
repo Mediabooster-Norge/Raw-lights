@@ -17,7 +17,7 @@ export default async function RootLayout({
   const locale = parseLocale(headerList.get('x-locale'))
 
   return (
-    <html lang={htmlLang(locale)} suppressHydrationWarning>
+    <html lang={htmlLang(locale)} data-theme="dark" data-light-mode="disabled" suppressHydrationWarning>
       <body>{children}</body>
     </html>
   )

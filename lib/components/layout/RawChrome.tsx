@@ -7,6 +7,7 @@ import { useSiteCopy } from '@/lib/i18n'
 
 type RawChromeProps = {
   logo?: { asset?: unknown; alt?: string }
+  logoLight?: { asset?: unknown; alt?: string }
 }
 
 const LOADER_DELAY_MS = 420
@@ -14,7 +15,7 @@ const LOADER_EXIT_MS = 1150
 // Keep a subtle beat after the loader clears, but start the hero immediately.
 const HERO_REVEAL_DELAY_MS = 24
 
-export function RawChrome({ logo }: RawChromeProps) {
+export function RawChrome({ logo, logoLight }: RawChromeProps) {
   const copy = useSiteCopy()
   const pathname = usePathname()
   const isHome = pathname === '/' || pathname === '/en' || pathname === '/nb'
@@ -69,7 +70,10 @@ export function RawChrome({ logo }: RawChromeProps) {
     <div className="raw-cursor" aria-hidden="true" />
     <div className={`raw-loader ${loaded ? 'is-done' : ''}`} aria-hidden="true">
       <div>
-        {logo ? <SanityImage image={logo} alt="" width={220} height={156} priority className="raw-loader__logo" /> : <strong>RAW</strong>}
+        {logo ? <>{/* Both logos render so client-side theme changes are immediate. */}
+          <SanityImage image={logo} alt="" width={220} height={156} priority className="raw-loader__logo raw-logo raw-logo--dark" />
+          {logoLight && <SanityImage image={logoLight} alt="" width={220} height={156} priority className="raw-loader__logo raw-logo raw-logo--light" />}
+        </> : <strong>RAW</strong>}
         <p>{copy.loaderLabel}</p>
         <i />
       </div>

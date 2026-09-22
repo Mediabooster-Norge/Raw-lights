@@ -1,5 +1,6 @@
 import { ReactNode } from 'react'
 import { Metadata } from 'next'
+import Script from 'next/script'
 import { draftMode, headers } from 'next/headers'
 import { VisualEditing } from 'next-sanity/visual-editing'
 import { notFound } from 'next/navigation'
@@ -88,6 +89,7 @@ export default async function LocaleLayout({ children, params }: Props) {
   const theme = mergeTheme(settings?.siteTheme)
   const homeHref = localizedPath(locale, '/')
   const cookieEnabled = settings?.enableCookieConsent !== false
+  const lightModeEnabled = settings?.enableLightMode === true
   const customConsentEnabled = Boolean(settings?.customCode?.consentScript?.enabled)
   const privacyHref = privacySlug ? localizedPath(locale, `/${privacySlug}`) : null
   const sameAs = (navigation?.socialLinks ?? [])
@@ -129,8 +131,23 @@ export default async function LocaleLayout({ children, params }: Props) {
   return (
     <LocaleProvider locale={locale} homeSlug={homeSlug} siteCopy={uiCopy}>
       <div className="raw-site" style={cssVariables}>
+        <Script id="raw-theme-bootstrap" strategy="beforeInteractive">{`
+          try {
+            var rawLightModeEnabled = ${lightModeEnabled ? 'true' : 'false'};
+            document.documentElement.dataset.lightMode = rawLightModeEnabled ? 'enabled' : 'disabled';
+            if (!rawLightModeEnabled) {
+              localStorage.removeItem('raw-theme');
+              document.documentElement.dataset.theme = 'dark';
+            } else {
+              var rawTheme = localStorage.getItem('raw-theme');
+              document.documentElement.dataset.theme = rawTheme === 'light' ? 'light' : 'dark';
+            }
+          } catch (_) {
+            document.documentElement.dataset.theme = 'dark';
+          }
+        `}</Script>
         <link rel="stylesheet" href="/fonts/google-fonts.css" />
-        <RawChrome logo={settings?.siteTheme?.logo} />
+        <RawChrome logo={settings?.siteTheme?.logo} logoLight={settings?.siteTheme?.logoLight} />
         <JsonLd data={organizationGraph} />
         <CustomCodeScripts
           enabled={cookieEnabled}
@@ -143,6 +160,8 @@ export default async function LocaleLayout({ children, params }: Props) {
         <PreviewBanner locale={locale} />
         <Header
           logo={settings?.siteTheme?.logo}
+          logoLight={settings?.siteTheme?.logoLight}
+          enableLightMode={lightModeEnabled}
           mainNav={navigation?.mainNav}
           headerCta={navigation?.headerCta}
           homeHref={homeHref}
@@ -153,6 +172,7 @@ export default async function LocaleLayout({ children, params }: Props) {
         </main>
         <Footer
           logo={settings?.siteTheme?.logo}
+          logoLight={settings?.siteTheme?.logoLight}
           footerNav={navigation?.footerNav}
           socialLinks={navigation?.socialLinks}
           homeHref={homeHref}

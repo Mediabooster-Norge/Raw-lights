@@ -19,6 +19,7 @@ export default defineType({
         defineField({ name: 'language', title: 'Språk', type: 'string', options: { list: [{ title: 'Norsk', value: 'nb' }, { title: 'English', value: 'en' }] }, validation: (Rule) => Rule.required() }),
         defineField({ name: 'copy', title: 'Tekst', type: 'object', fields: [
           defineField({ name: 'loaderLabel', title: 'Lasteskjerm', type: 'string' }), defineField({ name: 'scrollStory', title: 'Scroll-cue: historie', type: 'string' }), defineField({ name: 'scrollOrigin', title: 'Scroll-cue: opprinnelse', type: 'string' }),
+          defineField({ name: 'themeToggleToLight', title: 'Tema: tilgjengelighetsnavn for lys modus', type: 'string' }), defineField({ name: 'themeToggleToDark', title: 'Tema: tilgjengelighetsnavn for mørk modus', type: 'string' }),
           defineField({ name: 'footerTagline', title: 'Footer: slagord', type: 'text', rows: 3 }), defineField({ name: 'footerContactLabel', title: 'Footer: kontakt', type: 'string' }), defineField({ name: 'footerFollowLabel', title: 'Footer: følg', type: 'string' }), defineField({ name: 'footerResellerLabel', title: 'Footer: forhandlerlenke', type: 'string' }), defineField({ name: 'footerCopyright', title: 'Footer: copyright ({year} erstattes automatisk)', type: 'string' }),
           defineField({ name: 'catalogFilterLabel', title: 'Produkter: filtertittel', type: 'string' }), defineField({ name: 'catalogAll', title: 'Filter: alle', type: 'string' }), defineField({ name: 'catalogDriving', title: 'Filter: kjørelys', type: 'string' }), defineField({ name: 'catalogWork', title: 'Filter: arbeidslys', type: 'string' }), defineField({ name: 'catalogWarning', title: 'Filter: varsellys', type: 'string' }),
           defineField({ name: 'productLabel', title: 'Produktetikett', type: 'string' }), defineField({ name: 'productViewLabel', title: 'Produkt: se-knapp', type: 'string' }), defineField({ name: 'productHoverLabel', title: 'Produkt: hover-tekst', type: 'string' }), defineField({ name: 'contactEyebrow', title: 'Kontakt: etikett', type: 'string' }),
@@ -41,10 +42,18 @@ export default defineType({
       fields: [
         defineField({
           name: 'logo',
-          title: 'Logo',
+          title: 'Logo for mørk modus',
           type: 'image',
           options: { hotspot: true },
           fields: [altField]
+        }),
+        defineField({
+          name: 'logoLight',
+          title: 'Logo for lys modus',
+          type: 'image',
+          options: { hotspot: true },
+          fields: [altField],
+          description: 'Bruk den svarte RAW-logoen. Faller tilbake til logoen for mørk modus hvis dette feltet er tomt.',
         }),
         defineField({
           name: 'favicon',
@@ -74,6 +83,14 @@ export default defineType({
           ]
         })
       ]
+    }),
+    defineField({
+      name: 'enableLightMode',
+      title: 'Aktiver lys modus',
+      type: 'boolean',
+      group: 'brand',
+      initialValue: false,
+      description: 'Når denne er av, skjules temabryteren og nettstedet låses helt til mørk modus. Lagret lysmodus hos besøkende blir ignorert og fjernet.',
     }),
     defineField({
       name: 'homePage',

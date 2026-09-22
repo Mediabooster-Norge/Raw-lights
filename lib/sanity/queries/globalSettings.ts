@@ -4,6 +4,7 @@ export const globalSettingsQuery = groq`
   *[_type == "globalSettings"][0] {
     siteName,
     enableCookieConsent,
+    enableLightMode,
     "homePageId": homePage._ref,
     "homePageSlug": homePage->slug.current,
     "notFoundPageId": notFoundPage._ref,
@@ -11,6 +12,7 @@ export const globalSettingsQuery = groq`
     "privacyPageSlug": privacyPage->slug.current,
     siteTheme {
       logo { asset->, alt },
+      logoLight { asset->, alt },
       favicon { asset-> },
       typography {
         headingFont,

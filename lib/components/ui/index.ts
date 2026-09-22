@@ -1,6 +1,7 @@
 export * from './SanityImage'
 export * from './SanityLink'
 export * from './Logo'
+export * from './ThemeToggle'
 export * from './PortableText'
 export * from './Breadcrumbs'
 export * from './PreviewBanner'
