@@ -335,13 +335,17 @@ html.raw-touch .raw-cursor { display: none; }
 .raw-contact-info .raw-display,
 .raw-reseller .raw-display,
 .raw-faq .raw-display,
-.raw-timeline article h2,
 .raw-pdp-copy h1,
 .raw-product-body .raw-display,
 .raw-specifications > .raw-display,
 .raw-related .raw-display {
   font-size: var(--raw-display-size);
   line-height: 1.03;
+}
+.raw-timeline article h2 {
+  font-size: clamp(1.7rem, 2.8vw, 2.6rem);
+  line-height: 1.04;
+  overflow-wrap: anywhere;
 }
 .raw-family h3,
 .raw-rules__grid h3 {
