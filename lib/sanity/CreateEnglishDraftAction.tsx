@@ -35,7 +35,7 @@ export const CreateEnglishDraftAction: DocumentActionComponent = (props) => {
         await client.createOrReplace({
           _id: jobId,
           _type: 'translationJob',
-          sourceDocument: { _type: 'reference', _ref: sourceId },
+          sourceDocument: { _type: 'reference', _ref: sourceId, _weak: true },
           sourceLanguage: 'nb',
           targetLanguage: 'en',
           status: 'requested',

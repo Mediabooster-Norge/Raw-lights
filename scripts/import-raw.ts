@@ -62,12 +62,12 @@ async function seedProducts() {
     products.push(product)
   }
   const transaction = client.transaction()
-  products.forEach((product, index) => transaction.createOrReplace({ ...product, relatedProducts: products.filter((_, candidate) => candidate !== index).slice(0, 3).map((related) => ({ _type: 'reference', _ref: related._id })) }))
+  products.forEach((product, index) => transaction.createOrReplace({ ...product, relatedProducts: products.filter((_, candidate) => candidate !== index).slice(0, 3).map((related) => ({ _type: 'reference', _ref: related._id, _weak: true })) }))
   await transaction.commit()
   return products
 }
 
-const reference = (id: string) => ({ _type: 'reference', _ref: id })
+const reference = (id: string) => ({ _type: 'reference', _ref: id, _weak: true })
 const internal = (id: string, label: string) => ({ _type: 'link', type: 'internal', label, internalLink: reference(id) })
 
 async function seedContactForm() {

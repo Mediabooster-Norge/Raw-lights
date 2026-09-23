@@ -14,6 +14,7 @@ export default defineType({
       name: 'postType',
       title: 'Posttype',
       type: 'reference',
+      weak: true,
       to: [{ type: 'postType' }],
       validation: Rule => Rule.required(),
       description: 'Velg hvilken posttype som skal vises',

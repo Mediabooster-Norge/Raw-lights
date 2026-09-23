@@ -26,7 +26,7 @@ export const rawPinnedStories = defineType({
 
 export const rawProductSpotlight = defineType({
   name: 'rawProductSpotlight', title: 'RAW product spotlight', type: 'object', icon: SparklesIcon,
-  fields: [defineField({ name: 'product', title: 'Product', type: 'reference', to: [{ type: 'product' }], validation: (Rule) => Rule.required() }), defineField({ name: 'eyebrow', title: 'Eyebrow', type: 'string' }), defineField({ name: 'heading', title: 'Heading override', type: 'string' }), defineField({ name: 'text', title: 'Text override', type: 'text', rows: 4 })],
+  fields: [defineField({ name: 'product', title: 'Product', type: 'reference', weak: true, to: [{ type: 'product' }], validation: (Rule) => Rule.required() }), defineField({ name: 'eyebrow', title: 'Eyebrow', type: 'string' }), defineField({ name: 'heading', title: 'Heading override', type: 'string' }), defineField({ name: 'text', title: 'Text override', type: 'text', rows: 4 })],
   preview: { select: { title: 'product.title' }, prepare: ({ title }) => ({ title: title || 'RAW product spotlight' }) },
 })
 
@@ -74,7 +74,7 @@ export const rawContactInfo = defineType({
 
 export const rawContactForm = defineType({
   name: 'rawContactForm', title: 'RAW contact form', type: 'object', icon: SparklesIcon,
-  fields: [defineField({ name: 'heading', title: 'Heading', type: 'string' }), defineField({ name: 'form', title: 'Form', type: 'reference', to: [{ type: 'form' }], validation: (Rule) => Rule.required() })],
+  fields: [defineField({ name: 'heading', title: 'Heading', type: 'string' }), defineField({ name: 'form', title: 'Form', type: 'reference', weak: true, to: [{ type: 'form' }], validation: (Rule) => Rule.required() })],
   preview: { select: { title: 'heading' }, prepare: ({ title }) => ({ title: title || 'RAW contact form' }) },
 })
 

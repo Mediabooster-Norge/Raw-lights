@@ -29,11 +29,12 @@ export default defineType({
       name: 'internalLink',
       title: 'Intern side',
       type: 'reference',
+      weak: true,
       to: [
         { type: 'page' },
         { type: 'postType' },
-        { type: 'post' }
-        ,{ type: 'product' }
+        { type: 'post' },
+        { type: 'product' },
       ],
       hidden: ({ parent }) => parent?.type !== 'internal'
     }),

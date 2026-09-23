@@ -214,7 +214,7 @@ function relatedProducts(locale: 'en' | 'nb') {
     _key: `related-${index + 1}`,
     _type: 'reference',
     _ref: `${prefix}raw.product.${slug}`,
-    _weak: locale === 'en',
+    _weak: true,
   }))
 }
 

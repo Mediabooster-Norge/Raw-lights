@@ -47,10 +47,12 @@ export default defineType({
                 name: 'reference',
                 type: 'reference',
                 title: 'Side',
+                weak: true,
                 to: [
                   { type: 'page' },
                   { type: 'postType' },
-                  { type: 'post' }
+                  { type: 'post' },
+                  { type: 'product' },
                 ]
               }
             ]

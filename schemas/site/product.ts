@@ -54,7 +54,7 @@ export default defineType({
     defineField({ name: 'primaryCta', title: 'Primary CTA — lime / black', type: 'link', group: 'content' }),
     defineField({ name: 'secondaryCta', title: 'Secondary CTA — dark / white', type: 'link', group: 'content' }),
     defineField({ name: 'heroImage', title: 'Hero image', type: 'image', group: 'media', options: { hotspot: true }, fields: [altField], validation: (Rule) => Rule.required() }),
-    defineField({ name: 'relatedProducts', title: 'Related products', type: 'array', group: 'content', of: [{ type: 'reference', to: [{ type: 'product' }] }], validation: (Rule) => Rule.max(3) }),
+    defineField({ name: 'relatedProducts', title: 'Related products', type: 'array', group: 'content', of: [{ type: 'reference', weak: true, to: [{ type: 'product' }] }], validation: (Rule) => Rule.max(3) }),
     defineField({ name: 'seo', title: 'SEO', type: 'seo', group: 'seo' }),
     defineField({ name: 'visibility', title: 'Visibility', type: 'string', group: 'visibility', options: { list: [{ title: 'Public', value: 'public' }, { title: 'Hidden', value: 'hidden' }], layout: 'radio' }, initialValue: 'public' }),
     defineField({ name: 'publishDate', title: 'Publish date', type: 'datetime', group: 'visibility' }),

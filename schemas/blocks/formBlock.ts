@@ -19,6 +19,7 @@ export default defineType({
       name: 'form',
       title: 'Skjema',
       type: 'reference',
+      weak: true,
       to: [{ type: 'form' }],
       validation: (Rule) => Rule.required(),
       group: 'content',
