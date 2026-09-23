@@ -15,7 +15,7 @@
     "migration:apply": "tsx --env-file=.env.local scripts/migrate-raw-to-norwegian.ts --apply",
     "migration:global-seo": "tsx --env-file=.env.local scripts/migrate-global-seo-locales.ts",
     "translations:publish-english": "tsx --env-file=.env.local scripts/publish-english-drafts.ts",
-    "test": "tsx --test lib/sanity/revalidateTargets.test.ts lib/forms/honeypot.test.ts lib/i18n/languageSwitcher.test.ts lib/posts/pagination.test.ts lib/products/verne.test.ts lib/seo/buildJsonLd.test.ts lib/seo/localizedSeo.test.ts lib/theme/appearance.test.ts schemas/helpers/uniqueSlug.test.ts",
+    "test": "tsx --test lib/sanity/revalidateTargets.test.ts lib/forms/honeypot.test.ts lib/i18n/languageSwitcher.test.ts lib/posts/pagination.test.ts lib/products/verne.test.ts lib/maps/postalAddress.test.ts lib/seo/buildJsonLd.test.ts lib/seo/localizedSeo.test.ts lib/theme/appearance.test.ts schemas/helpers/uniqueSlug.test.ts",
     "typegen": "sanity schema extract && sanity typegen generate"
   },
   "dependencies": {

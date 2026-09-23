@@ -80,7 +80,24 @@ export const rawContactForm = defineType({
 
 export const rawReseller = defineType({
   name: 'rawReseller', title: 'RAW reseller callout', type: 'object', icon: SparklesIcon,
-  fields: [defineField({ name: 'eyebrow', title: 'Eyebrow', type: 'string' }), defineField({ name: 'heading', title: 'Heading', type: 'string' }), defineField({ name: 'text', title: 'Text', type: 'text', rows: 3 }), link('cta', 'CTA')],
+  fields: [
+    defineField({ name: 'eyebrow', title: 'Eyebrow', type: 'string' }),
+    defineField({ name: 'heading', title: 'Heading', type: 'string' }),
+    defineField({ name: 'text', title: 'Text', type: 'text', rows: 3 }),
+    defineField({
+      name: 'address',
+      title: 'Adresse',
+      type: 'object',
+      description: 'Brukes til kartet ved siden av teksten.',
+      fields: [
+        defineField({ name: 'streetAddress', title: 'Gateadresse', type: 'string' }),
+        defineField({ name: 'postalCode', title: 'Postnummer', type: 'string' }),
+        defineField({ name: 'addressLocality', title: 'Poststed', type: 'string' }),
+        defineField({ name: 'addressCountry', title: 'Landkode', type: 'string', initialValue: 'NO', validation: (Rule) => Rule.length(2).warning('Bruk ISO-landkode, f.eks. NO') }),
+      ],
+    }),
+    link('cta', 'CTA'),
+  ],
   preview: { select: { title: 'heading' }, prepare: ({ title }) => ({ title: title || 'RAW reseller callout' }) },
 })
 

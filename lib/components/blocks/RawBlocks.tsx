@@ -9,6 +9,7 @@ import { SanityLink } from '@/lib/components/ui/SanityLink'
 import { PortableText } from '@/lib/components/ui/PortableText'
 import { FormRenderer } from '@/lib/components/forms/FormRenderer'
 import { LocaleLink, productPath, useLocale, useSiteCopy } from '@/lib/i18n'
+import { formatPostalAddress, mapsEmbedUrl, type PostalAddress } from '@/lib/maps/postalAddress'
 
 type Image = { alt?: string; asset?: { url?: string } }
 type Product = { title?: string; slug?: string; sku?: string; excerpt?: string; category?: string; heroImage?: Image; keyStats?: { value?: string; label?: string }[]; features?: { title?: string; text?: string }[] }
@@ -136,7 +137,9 @@ export function RawRules({ data }: { data: { eyebrow?: string; heading?: string;
     const update = () => {
       const section = root.current
       if (!section) return
-      const progress = Math.max(0, Math.min(1, (innerHeight * .62 - section.getBoundingClientRect().top) / Math.max(1, section.offsetHeight)))
+      const rect = section.getBoundingClientRect()
+      const progress = Math.max(0, Math.min(1, (innerHeight * .55 - rect.top) / Math.max(1, rect.height)))
+      section.style.setProperty('--raw-rules-fill', String(progress))
       setActive(Math.min(itemCount - 1, Math.floor(progress * itemCount)))
     }
     addEventListener('scroll', update, { passive: true }); addEventListener('resize', update); update()
@@ -146,7 +149,7 @@ export function RawRules({ data }: { data: { eyebrow?: string; heading?: string;
 }
 
 export function RawFinale({ data }: { data: { eyebrow?: string; heading?: string; text?: string; primaryCta?: any; secondaryCta?: any } }) {
-  return <section id="path" className="raw-finale"><div><p className="raw-eyebrow">{data.eyebrow}</p><h2 className="raw-display">{data.heading}</h2><p className="raw-lede">{data.text}</p><div className="raw-actions">{data.primaryCta && <SanityLink link={data.primaryCta} className="raw-button" />}{data.secondaryCta && <SanityLink link={data.secondaryCta} className="raw-button raw-button--ghost" />}</div></div></section>
+  return <section id="path" className="raw-finale"><div className="raw-shell"><p className="raw-eyebrow">{data.eyebrow}</p><h2 className="raw-display">{data.heading}</h2><p className="raw-lede">{data.text}</p><div className="raw-actions">{data.primaryCta && <SanityLink link={data.primaryCta} className="raw-button" />}{data.secondaryCta && <SanityLink link={data.secondaryCta} className="raw-button raw-button--ghost" />}</div></div></section>
 }
 
 export function RawContactInfo({ data }: { data: { eyebrow?: string; heading?: string; text?: string; phone?: string; email?: string } }) {
@@ -159,8 +162,40 @@ export function RawContactForm({ data }: { data: { heading?: string; form?: { _i
   return <section className="raw-section raw-contact-form"><div className="raw-shell"><p className="raw-eyebrow">{copy.contactEyebrow}</p><h2 className="raw-display">{data.heading}</h2><FormRenderer formId={data.form._id} fields={data.form.fields || []} submitButtonText={data.form.submitLabel} successMessage={data.form.successMessage} /></div></section>
 }
 
-export function RawReseller({ data }: { data: { eyebrow?: string; heading?: string; text?: string; cta?: any } }) {
-  return <section id="resellers" className="raw-reseller"><div className="raw-shell"><p className="raw-eyebrow">{data.eyebrow}</p><h2 className="raw-display">{data.heading}</h2><p className="raw-lede">{data.text}</p>{data.cta && <SanityLink link={data.cta} className="raw-button" />}</div></section>
+export function RawReseller({ data }: { data: { eyebrow?: string; heading?: string; text?: string; cta?: any; address?: PostalAddress } }) {
+  const mapUrl = mapsEmbedUrl(data.address)
+  const mapQuery = formatPostalAddress(data.address)
+  const street = data.address?.streetAddress?.trim()
+  const cityLine = [data.address?.postalCode, data.address?.addressLocality].filter((part) => part?.trim()).join(' ')
+  return (
+    <section id="resellers" className="raw-reseller">
+      <div className={mapUrl ? 'raw-shell raw-reseller__layout' : 'raw-shell'}>
+        <div className="raw-reseller__copy">
+          <p className="raw-eyebrow">{data.eyebrow}</p>
+          <h2 className="raw-display">{data.heading}</h2>
+          {data.text && <p className="raw-lede">{data.text}</p>}
+          {mapQuery && (
+            <address className="raw-reseller__address">
+              {street && <span>{street}</span>}
+              {cityLine && <span>{cityLine}</span>}
+            </address>
+          )}
+          {data.cta && <SanityLink link={data.cta} className="raw-button" />}
+        </div>
+        {mapUrl && (
+          <div className="raw-reseller__map">
+            <iframe
+              title={mapQuery}
+              src={mapUrl}
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+              allowFullScreen
+            />
+          </div>
+        )}
+      </div>
+    </section>
+  )
 }
 
 export function RawFaq({ data }: { data: { eyebrow?: string; heading?: string; text?: string; items?: { _key?: string; question?: string; answer?: any }[] } }) {
@@ -169,7 +204,7 @@ export function RawFaq({ data }: { data: { eyebrow?: string; heading?: string; t
 }
 
 export function RawTimeline({ data }: { data: { items?: { index?: string; eyebrow?: string; title?: string; text?: string; image?: Image }[] } }) {
-  return <section className="raw-timeline raw-shell">{data.items?.map((item) => <article key={item.title}><p className="raw-kicker">{item.index}</p><div><p className="raw-eyebrow">{item.eyebrow}</p><h2 className="raw-display">{item.title}</h2><p className="raw-lede">{item.text}</p></div>{item.image && <SanityImage image={item.image} width={1000} height={700} sizes="(min-width: 900px) 45vw, 100vw" />}</article>)}</section>
+  return <section className="raw-timeline raw-shell">{data.items?.map((item) => <article key={item.title}><div>{item.index && <p className="raw-kicker">{item.index}</p>}<p className="raw-eyebrow">{item.eyebrow}</p><h2 className="raw-display">{item.title}</h2><p className="raw-lede">{item.text}</p></div>{item.image && <SanityImage image={item.image} width={1000} height={700} sizes="(min-width: 900px) 45vw, 100vw" />}</article>)}</section>
 }
 
 export function ProductCatalog({ data }: { data: { products?: Product[]; fallbackProducts?: Product[]; showFilters?: boolean } }) {

@@ -132,7 +132,7 @@ async function seedPages(products: any[]) {
       { _key: 'hero', _type: 'rawStoryHero', eyebrow: 'Contact', headingLines: ['Get in touch', 'with us.'], chapter: 'RAW', chapterTitle: 'Contact', aside: 'Born in Norway.', image: fjord, animate: true },
       { _key: 'intro', _type: 'rawContactInfo', eyebrow: 'RAWlights Group', heading: 'Light the way with us.', text: 'RAWlights designs and develops premium driving, working, and warning lights for demanding Nordic conditions.', phone: '+47 22 30 68 00', email: 'contact@rawlightsgroup.com' },
       { _key: 'form', _type: 'rawContactForm', heading: 'Send a message.', form: reference('raw.form.contact') },
-      { _key: 'reseller', _type: 'rawReseller', eyebrow: 'Norwegian reseller', heading: 'Egil Verne AS.', text: 'For product advice, availability, and local support, visit our Norwegian reseller.', cta: { _type: 'link', type: 'external', label: 'Visit Verne', externalUrl: 'https://verne.no', openInNewTab: true } },
+      { _key: 'reseller', _type: 'rawReseller', eyebrow: 'Norwegian reseller', heading: 'Egil Verne AS.', text: 'For product advice, availability, and local support, visit our Norwegian reseller.', address: { streetAddress: 'Professor Birkelands vei 26B', postalCode: '1081', addressLocality: 'Oslo', addressCountry: 'NO' }, cta: { _type: 'link', type: 'external', label: 'Visit Verne', externalUrl: 'https://verne.no', openInNewTab: true } },
     ] },
   ]
   const transaction = client.transaction()
