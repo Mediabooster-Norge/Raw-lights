@@ -9,6 +9,7 @@ import { createReadStream } from 'node:fs'
 import { readFile } from 'node:fs/promises'
 import { basename, resolve } from 'node:path'
 import { createClient } from 'next-sanity'
+import { productCtas, verneProductUrl } from '../lib/products/verne'
 
 const projectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID
 const dataset = process.env.NEXT_PUBLIC_SANITY_DATASET || 'production'
@@ -58,7 +59,9 @@ async function seedProducts() {
     const keyStats = [...html.matchAll(/<div class="stat"><b>([\s\S]*?)<\/b><span>([\s\S]*?)<\/span><\/div>/g)].map((item) => ({ _key: `stat-${item.index}`, _type: 'object', value: text(item[1]), label: text(item[2]) }))
     const slug = filename.replace(/\.html$/, '')
     const id = `raw.product.${slug}`
-    const product = { _id: id, _type: 'product', language: 'en', title, slug: { _type: 'slug', current: slug }, category, sku, price: match(html, /<p class="pdp-price">([\s\S]*?)<\/p>/), excerpt: description, descriptionHeading: 'Built for Nordic conditions.', heroImage: await image(sourceImage, title), features, specifications, keyStats, primaryCta: { _type: 'link', type: 'internal', label: 'Contact a reseller', internalLink: { _type: 'reference', _ref: 'raw.page.contact', _weak: true } }, secondaryCta: { _type: 'link', type: 'external', label: 'Egil Verne AS', externalUrl: 'https://verne.no', openInNewTab: true }, visibility: 'public', order: products.length, seo: { metaTitle: `${title} — RAW Lights`, metaDescription: description } }
+    const verne = verneProductUrl(sku, slug)
+    if (!verne.url) throw new Error(`No Verne product URL for ${slug} (${sku}).`)
+    const product = { _id: id, _type: 'product', language: 'en', title, slug: { _type: 'slug', current: slug }, category, sku, price: match(html, /<p class="pdp-price">([\s\S]*?)<\/p>/), excerpt: description, descriptionHeading: 'Built for Nordic conditions.', heroImage: await image(sourceImage, title), features, specifications, keyStats, ...productCtas('en', verne.url), visibility: 'public', order: products.length, seo: { metaTitle: `${title} — RAW Lights`, metaDescription: description } }
     products.push(product)
   }
   const transaction = client.transaction()

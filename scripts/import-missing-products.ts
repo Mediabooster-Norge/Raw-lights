@@ -10,6 +10,7 @@
  *   set -a; source .env.local; set +a; CONFIRM_MISSING_PRODUCTS=rawlights-products npx tsx scripts/import-missing-products.ts --apply
  */
 import { createClient } from 'next-sanity'
+import { productCtas, verneProductUrl } from '../lib/products/verne'
 
 const projectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID
 const dataset = process.env.NEXT_PUBLIC_SANITY_DATASET || 'production'
@@ -253,18 +254,20 @@ async function main() {
       heroImage,
       visibility: 'public',
       order: definition.order,
-      secondaryCta: { _type: 'link', type: 'external', label: 'Egil Verne AS', externalUrl: 'https://verne.no', openInNewTab: true },
     }
+    const verne = verneProductUrl(null, definition.slug)
+    if (!verne.url) throw new Error(`No Verne product URL for ${definition.slug}.`)
     return {
       nb: {
         ...base,
         _id: `raw.product.${definition.slug}`,
         language: 'nb',
+        sku: verne.sku,
         excerpt: definition.norwegian.excerpt,
         descriptionHeading: 'Bygget for nordiske forhold.',
         features: featureObjects(definition.norwegian.features),
         keyStats: keyStats(definition, 'nb'),
-        primaryCta: { _type: 'link', type: 'internal', label: 'Kontakt en forhandler', internalLink: { _type: 'reference', _ref: 'raw.page.contact', _weak: true } },
+        ...productCtas('nb', verne.url),
         relatedProducts: relatedProducts('nb'),
         seo: { metaTitle: `${title} | RAW Lights`, metaDescription: definition.norwegian.excerpt },
       },
@@ -272,11 +275,12 @@ async function main() {
         ...base,
         _id: `i18n.en.raw.product.${definition.slug}`,
         language: 'en',
+        sku: verne.sku,
         excerpt: englishExcerpt,
         descriptionHeading: 'Built for Nordic conditions.',
         features: featureObjects(englishFeatureList),
         keyStats: keyStats(definition, 'en'),
-        primaryCta: { _type: 'link', type: 'internal', label: 'Contact a reseller', internalLink: { _type: 'reference', _ref: 'i18n.en.raw.page.contact', _weak: true } },
+        ...productCtas('en', verne.url),
         relatedProducts: relatedProducts('en'),
         seo: { metaTitle: `${title} | RAW Lights`, metaDescription: englishExcerpt },
       },
