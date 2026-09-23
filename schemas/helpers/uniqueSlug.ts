@@ -1,4 +1,4 @@
-import type { SlugValue, ValidationContext } from 'sanity'
+import type { SlugIsUniqueValidator, SlugValidationContext, SlugValue, ValidationContext } from 'sanity'
 
 const API_VERSION = '2024-01-01'
 
@@ -12,24 +12,31 @@ function languageOf(document: { language?: unknown } | undefined) {
     : 'nb'
 }
 
-export async function uniqueLocalizedSlug(
-  slug: SlugValue | undefined,
-  context: ValidationContext
-) {
-  const current = slug?.current
-  if (!current) return true
+type SlugDocument = {
+  _id?: string
+  _type?: string
+  language?: string
+  postType?: { _ref?: string }
+}
 
-  const document = context.document as
-    | { _id?: string; _type?: string; language?: string; postType?: { _ref?: string } }
-    | undefined
+type LocalizedSlugContext = Pick<ValidationContext, 'document' | 'getClient'>
+
+async function localizedSlugCollisionCount(
+  slug: string,
+  context: LocalizedSlugContext
+): Promise<number | null> {
+  const document = context.document as SlugDocument | undefined
   const type = document?._type
-  if (!type) return true
+  if (!type) return null
 
-  const client = context.getClient({ apiVersion: API_VERSION })
-  const id = publishedId(document?._id)
+  const id = publishedId(document._id)
   const language = languageOf(document)
+  const languageConstraint =
+    language === 'nb'
+      ? '(!defined(language) || language == $language)'
+      : 'language == $language'
   const params: Record<string, string> = {
-    slug: current,
+    slug,
     language,
     draftId: `drafts.${id}`,
     publishedId: id,
@@ -37,16 +44,38 @@ export async function uniqueLocalizedSlug(
 
   let query: string
   if (type === 'post') {
-    const postTypeId = document?.postType?._ref
-    if (!postTypeId) return true
+    const postTypeId = document.postType?._ref
+    if (!postTypeId) return null
     params.postTypeId = postTypeId
-    query = `count(*[_type == "post" && slug.current == $slug && postType._ref == $postTypeId && (!defined(language) || language == $language) && !(_id in [$draftId, $publishedId])])`
+    query = `count(*[_type == "post" && slug.current == $slug && postType._ref == $postTypeId && ${languageConstraint} && !sanity::versionOf($publishedId) && !(_id in [$draftId, $publishedId])])`
   } else if (type === 'page' || type === 'postType') {
-    query = `count(*[(_type == "page" || _type == "postType") && slug.current == $slug && (!defined(language) || language == $language) && !(_id in [$draftId, $publishedId])])`
+    query = `count(*[(_type == "page" || _type == "postType") && slug.current == $slug && ${languageConstraint} && !sanity::versionOf($publishedId) && !(_id in [$draftId, $publishedId])])`
+  } else if (type === 'product') {
+    query = `count(*[_type == "product" && slug.current == $slug && ${languageConstraint} && !sanity::versionOf($publishedId) && !(_id in [$draftId, $publishedId])])`
   } else {
-    return true
+    return null
   }
 
-  const count = await client.fetch<number>(query, params)
+  const client = context.getClient({ apiVersion: API_VERSION }).withConfig({ perspective: 'raw' })
+  return client.fetch<number>(query, params)
+}
+
+export const isUniqueLocalizedSlug: SlugIsUniqueValidator = async (
+  slug: string,
+  context: SlugValidationContext
+) => {
+  const count = await localizedSlugCollisionCount(slug, context)
+  return count === null ? context.defaultIsUnique(slug, context) : count === 0
+}
+
+export async function uniqueLocalizedSlug(
+  slug: SlugValue | undefined,
+  context: ValidationContext
+) {
+  const current = slug?.current
+  if (!current) return true
+
+  const count = await localizedSlugCollisionCount(current, context)
+  if (count === null) return true
   return count === 0 || 'URL er allerede i bruk på dette språket'
 }

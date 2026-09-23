@@ -2,7 +2,7 @@ import { TagsIcon } from '@sanity/icons'
 import { defineType, defineField } from 'sanity'
 import { archiveGroup, generalGroup, seoGroup } from '../studio/groups'
 import { languageField } from '../helpers/languageField'
-import { uniqueLocalizedSlug } from '../helpers/uniqueSlug'
+import { isUniqueLocalizedSlug, uniqueLocalizedSlug } from '../helpers/uniqueSlug'
 import { jsonLdPostTypes } from '../../lib/seo/types'
 
 export default defineType({
@@ -35,7 +35,8 @@ export default defineType({
       type: 'slug',
       options: {
         source: 'title',
-        maxLength: 96
+        maxLength: 96,
+        isUnique: isUniqueLocalizedSlug,
       },
       description: 'Brukes i URL: /artister, /nyheter, etc.',
       validation: (Rule) => Rule.required().custom(uniqueLocalizedSlug),

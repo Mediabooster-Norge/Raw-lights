@@ -2,7 +2,7 @@ import { BulbOutlineIcon } from '@sanity/icons'
 import { defineField, defineType } from 'sanity'
 import { contentGroup, mediaGroup, seoGroup, visibilityGroup } from '../studio/groups'
 import { languageField } from '../helpers/languageField'
-import { uniqueLocalizedSlug } from '../helpers/uniqueSlug'
+import { isUniqueLocalizedSlug, uniqueLocalizedSlug } from '../helpers/uniqueSlug'
 import { altField } from '../helpers/altField'
 
 const productCategories = [
@@ -20,7 +20,7 @@ export default defineType({
   fields: [
     languageField,
     defineField({ name: 'title', title: 'Product name', type: 'string', group: 'content', validation: (Rule) => Rule.required() }),
-    defineField({ name: 'slug', title: 'URL', type: 'slug', group: 'content', options: { source: 'title', maxLength: 96 }, validation: (Rule) => Rule.required().custom(uniqueLocalizedSlug) }),
+    defineField({ name: 'slug', title: 'URL', type: 'slug', group: 'content', options: { source: 'title', maxLength: 96, isUnique: isUniqueLocalizedSlug }, validation: (Rule) => Rule.required().custom(uniqueLocalizedSlug) }),
     defineField({ name: 'category', title: 'Category', type: 'string', group: 'content', options: { list: productCategories, layout: 'radio' }, validation: (Rule) => Rule.required() }),
     defineField({ name: 'sku', title: 'SKU', type: 'string', group: 'content' }),
     defineField({ name: 'mpn', title: 'MPN', type: 'string', group: 'content', description: 'Produsentens delenummer. Valgfritt, men anbefalt når det finnes.' }),
