@@ -2,7 +2,7 @@
 
 import { Logo } from '@/lib/components/ui/Logo'
 import { SanityLink } from '@/lib/components/ui/SanityLink'
-import { useSiteCopy } from '@/lib/i18n'
+import { LocaleLink, useSiteCopy } from '@/lib/i18n'
 
 /* Footer columns are Sanity-configured document data. */
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -15,7 +15,7 @@ export function Footer({ logo, logoLight, footerNav, socialLinks, homeHref = '/'
   const tagline = (copy.footerTagline ?? '').split('\n')
   return <footer className="raw-footer">
     <div className="raw-footer__brand">
-      <a href={homeHref} aria-label="RAW Lights home">{logo ? <Logo logo={logo} logoLight={logoLight} className="h-10 w-auto" /> : <span>RAW</span>}</a>
+      <LocaleLink href={homeHref} aria-label="RAW Lights home" prefetch>{logo ? <Logo logo={logo} logoLight={logoLight} className="h-10 w-auto" /> : <span>RAW</span>}</LocaleLink>
       <p>{tagline.map((line, index) => <span key={line}>{line}{index < tagline.length - 1 && <br />}</span>)}</p>
     </div>
     <div className="raw-footer__contact">

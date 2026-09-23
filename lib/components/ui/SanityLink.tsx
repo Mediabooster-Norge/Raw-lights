@@ -1,6 +1,6 @@
 'use client'
 
-import { CSSProperties, MouseEventHandler, ReactNode } from 'react'
+import { ComponentProps, CSSProperties, MouseEventHandler, ReactNode } from 'react'
 import { LocaleLink, productPath, useHomeSlug, useLocale } from '@/lib/i18n'
 
 type SanityLinkType = {
@@ -21,6 +21,7 @@ type SanityLinkProps = {
   className?: string
   style?: CSSProperties
   onClick?: MouseEventHandler<HTMLAnchorElement>
+  prefetch?: ComponentProps<typeof LocaleLink>['prefetch']
 }
 
 function buildInternalUrl(
@@ -56,7 +57,7 @@ function buildInternalUrl(
   return `/${slug}`
 }
 
-export function SanityLink({ link, children, className, style, onClick }: SanityLinkProps) {
+export function SanityLink({ link, children, className, style, onClick, prefetch }: SanityLinkProps) {
   const homeSlug = useHomeSlug()
   const locale = useLocale()
   if (!link) return null
@@ -93,7 +94,7 @@ export function SanityLink({ link, children, className, style, onClick }: Sanity
   }
 
   return (
-    <LocaleLink href={href} className={className} style={style} onClick={onClick}>
+    <LocaleLink href={href} className={className} style={style} onClick={onClick} prefetch={prefetch}>
       {content}
     </LocaleLink>
   )

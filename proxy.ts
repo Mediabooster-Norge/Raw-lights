@@ -1,10 +1,23 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { unstable_cache } from 'next/cache'
 import { getRedirects } from '@/lib/sanity/redirects'
 import { getHomePageSlugs } from '@/lib/sanity/home'
 import { defaultLocale, localizedPath, parseLocale, stripLocalePrefix } from '@/lib/i18n/config'
 import { internalPathForLocale } from '@/lib/i18n/routes'
 
 const PUBLIC_FILE = /\.[^/]+$/
+
+const getRoutingConfig = unstable_cache(
+  async () => {
+    const [redirects, homeSlugs] = await Promise.all([getRedirects(), getHomePageSlugs()])
+    return { redirects, homeSlugs: Array.from(homeSlugs) }
+  },
+  ['proxy-routing-config'],
+  {
+    revalidate: 60,
+    tags: ['redirects', 'global-settings', 'translations'],
+  }
+)
 
 function shouldSkip(pathname: string) {
   return (
@@ -51,7 +64,7 @@ export async function proxy(request: NextRequest) {
   const { locale: pathLocale, path } = stripLocalePrefix(pathname)
 
   try {
-    const [redirects, homeSlugs] = await Promise.all([getRedirects(), getHomePageSlugs()])
+    const { redirects, homeSlugs } = await getRoutingConfig()
     const match = redirects.find((redirect) => {
       const source = normalizePath(redirect.source)
       return source === pathname || source === path
@@ -66,7 +79,7 @@ export async function proxy(request: NextRequest) {
     }
 
     const slug = path === '/' ? '' : path.replace(/^\//, '')
-    if (slug && !slug.includes('/') && homeSlugs.has(slug)) {
+    if (slug && !slug.includes('/') && homeSlugs.includes(slug)) {
       return NextResponse.redirect(new URL(localizedPath(pathLocale, '/'), request.url), 308)
     }
   } catch {

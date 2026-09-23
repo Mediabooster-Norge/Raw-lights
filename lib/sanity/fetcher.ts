@@ -263,8 +263,12 @@ export type TranslationDoc = {
 export async function getTranslations(id: string): Promise<TranslationDoc[]> {
   const client = getClient()
   if (!client) return []
-  const result = await client.fetch(translationsQuery, { id }, {
-    next: { tags: ['translations', `translation-${id}`] }
+  // Translation metadata always references the published document id. A
+  // token-backed query can still return its `drafts.` counterpart first, even
+  // outside Presentation mode, so normalize before looking up the pair.
+  const referenceId = id.replace(/^drafts\./, '')
+  const result = await client.fetch(translationsQuery, { id: referenceId }, {
+    next: { tags: ['translations', `translation-${referenceId}`] }
   })
   return (result?.translations ?? [])
     .map((item: { language?: string; doc?: TranslationDoc }) => {
